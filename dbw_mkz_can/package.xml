@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <name>dbw_mkz_can</name>
+  <version>0.0.0</version>
+  <description>
+    Drive-by-wire interface to the Dataspeed Inc. Lincoln MKZ DBW kit
+  </description>
+
+  <maintainer email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</maintainer>
+  <author email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</author>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>dataspeed_can_msgs</build_depend>
+  <build_depend>dwb_mkz_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>nodelet</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml" />
+  </export>
+
+</package>

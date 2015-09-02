@@ -1,0 +1,73 @@
+
+#ifndef JOYSTICKDEMO_H_
+#define JOYSTICKDEMO_H_
+
+#include <ros/ros.h>
+#include <sensor_msgs/Joy.h>
+#include <std_msgs/Bool.h>
+
+#include <dbw_mkz_msgs/ThrottleCmd.h>
+#include <dbw_mkz_msgs/BrakeCmd.h>
+#include <dbw_mkz_msgs/SteeringCmd.h>
+#include <dbw_mkz_msgs/GearCmd.h>
+#include <dbw_mkz_msgs/ThrottleReport.h>
+#include <dbw_mkz_msgs/BrakeReport.h>
+#include <dbw_mkz_msgs/SteeringReport.h>
+#include <dbw_mkz_msgs/GearReport.h>
+#include <dbw_mkz_msgs/Misc1Report.h>
+#include <dbw_mkz_msgs/TurnSignalCmd.h>
+
+namespace joystick_demo{
+
+// Gear commands
+#define GEAR_NONE      0
+#define GEAR_PARK      1
+#define GEAR_REVERSE   2
+#define GEAR_NEUTRAL   3
+#define GEAR_DRIVE     4
+#define GEAR_LOWGEAR   5
+
+// Turn signal commands
+#define TURN_NONE      0
+#define TURN_LEFT      1
+#define TURN_RIGHT     2
+
+typedef struct{
+  double brake_cmd;
+  double throttle_joy;
+  double steering_joy;
+  bool steering_mult;
+  int gear_cmd;
+  bool enable;
+  int turn_signal_cmd;
+} JoystickDataStruct;
+
+class JoystickDemo{
+public:
+  JoystickDemo(ros::NodeHandle n);
+private:
+  void recvJoy(const sensor_msgs::Joy::ConstPtr& msg);
+  void recvEnable(const std_msgs::Bool::ConstPtr& msg);
+  void cmdCallback(const ros::TimerEvent& event);
+
+  ros::Subscriber sub_joy_;
+  ros::Subscriber sub_enable_;
+  ros::Publisher pub_throttle_;
+  ros::Publisher pub_brake_;
+  ros::Publisher pub_steering_;
+  ros::Publisher pub_gear_;
+  ros::Publisher pub_turn_signal_;
+  ros::Timer cmd_timer_;
+
+  JoystickDataStruct joy_data_;
+  sensor_msgs::Joy last_joy_;
+
+};
+
+
+}
+
+
+
+
+#endif /* JOYSTICKDEMO_H_ */

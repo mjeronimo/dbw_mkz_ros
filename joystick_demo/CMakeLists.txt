@@ -15,6 +15,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME} src/joystick_demo.cpp src/JoystickDemo.cpp)
+add_dependencies(${PROJECT_NAME} dbw_mkz_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )

@@ -5,6 +5,7 @@ import csv
 from std_msgs.msg import Float64, UInt16
 from dbw_mkz_msgs.msg import BrakeReport
 from math import fabs
+import rospkg
 
 requested_tq = 0
 actl_brake_pos = 0
@@ -30,7 +31,7 @@ def brake_sweep():
     rate = rospy.Rate(1.0 / rospy.get_param('~settle_time'))
     
     # Open CSV file
-    csvfile = open('/home/dataspeed/Desktop/brake_sweep_data.csv', 'w')
+    csvfile = open(rospkg.RosPack().get_path('dbw_test') + '/brake_sweep_data.csv', 'w')
     csv_writer = csv.writer(csvfile, delimiter=',')
     
     # Perform sweep

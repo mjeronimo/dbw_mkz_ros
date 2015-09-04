@@ -5,6 +5,7 @@ catkin_python_setup()
 
 find_package(catkin REQUIRED COMPONENTS
   dbw_mkz_msgs
+  roslib
   rospy
 )
 

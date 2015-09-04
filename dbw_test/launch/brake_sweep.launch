@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <include file="$(find dbw_mkz_can)/launch/dbw.launch" />
+
+  <node pkg="dataspeed_can_tools" type="can_extractor_node" name="can_extractor" />
+
+  <group ns="vehicle" >
+    <node pkg="dbw_test" type="brake_pub.py" name="brake_pub" />
+
+    <node pkg="dbw_test" type="brake_sweep.py" name="brake_sweep" output="screen" >
+      <rosparam file="$(find dbw_test)/yaml/brake_sweep_params.yaml" />
+    </node>
+  </group>
+
+</launch>

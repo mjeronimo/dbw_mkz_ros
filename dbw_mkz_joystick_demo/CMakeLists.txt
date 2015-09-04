@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(joystick_demo)
+project(dbw_mkz_joystick_demo)
 
 set(${PROJECT_NAME}_CATKIN_DEPS
   dbw_mkz_msgs

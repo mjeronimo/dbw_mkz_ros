@@ -1,4 +1,3 @@
-
 #ifndef JOYSTICKDEMO_H_
 #define JOYSTICKDEMO_H_
 
@@ -17,22 +16,10 @@
 #include <dbw_mkz_msgs/Misc1Report.h>
 #include <dbw_mkz_msgs/TurnSignalCmd.h>
 
-namespace joystick_demo{
+namespace joystick_demo
+{
 
-// Gear commands
-#define GEAR_NONE      0
-#define GEAR_PARK      1
-#define GEAR_REVERSE   2
-#define GEAR_NEUTRAL   3
-#define GEAR_DRIVE     4
-#define GEAR_LOWGEAR   5
-
-// Turn signal commands
-#define TURN_NONE      0
-#define TURN_LEFT      1
-#define TURN_RIGHT     2
-
-typedef struct{
+typedef struct {
   double brake_cmd;
   double throttle_joy;
   double steering_joy;
@@ -42,7 +29,7 @@ typedef struct{
   int turn_signal_cmd;
 } JoystickDataStruct;
 
-class JoystickDemo{
+class JoystickDemo {
 public:
   JoystickDemo(ros::NodeHandle n);
 private:
@@ -64,10 +51,6 @@ private:
 
 };
 
-
 }
-
-
-
 
 #endif /* JOYSTICKDEMO_H_ */

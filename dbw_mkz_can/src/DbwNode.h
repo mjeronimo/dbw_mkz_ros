@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 // ROS messages
+#include <dataspeed_can_msg_filters/ApproximateTime.h>
 #include <dataspeed_can_msgs/CanMessageStamped.h>
 #include <dbw_mkz_msgs/BrakeCmd.h>
 #include <dbw_mkz_msgs/BrakeReport.h>
@@ -16,6 +17,12 @@
 #include <dbw_mkz_msgs/TurnSignalCmd.h>
 #include <dbw_mkz_msgs/Misc1Report.h>
 #include <dbw_mkz_msgs/WheelSpeedReport.h>
+#include <dbw_mkz_msgs/FuelLevelReport.h>
+#include <dbw_mkz_msgs/SuspensionReport.h>
+#include <dbw_mkz_msgs/TirePressureReport.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/NavSatFix.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Bool.h>
 
 namespace dbw_mkz_can
@@ -30,6 +37,8 @@ public:
 private:
   void timerCallback(const ros::TimerEvent& event);
   void recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg);
+  void recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
+  void recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
   void recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg);
   void recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg);
   void recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg);
@@ -76,7 +85,17 @@ private:
   ros::Publisher pub_gear_;
   ros::Publisher pub_misc_1_;
   ros::Publisher pub_wheel_speeds_;
+  ros::Publisher pub_suspension_;
+  ros::Publisher pub_tire_pressure_;
+  ros::Publisher pub_fuel_level_;
+  ros::Publisher pub_imu_;
+  ros::Publisher pub_gps_fix_;
+  ros::Publisher pub_gps_vel_;
   ros::Publisher pub_sys_enable_;
+
+  // Time Synchronization
+  dataspeed_can_msg_filters::ApproximateTime sync_imu_;
+  dataspeed_can_msg_filters::ApproximateTime sync_gps_;
 };
 
 } // namespace dbw_mkz_can

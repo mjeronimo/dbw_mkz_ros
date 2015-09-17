@@ -15,12 +15,15 @@
 
   <build_depend>roscpp</build_depend>
   <build_depend>nodelet</build_depend>
+  <build_depend>message_filters</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>dataspeed_can_msgs</build_depend>
-  <build_depend>dwb_mkz_msgs</build_depend>
+  <build_depend>dataspeed_can_msg_filters</build_depend>
+  <build_depend>dbw_mkz_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>nodelet</run_depend>
+  <run_depend>message_filters</run_depend>
 
   <export>
     <nodelet plugin="${prefix}/nodelets.xml" />

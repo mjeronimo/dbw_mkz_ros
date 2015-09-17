@@ -6,6 +6,11 @@ float32 pedal_input
 float32 pedal_cmd
 float32 pedal_output
 
+# Braking torque (Nm)
+float32 torque_input
+float32 torque_cmd
+float32 torque_output
+
 # Brake On Off (BOO), brake lights
 bool boo_input
 bool boo_cmd

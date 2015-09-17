@@ -15,6 +15,7 @@
 
   <run_depend>dwb_mkz_can</run_depend>
   <run_depend>dwb_mkz_msgs</run_depend>
+  <run_depend>dwb_mkz_joystick_demo</run_depend>
 
   <export>
     <metapackage/>

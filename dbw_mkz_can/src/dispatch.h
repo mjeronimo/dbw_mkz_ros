@@ -124,6 +124,62 @@ typedef struct {
   int16_t gyro_yaw;
 } MsgReportGyro;
 
+typedef struct {
+  int32_t latitude :31;
+  int32_t lat_valid :1;
+  int32_t longitude :31;
+  int32_t long_valid :1;
+} MsgReportGps1;
+
+typedef struct {
+  uint8_t utc_year :5;
+  uint8_t :3;
+  uint8_t utc_month :4;
+  uint8_t :4;
+  uint8_t utc_day :5;
+  uint8_t :3;
+  uint8_t utc_hours :5;
+  uint8_t :3;
+  uint8_t utc_minutes :6;
+  uint8_t :2;
+  uint8_t utc_seconds :6;
+  uint8_t :2;
+  uint8_t compass_dir :4;
+  uint8_t :4;
+  uint8_t pdop :5;
+  uint8_t fault :1;
+  uint8_t inferred :1;
+  uint8_t :1;
+} MsgReportGps2;
+
+typedef struct {
+  int16_t altitude;
+  uint16_t heading;
+  uint8_t speed;
+  uint8_t hdop;
+  uint8_t vdop;
+  uint8_t quality :3;
+  uint8_t num_sats :5;
+} MsgReportGps3;
+
+typedef struct {
+  int16_t front_left;
+  int16_t front_right;
+  int16_t rear_left;
+  int16_t rear_right;
+} MsgReportSuspension;
+
+typedef struct {
+  uint16_t front_left;
+  uint16_t front_right;
+  uint16_t rear_left;
+  uint16_t rear_right;
+} MsgReportTirePressure;
+
+typedef struct {
+  int16_t fuel_level;
+} MsgReportFuelLevel;
+
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
   BUILD_ASSERT(4 == sizeof(MsgBrakeCmd));
@@ -139,23 +195,35 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportWheelSpeed));
   BUILD_ASSERT(6 == sizeof(MsgReportAccel));
   BUILD_ASSERT(4 == sizeof(MsgReportGyro));
+  BUILD_ASSERT(8 == sizeof(MsgReportGps1));
+  BUILD_ASSERT(8 == sizeof(MsgReportGps2));
+  BUILD_ASSERT(8 == sizeof(MsgReportGps3));
+  BUILD_ASSERT(8 == sizeof(MsgReportSuspension));
+  BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
+  BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
 }
 #undef BUILD_ASSERT
 
 enum {
-  ID_BRAKE_CMD          = 0x060,
-  ID_BRAKE_REPORT       = 0x061,
-  ID_THROTTLE_CMD       = 0x062,
-  ID_THROTTLE_REPORT    = 0x063,
-  ID_STEERING_CMD       = 0x064,
-  ID_STEERING_REPORT    = 0x065,
-  ID_GEAR_CMD           = 0x066,
-  ID_GEAR_REPORT        = 0x067,
-  ID_MISC_CMD           = 0x068,
-  ID_MISC_REPORT        = 0x069,
-  ID_REPORT_WHEEL_SPEED = 0x06A,
-  ID_REPORT_ACCEL       = 0x06B,
-  ID_REPORT_GYRO        = 0x06C,
+  ID_BRAKE_CMD            = 0x060,
+  ID_BRAKE_REPORT         = 0x061,
+  ID_THROTTLE_CMD         = 0x062,
+  ID_THROTTLE_REPORT      = 0x063,
+  ID_STEERING_CMD         = 0x064,
+  ID_STEERING_REPORT      = 0x065,
+  ID_GEAR_CMD             = 0x066,
+  ID_GEAR_REPORT          = 0x067,
+  ID_MISC_CMD             = 0x068,
+  ID_MISC_REPORT          = 0x069,
+  ID_REPORT_WHEEL_SPEED   = 0x06A,
+  ID_REPORT_ACCEL         = 0x06B,
+  ID_REPORT_GYRO          = 0x06C,
+  ID_REPORT_GPS1          = 0x06D,
+  ID_REPORT_GPS2          = 0x06E,
+  ID_REPORT_GPS3          = 0x06F,
+  ID_REPORT_SUSPENSION    = 0x070,
+  ID_REPORT_TIRE_PRESSURE = 0x071,
+  ID_REPORT_FUEL_LEVEL    = 0x072,
 };
 
 #endif // _DISPATCH_H

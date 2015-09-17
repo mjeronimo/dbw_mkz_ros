@@ -38,6 +38,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 
   // Brake
   dbw_mkz_msgs::BrakeCmd brake_msg;
+  brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
   brake_msg.pedal_cmd = joy_data_.brake_cmd;
   brake_msg.enable = joy_data_.enable;
   brake_msg.boo_cmd = (brake_msg.pedal_cmd > 0.2);

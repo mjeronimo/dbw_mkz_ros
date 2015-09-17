@@ -1,11 +1,97 @@
 #include "DbwNode.h"
 #include "dispatch.h"
+#include <message_filters/sync_policies/approximate_time.h>
+#include <message_filters/sync_policies/exact_time.h>
 
 namespace dbw_mkz_can
 {
 
+static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
+//  % , Nm
+ {0.15, 0},
+ {0.17, 1},
+ {0.18, 4},
+ {0.19, 28},
+ {0.20, 68},
+ {0.21, 519},
+ {0.23, 521},
+ {0.24, 676},
+ {0.25, 948},
+ {0.26, 1228},
+ {0.27, 1500},
+ {0.28, 1776},
+ {0.29, 2104},
+ {0.30, 2468},
+ {0.31, 2824},
+ {0.32, 3212},
+ {0.40, 3248},
+};
+static inline float brakeTorqueFromPedal(float pedal) {
+  const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
+  if (pedal <= BRAKE_TABLE[0].pedal) {
+    return BRAKE_TABLE[0].torque;
+  } else if (pedal >= BRAKE_TABLE[size - 1].pedal) {
+    return BRAKE_TABLE[size - 1].torque;
+  } else {
+    for (unsigned int i = 1; i < size; i++) {
+      if (pedal < BRAKE_TABLE[i].pedal) {
+        float start = BRAKE_TABLE[i - 1].torque;
+        float dinput = pedal - BRAKE_TABLE[i - 1].pedal;
+        float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
+        float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
+        if (fabs(dtorque) > 1e-6) {
+          if (fabs(dpedal) > 1e-6) {
+            return start + (dinput / (dtorque / dpedal));
+          } else {
+            return start + (dtorque / 2);
+          }
+        } else {
+          return start;
+        }
+      }
+    }
+  }
+  return 0.0;
+}
+static inline float brakePedalFromTorque(float torque) {
+  const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
+  if (torque <= BRAKE_TABLE[0].torque) {
+    return BRAKE_TABLE[0].pedal;
+  } else if (torque >= BRAKE_TABLE[size - 1].torque) {
+    return BRAKE_TABLE[size - 1].pedal;
+  } else {
+    for (unsigned int i = 1; i < size; i++) {
+      if (torque < BRAKE_TABLE[i].torque) {
+        float start = BRAKE_TABLE[i - 1].pedal;
+        float dinput = torque - BRAKE_TABLE[i - 1].torque;
+        float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
+        float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
+        if (fabs(dpedal) > 1e-6) {
+          if (fabs(dtorque) > 1e-6) {
+            return start + (dinput / (dpedal / dtorque));
+          } else {
+            return start + (dpedal / 2);
+          }
+        } else {
+          return start;
+        }
+      }
+    }
+  }
+  return 0.0;
+}
+
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
+: sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
+, sync_gps_(10, boost::bind(&DbwNode::recvCanGps, this, _1), ID_REPORT_GPS1, ID_REPORT_GPS2, ID_REPORT_GPS3)
 {
+  // Reduce synchronization delay
+  sync_imu_.setInterMessageLowerBound(0, ros::Duration(0.003)); // 10ms period
+  sync_imu_.setInterMessageLowerBound(1, ros::Duration(0.003)); // 10ms period
+  sync_gps_.setInterMessageLowerBound(0, ros::Duration(0.3)); // 1s period
+  sync_gps_.setInterMessageLowerBound(1, ros::Duration(0.3)); // 1s period
+  sync_gps_.setInterMessageLowerBound(2, ros::Duration(0.3)); // 1s period
+
   // Initialize enable state machine
   prev_enable_ = true;
   enable_ = false;
@@ -34,6 +120,12 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gear_ = node.advertise<dbw_mkz_msgs::GearReport>("gear_report", 2);
   pub_misc_1_ = node.advertise<dbw_mkz_msgs::Misc1Report>("misc_1_report", 2);
   pub_wheel_speeds_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("wheel_speed_report", 2);
+  pub_suspension_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("suspension_report", 2);
+  pub_tire_pressure_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("tire_pressure_report", 2);
+  pub_fuel_level_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("fuel_level_report", 2);
+  pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
+  pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
+  pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
 
@@ -55,6 +147,8 @@ DbwNode::~DbwNode()
 
 void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg)
 {
+  sync_imu_.processMsg(msg);
+  sync_gps_.processMsg(msg);
   if (!msg->msg.extended) {
     switch (msg->msg.id) {
       case ID_BRAKE_REPORT:
@@ -66,6 +160,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
           out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
           out.pedal_output = (float)ptr->PO / UINT16_MAX;
+          out.torque_input = brakeTorqueFromPedal(out.pedal_input);
+          out.torque_cmd = brakeTorqueFromPedal(out.pedal_cmd);
+          out.torque_output = brakeTorqueFromPedal(out.pedal_output);
           out.boo_input  = ptr->BI ? true : false;
           out.boo_cmd    = ptr->BC ? true : false;
           out.boo_output = ptr->BO ? true : false;
@@ -169,24 +266,41 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         }
         break;
 
-#if 0
-      case ID_REPORT_ACCEL:
-        if (msg->msg.dlc >= sizeof(MsgReportAccel)) {
-          const MsgReportAccel *ptr = (const MsgReportAccel*)msg->msg.data.elems;
-          (float)ptr->accel_lat  * 0.01;
-          (float)ptr->accel_long * 0.01;
-          (float)ptr->accel_vert * 0.01;
+      case ID_REPORT_SUSPENSION:
+        if (msg->msg.dlc >= sizeof(MsgReportSuspension)) {
+          const MsgReportSuspension *ptr = (const MsgReportSuspension*)msg->msg.data.elems;
+          dbw_mkz_msgs::SuspensionReport out;
+          out.header.stamp = msg->header.stamp;
+          out.front_left  = (float)ptr->front_left  * 0.782779e-3;
+          out.front_right = (float)ptr->front_right * 0.782779e-3;
+          out.rear_left   = (float)ptr->rear_left   * 0.782779e-3;
+          out.rear_right  = (float)ptr->rear_right  * 0.782779e-3;
+          pub_suspension_.publish(out);
         }
         break;
 
-      case ID_REPORT_GYRO:
-        if (msg->msg.dlc >= sizeof(MsgReportGyro)) {
-          const MsgReportGyro *ptr = (const MsgReportGyro*)msg->msg.data.elems;
-          (float)ptr->gyro_roll * 0.0002;
-          (float)ptr->gyro_yaw  * 0.0002;
+      case ID_REPORT_TIRE_PRESSURE:
+        if (msg->msg.dlc >= sizeof(MsgReportTirePressure)) {
+          const MsgReportTirePressure *ptr = (const MsgReportTirePressure*)msg->msg.data.elems;
+          dbw_mkz_msgs::TirePressureReport out;
+          out.header.stamp = msg->header.stamp;
+          out.front_left  = (float)ptr->front_left;
+          out.front_right = (float)ptr->front_right;
+          out.rear_left   = (float)ptr->rear_left;
+          out.rear_right  = (float)ptr->rear_right;
+          pub_tire_pressure_.publish(out);
         }
         break;
-#endif
+
+      case ID_REPORT_FUEL_LEVEL:
+        if (msg->msg.dlc >= sizeof(MsgReportFuelLevel)) {
+          const MsgReportFuelLevel *ptr = (const MsgReportFuelLevel*)msg->msg.data.elems;
+          dbw_mkz_msgs::FuelLevelReport out;
+          out.header.stamp = msg->header.stamp;
+          out.fuel_level  = (float)ptr->fuel_level * 0.108696;
+          pub_fuel_level_.publish(out);
+        }
+        break;
 
       case ID_BRAKE_CMD:
         ROS_WARN("DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Brake. Id: 0x%03X", ID_BRAKE_CMD);
@@ -217,6 +331,74 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
 #endif
 }
 
+void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs) {
+  ROS_ASSERT(msgs.size() == 2);
+  ROS_ASSERT(msgs[0]->msg.id == ID_REPORT_ACCEL);
+  ROS_ASSERT(msgs[1]->msg.id == ID_REPORT_GYRO);
+  if ((msgs[0]->msg.dlc >= sizeof(MsgReportAccel)) && (msgs[1]->msg.dlc >= sizeof(MsgReportGyro))) {
+    const MsgReportAccel *ptr_accel = (const MsgReportAccel*)msgs[0]->msg.data.elems;
+    const MsgReportGyro *ptr_gyro = (const MsgReportGyro*)msgs[1]->msg.data.elems;
+    sensor_msgs::Imu out;
+    out.header.stamp = msgs[0]->header.stamp;
+    out.linear_acceleration.x = (double)ptr_accel->accel_lat * 0.01;
+    out.linear_acceleration.y = (double)ptr_accel->accel_long * 0.01;
+    out.linear_acceleration.z = (double)ptr_accel->accel_vert * 0.01;
+    out.linear_acceleration_covariance[0] = -1;
+    out.angular_velocity.x = (double)ptr_gyro->gyro_roll * 0.0002;
+    out.angular_velocity.z = (double)ptr_gyro->gyro_yaw * 0.0002;
+    out.angular_velocity_covariance[0] = -1;
+    pub_imu_.publish(out);
+  }
+  ROS_INFO("Time: %u.%u, %u.%u, delta: %fms",
+           msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
+           msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
+           (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+}
+
+void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs) {
+  ROS_ASSERT(msgs.size() == 3);
+  ROS_ASSERT(msgs[0]->msg.id == ID_REPORT_GPS1);
+  ROS_ASSERT(msgs[1]->msg.id == ID_REPORT_GPS2);
+  ROS_ASSERT(msgs[2]->msg.id == ID_REPORT_GPS3);
+  if ((msgs[0]->msg.dlc >= sizeof(MsgReportGps1)) && (msgs[1]->msg.dlc >= sizeof(MsgReportGps2)) && (msgs[2]->msg.dlc >= sizeof(MsgReportGps3))) {
+    const MsgReportGps1 *ptr1 = (const MsgReportGps1*)msgs[0]->msg.data.elems;
+    const MsgReportGps2 *ptr2 = (const MsgReportGps2*)msgs[1]->msg.data.elems;
+    const MsgReportGps3 *ptr3 = (const MsgReportGps3*)msgs[2]->msg.data.elems;
+    sensor_msgs::NavSatFix msg_fix;
+    msg_fix.header.stamp =  msgs[0]->header.stamp;
+    msg_fix.latitude = (double)ptr1->latitude * 3e6;
+    msg_fix.longitude = (double)ptr1->longitude * 3e6;
+    msg_fix.altitude = (double)ptr3->altitude * 4;
+    msg_fix.position_covariance_type = sensor_msgs::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+    msg_fix.status.service = sensor_msgs::NavSatStatus::SERVICE_GPS;
+    switch (ptr3->quality) {
+      case 0:
+      default:
+        msg_fix.status.status = sensor_msgs::NavSatStatus::STATUS_NO_FIX;
+        break;
+      case 1:
+      case 2:
+        msg_fix.status.status = sensor_msgs::NavSatStatus::STATUS_FIX;
+        break;
+    }
+    pub_gps_fix_.publish(msg_fix);
+
+    geometry_msgs::TwistStamped msg_vel;
+    msg_vel.header.stamp = msgs[0]->header.stamp;
+    double heading = (double)ptr3->heading * (0.01 * M_PI / 180);
+    double speed = (double)ptr3->speed * 0.44704;
+    msg_vel.twist.linear.x = cos(heading) * speed;
+    msg_vel.twist.linear.y = sin(heading) * speed;
+    pub_gps_vel_.publish(msg_vel);
+
+  }
+  ROS_INFO("Time: %u.%u, %u.%u, %u.%u, delta: %fms",
+           msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
+           msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
+           msgs[2]->header.stamp.sec, msgs[2]->header.stamp.nsec,
+           (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+}
+
 void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
 {
   dataspeed_can_msgs::CanMessage out;
@@ -226,7 +408,19 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   MsgBrakeCmd *ptr = (MsgBrakeCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd * UINT16_MAX));
+    float cmd = 0.0;
+    switch (msg->pedal_cmd_type) {
+      default:
+      case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
+        break;
+      case dbw_mkz_msgs::BrakeCmd::CMD_PEDAL:
+        cmd = msg->pedal_cmd;
+        break;
+      case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE:
+        cmd = brakePedalFromTorque(msg->pedal_cmd);
+        break;
+    }
+    ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));
     if (msg->boo_cmd) {
       ptr->BCMD = 1;
     } else if (boo_control_) {

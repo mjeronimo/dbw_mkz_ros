@@ -10,14 +10,17 @@ add_message_files(DIRECTORY msg FILES
   AmbientLight.msg
   BrakeCmd.msg
   BrakeReport.msg
+  FuelLevelReport.msg
   Gear.msg
   GearCmd.msg
   GearReport.msg
   Misc1Report.msg
   SteeringCmd.msg
   SteeringReport.msg
+  SuspensionReport.msg
   ThrottleCmd.msg
   ThrottleReport.msg
+  TirePressureReport.msg
   TurnSignal.msg
   TurnSignalCmd.msg
   WheelSpeedReport.msg

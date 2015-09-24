@@ -10,8 +10,8 @@
   <author>Dataspeed Inc.</author>
   <maintainer email="khallenbeck@dataspeedinc.com">Dataspeed Inc.</maintainer>
   <url type="website">http://dataspeedinc.com</url>
-  <url type="repository">https://bitbucket.org/dataspeedinc/dataspeed_can</url>
-  <url type="bugtracker">https://bitbucket.org/dataspeedinc/dataspeed_can/issues</url>
+  <url type="repository">https://bitbucket.org/dataspeedinc/dbw_mkz_ros</url>
+  <url type="bugtracker">https://bitbucket.org/dataspeedinc/dbw_mkz_ros/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 

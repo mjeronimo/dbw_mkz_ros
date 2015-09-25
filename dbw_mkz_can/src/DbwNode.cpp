@@ -27,6 +27,7 @@ static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
  {0.40, 3248},
 };
 static inline float brakeTorqueFromPedal(float pedal) {
+#if 0
   const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
   if (pedal <= BRAKE_TABLE[0].pedal) {
     return BRAKE_TABLE[0].torque;
@@ -51,9 +52,11 @@ static inline float brakeTorqueFromPedal(float pedal) {
       }
     }
   }
+#endif
   return 0.0;
 }
 static inline float brakePedalFromTorque(float torque) {
+#if 0
   const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
   if (torque <= BRAKE_TABLE[0].torque) {
     return BRAKE_TABLE[0].pedal;
@@ -78,6 +81,7 @@ static inline float brakePedalFromTorque(float torque) {
       }
     }
   }
+#endif
   return 0.0;
 }
 
@@ -349,10 +353,12 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
     out.angular_velocity_covariance[0] = -1;
     pub_imu_.publish(out);
   }
+#if 0
   ROS_INFO("Time: %u.%u, %u.%u, delta: %fms",
            msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
            msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
            (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+#endif
 }
 
 void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs) {
@@ -392,11 +398,13 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
     pub_gps_vel_.publish(msg_vel);
 
   }
+#if 0
   ROS_INFO("Time: %u.%u, %u.%u, %u.%u, delta: %fms",
            msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
            msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
            msgs[2]->header.stamp.sec, msgs[2]->header.stamp.nsec,
            (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+#endif
 }
 
 void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)

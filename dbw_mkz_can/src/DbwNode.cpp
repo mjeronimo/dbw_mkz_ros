@@ -1,7 +1,5 @@
 #include "DbwNode.h"
 #include "dispatch.h"
-#include <message_filters/sync_policies/approximate_time.h>
-#include <message_filters/sync_policies/exact_time.h>
 
 namespace dbw_mkz_can
 {

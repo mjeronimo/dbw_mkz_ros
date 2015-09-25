@@ -12,18 +12,19 @@ JoystickDemo::JoystickDemo(ros::NodeHandle n)
   sub_enable_ = n.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
 
   joy_data_.brake_cmd = 0.0;
-  joy_data_.enable = false;
   joy_data_.gear_cmd = dbw_mkz_msgs::Gear::NONE;
   joy_data_.steering_joy = 0.0;
   joy_data_.steering_mult = false;
   joy_data_.throttle_joy = 0.0;
   joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::NONE;
+  joy_data_.joy_throttle_valid = false;
+  joy_data_.joy_brake_valid = false;
 
-  pub_throttle_ = n.advertise<dbw_mkz_msgs::ThrottleCmd>("throttle_command", 1);
-  pub_brake_ = n.advertise<dbw_mkz_msgs::BrakeCmd>("brake_command", 1);
-  pub_turn_signal_ = n.advertise<dbw_mkz_msgs::TurnSignalCmd>("turn_signal_command", 1);
-  pub_steering_ = n.advertise<dbw_mkz_msgs::SteeringCmd>("steering_command", 1);
-  pub_gear_ = n.advertise<dbw_mkz_msgs::GearCmd>("gear_command", 1);
+  pub_throttle_ = n.advertise<dbw_mkz_msgs::ThrottleCmd>("throttle_cmd", 1);
+  pub_brake_ = n.advertise<dbw_mkz_msgs::BrakeCmd>("brake_cmd", 1);
+  pub_turn_signal_ = n.advertise<dbw_mkz_msgs::TurnSignalCmd>("turn_signal_cmd", 1);
+  pub_steering_ = n.advertise<dbw_mkz_msgs::SteeringCmd>("steering_cmd", 1);
+  pub_gear_ = n.advertise<dbw_mkz_msgs::GearCmd>("gear_cmd", 1);
 
   cmd_timer_ = n.createTimer(ros::Duration(0.02), &JoystickDemo::cmdCallback, this);
 }
@@ -32,7 +33,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 {
   // Throttle
   dbw_mkz_msgs::ThrottleCmd throttle_msg;
-  throttle_msg.enable = joy_data_.enable;
+  throttle_msg.enable = true;
   throttle_msg.pedal_cmd = 0.15 + joy_data_.throttle_joy * (0.8 - 0.15);
   pub_throttle_.publish(throttle_msg);
 
@@ -40,7 +41,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   dbw_mkz_msgs::BrakeCmd brake_msg;
   brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
   brake_msg.pedal_cmd = joy_data_.brake_cmd;
-  brake_msg.enable = joy_data_.enable;
+  brake_msg.enable = true;
   brake_msg.boo_cmd = (brake_msg.pedal_cmd > 0.2);
   pub_brake_.publish(brake_msg);
 
@@ -51,7 +52,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 
   // Steering
   dbw_mkz_msgs::SteeringCmd steering_msg;
-  steering_msg.enable = joy_data_.enable;
+  steering_msg.enable = true;
   steering_msg.steering_wheel_angle_cmd = joy_data_.steering_joy;
   if (joy_data_.steering_mult) {
     steering_msg.steering_wheel_angle_cmd *= 2.0;
@@ -66,20 +67,31 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 
 void JoystickDemo::recvEnable(const std_msgs::Bool::ConstPtr& msg)
 {
-  joy_data_.enable = msg->data;
 }
 
 void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 {
+  // Handle joystick startup
+  if (msg->axes[5] != 0.0) {
+    joy_data_.joy_throttle_valid = true;
+  }
+  if (msg->axes[2] != 0.0) {
+    joy_data_.joy_brake_valid = true;
+  }
+
   // Throttle
-  joy_data_.throttle_joy = 0.5 - 0.5 * msg->axes[5];
+  if (joy_data_.joy_throttle_valid) {
+    joy_data_.throttle_joy = 0.5 - 0.5 * msg->axes[5];
+  }
 
   // Brake
-  double brake_joy = 0.5 - 0.5 * msg->axes[2];
-  if (brake_joy < 0.5) {
-    joy_data_.brake_cmd = 0.15 + brake_joy * (0.27 - 0.15) / 0.5;
-  } else {
-    joy_data_.brake_cmd = 0.27 + (brake_joy - 0.5) * (0.5 - 0.27) / 0.5;
+  if (joy_data_.joy_brake_valid) {
+    double brake_joy = 0.5 - 0.5 * msg->axes[2];
+    if (brake_joy < 0.5) {
+      joy_data_.brake_cmd = 0.15 + brake_joy * (0.27 - 0.15) / 0.5;
+    } else {
+      joy_data_.brake_cmd = 0.27 + (brake_joy - 0.5) * (0.5 - 0.27) / 0.5;
+    }
   }
 
   // Gear

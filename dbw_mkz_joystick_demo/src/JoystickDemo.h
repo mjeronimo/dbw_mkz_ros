@@ -25,8 +25,9 @@ typedef struct {
   double steering_joy;
   bool steering_mult;
   int gear_cmd;
-  bool enable;
   int turn_signal_cmd;
+  bool joy_throttle_valid;
+  bool joy_brake_valid;
 } JoystickDataStruct;
 
 class JoystickDemo {

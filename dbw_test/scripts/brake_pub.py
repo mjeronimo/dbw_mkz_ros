@@ -25,6 +25,7 @@ def brake_pub():
             brake_cmd.boo_cmd = False
         brake_cmd.enable = True
         brake_cmd.pedal_cmd = brake_val
+        brake_cmd.pedal_cmd_type = 1
         pub.publish(brake_cmd)                    
         rate.sleep()
 

@@ -370,9 +370,9 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
     const MsgReportGps3 *ptr3 = (const MsgReportGps3*)msgs[2]->msg.data.elems;
     sensor_msgs::NavSatFix msg_fix;
     msg_fix.header.stamp =  msgs[0]->header.stamp;
-    msg_fix.latitude = (double)ptr1->latitude * 3e6;
-    msg_fix.longitude = (double)ptr1->longitude * 3e6;
-    msg_fix.altitude = (double)ptr3->altitude * 4;
+    msg_fix.latitude = (double)ptr1->latitude / 3e6;
+    msg_fix.longitude = (double)ptr1->longitude / 3e6;
+    msg_fix.altitude = (double)ptr3->altitude * 0.25;
     msg_fix.position_covariance_type = sensor_msgs::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
     msg_fix.status.service = sensor_msgs::NavSatStatus::SERVICE_GPS;
     switch (ptr3->quality) {

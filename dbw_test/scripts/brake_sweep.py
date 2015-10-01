@@ -15,9 +15,12 @@ def recv_brake_tq(data):
     requested_tq = data.data
 
 def recv_actl_brake_pos(data):
+    global actl_brake_pos
     actl_brake_pos = data.pedal_output
+    #rospy.loginfo('wtf ' + str(actl_brake_pos))
 
 def brake_sweep():
+    global actl_brake_pos
     # Initialization
     pub = rospy.Publisher('brake_val', Float64, queue_size=1)
     rospy.Subscriber('/ABS_BrkBst_Data_HS1/BrkTot_Tq_RqDrv', UInt16, recv_brake_tq)
@@ -51,6 +54,7 @@ def brake_sweep():
         
         # Make sure pedal command is responding
         pedal_diff = brake_val - actl_brake_pos
+        rospy.loginfo('diff: ' + str(pedal_diff))
         if (fabs(pedal_diff) > 0.02):
             rospy.logwarn('Large disparity between pedal request and actual... not saving data point')
             continue

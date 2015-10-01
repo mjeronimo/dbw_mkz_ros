@@ -122,9 +122,9 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gear_ = node.advertise<dbw_mkz_msgs::GearReport>("gear_report", 2);
   pub_misc_1_ = node.advertise<dbw_mkz_msgs::Misc1Report>("misc_1_report", 2);
   pub_wheel_speeds_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("wheel_speed_report", 2);
-  pub_suspension_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("suspension_report", 2);
-  pub_tire_pressure_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("tire_pressure_report", 2);
-  pub_fuel_level_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("fuel_level_report", 2);
+  pub_suspension_ = node.advertise<dbw_mkz_msgs::SuspensionReport>("suspension_report", 2);
+  pub_tire_pressure_ = node.advertise<dbw_mkz_msgs::TirePressureReport>("tire_pressure_report", 2);
+  pub_fuel_level_ = node.advertise<dbw_mkz_msgs::FuelLevelReport>("fuel_level_report", 2);
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
@@ -273,10 +273,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           const MsgReportSuspension *ptr = (const MsgReportSuspension*)msg->msg.data.elems;
           dbw_mkz_msgs::SuspensionReport out;
           out.header.stamp = msg->header.stamp;
-          out.front_left  = (float)ptr->front_left  * 0.782779e-3;
-          out.front_right = (float)ptr->front_right * 0.782779e-3;
-          out.rear_left   = (float)ptr->rear_left   * 0.782779e-3;
-          out.rear_right  = (float)ptr->rear_right  * 0.782779e-3;
+          out.front_left  = (float)ptr->front_left  * 0.3913895e-3;
+          out.front_right = (float)ptr->front_right * 0.3913895e-3;
+          out.rear_left   = (float)ptr->rear_left   * 0.3913895e-3;
+          out.rear_right  = (float)ptr->rear_right  * 0.3913895e-3;
           pub_suspension_.publish(out);
         }
         break;

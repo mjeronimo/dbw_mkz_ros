@@ -21,7 +21,7 @@ def brake_sweep():
     # Initialization
     pub = rospy.Publisher('brake_val', Float64, queue_size=1)
     rospy.Subscriber('/ABS_BrkBst_Data_HS1/BrkTot_Tq_RqDrv', UInt16, recv_brake_tq)
-    rospy.Subscriber('brake_report', BrakeReport, recv_actl_brake_pos)
+    rospy.Subscriber('/vehicle/brake_report', BrakeReport, recv_actl_brake_pos)
     rospy.init_node('brake_sweep')
     
     # Parameters

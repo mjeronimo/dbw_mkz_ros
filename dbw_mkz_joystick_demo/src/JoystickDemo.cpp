@@ -108,7 +108,7 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
   }
 
   // Steering
-  joy_data_.steering_joy = 235.0 * ((fabs(msg->axes[0]) > fabs(msg->axes[3])) ? msg->axes[0] : msg->axes[3]);
+  joy_data_.steering_joy = 235.0 * M_PI / 180.0 * ((fabs(msg->axes[0]) > fabs(msg->axes[3])) ? msg->axes[0] : msg->axes[3]);
   joy_data_.steering_mult = msg->buttons[6] || msg->buttons[7];
 
   // Turn signal

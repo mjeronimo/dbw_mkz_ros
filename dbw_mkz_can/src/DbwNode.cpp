@@ -355,7 +355,7 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
   ROS_INFO("Time: %u.%u, %u.%u, delta: %fms",
            msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
            msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
-           (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+           labs((msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec()) / 1000000.0);
 #endif
 }
 
@@ -401,7 +401,10 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
            msgs[0]->header.stamp.sec, msgs[0]->header.stamp.nsec,
            msgs[1]->header.stamp.sec, msgs[1]->header.stamp.nsec,
            msgs[2]->header.stamp.sec, msgs[2]->header.stamp.nsec,
-           (msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec() / 1000000.0);
+           std::max(std::max(
+               labs((msgs[1]->header.stamp - msgs[0]->header.stamp).toNSec()),
+               labs((msgs[2]->header.stamp - msgs[1]->header.stamp).toNSec())),
+               labs((msgs[0]->header.stamp - msgs[2]->header.stamp).toNSec())) / 1000000.0);
 #endif
 }
 
@@ -563,61 +566,86 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
 
 void DbwNode::enableSystem()
 {
-  enable_ = true;
-  if (publishDbwEnabled()) {
-    ROS_INFO("DBW system enabled.");
+  if (!enable_) {
+    enable_ = true;
+    if (publishDbwEnabled()) {
+      ROS_INFO("DBW system enabled.");
+    } else {
+      ROS_INFO("DBW system enable requested. Waiting for ready.");
+    }
   }
 }
 
 void DbwNode::driverCancel()
 {
-  enable_ = false;
-  if (publishDbwEnabled()) {
+  if (enable_) {
+    enable_ = false;
+    publishDbwEnabled();
     ROS_WARN("DBW system disabled. Cancel button pressed.");
   }
 }
 
 void DbwNode::driverBrake(bool driver)
 {
-  if (driver && enabled()) {
+  bool en = enabled();
+  if (driver && en) {
     enable_ = false;
   }
   driver_brake_ = driver;
   if (publishDbwEnabled()) {
-    ROS_WARN("DBW system disabled. Driver override on brake pedal.");
+    if (en) {
+      ROS_WARN("DBW system disabled. Driver override on brake pedal.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
   }
 }
 
 void DbwNode::driverThrottle(bool driver)
 {
-  if (driver && enabled()) {
+  bool en = enabled();
+  if (driver && en) {
     enable_ = false;
   }
   driver_throttle_ = driver;
   if (publishDbwEnabled()) {
-    ROS_WARN("DBW system disabled. Driver override on throttle pedal.");
+    if (en) {
+      ROS_WARN("DBW system disabled. Driver override on throttle pedal.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
   }
 }
 
 void DbwNode::driverSteering(bool driver)
 {
-  if (driver && enabled()) {
+  bool en = enabled();
+  if (driver && en) {
     enable_ = false;
   }
   driver_steering_ = driver;
   if (publishDbwEnabled()) {
-    ROS_WARN("DBW system disabled. Driver override on steering wheel.");
+    if (en) {
+      ROS_WARN("DBW system disabled. Driver override on steering wheel.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
   }
 }
 
 void DbwNode::driverGear(bool driver)
 {
-  if (driver && enabled()) {
+  bool en = enabled();
+  if (driver && en) {
     enable_ = false;
   }
   driver_gear_ = driver;
   if (publishDbwEnabled()) {
-    ROS_WARN("DBW system disabled. Driver override on shifter.");
+    if (en) {
+      ROS_WARN("DBW system disabled. Driver override on shifter.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
   }
 }
 

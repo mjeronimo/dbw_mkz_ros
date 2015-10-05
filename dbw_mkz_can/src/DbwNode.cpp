@@ -6,27 +6,22 @@ namespace dbw_mkz_can
 
 static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
 //  % , Nm
- {0.15, 0},
- {0.17, 1},
- {0.18, 4},
- {0.19, 28},
- {0.20, 68},
- {0.21, 519},
- {0.23, 521},
- {0.24, 676},
- {0.25, 948},
- {0.26, 1228},
- {0.27, 1500},
- {0.28, 1776},
- {0.29, 2104},
- {0.30, 2468},
- {0.31, 2824},
- {0.32, 3212},
- {0.40, 3248},
+ {0.150,    0},
+ {0.173,    0},
+ {0.178,    4},
+ {0.204,  112},
+ {0.207,  520},
+ {0.230,  520},
+ {0.242,  816},
+ {0.279, 1832},
+ {0.301, 2612},
+ {0.319, 3316},
+ {0.322, 3412},
+ {0.330, 3412},
 };
 static inline float brakeTorqueFromPedal(float pedal) {
-#if 0
-  const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
+#if 1
+  const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
   if (pedal <= BRAKE_TABLE[0].pedal) {
     return BRAKE_TABLE[0].torque;
   } else if (pedal >= BRAKE_TABLE[size - 1].pedal) {
@@ -38,14 +33,10 @@ static inline float brakeTorqueFromPedal(float pedal) {
         float dinput = pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
-        if (fabs(dtorque) > 1e-6) {
-          if (fabs(dpedal) > 1e-6) {
-            return start + (dinput / (dtorque / dpedal));
-          } else {
-            return start + (dtorque / 2);
-          }
+        if (fabs(dpedal) > 1e-6) {
+          return start + (dinput * dtorque / dpedal);
         } else {
-          return start;
+          return start + (dtorque / 2);
         }
       }
     }
@@ -54,8 +45,8 @@ static inline float brakeTorqueFromPedal(float pedal) {
   return 0.0;
 }
 static inline float brakePedalFromTorque(float torque) {
-#if 0
-  const unsigned int size = sizeof(BRAKE_TABLE[0]) / sizeof(BRAKE_TABLE);
+#if 1
+  const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
   if (torque <= BRAKE_TABLE[0].torque) {
     return BRAKE_TABLE[0].pedal;
   } else if (torque >= BRAKE_TABLE[size - 1].torque) {
@@ -67,14 +58,10 @@ static inline float brakePedalFromTorque(float torque) {
         float dinput = torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
-        if (fabs(dpedal) > 1e-6) {
-          if (fabs(dtorque) > 1e-6) {
-            return start + (dinput / (dpedal / dtorque));
-          } else {
-            return start + (dpedal / 2);
-          }
+        if (fabs(dtorque) > 1e-6) {
+          return start + (dinput * dpedal / dtorque);
         } else {
-          return start;
+          return start + (dpedal / 2);
         }
       }
     }

@@ -11,10 +11,10 @@
     <param name="bitrate_2" value="0" />
     <remap from="can_bus_3" to="can_bus_dbw"/>
     <param name="bitrate_3" value="500000" />
-    <param name="channel_3_mask_0" value="2032" />  <!-- 0x7F0 -->
-    <param name="channel_3_match_0" value="96" />   <!-- 0x060 --> <!-- 0x060 to 0x06F -->
-    <param name="channel_3_mask_1" value="2044" />  <!-- 0x7FC -->
-    <param name="channel_3_match_1" value="112" />  <!-- 0x070 --> <!-- 0x070 to 0x073 -->
+    <param name="channel_3_mask_0"  value="0x800007F0" />
+    <param name="channel_3_match_0" value="0x00000060" /> <!-- SID 0x060 to 0x06F -->
+    <param name="channel_3_mask_1"  value="0x800007FC" />
+    <param name="channel_3_match_1" value="0x00000070" /> <!-- SID 0x070 to 0x073 -->
     <remap from="can_bus_4" to="can_bus_4"/>
     <param name="bitrate_4" value="0" />
   </node>

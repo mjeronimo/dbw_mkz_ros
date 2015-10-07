@@ -1,0 +1,7 @@
+# Calibrated model parameters
+
+idling_force: 145.0               # Fi (Newtons)
+max_drive_force: 11140.0          # Fm (Newtons)
+max_braking_viscosity: 700.0     # d
+rolling_resistance_coeff: 50.0   # cr
+vehicle_mass: 1736.35             # m (kg)

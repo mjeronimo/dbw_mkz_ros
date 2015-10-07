@@ -1,0 +1,5 @@
+# Distance between front and rear wheels, in inches
+wheelbase: 112
+
+# Estimated ratio between steering wheel angle and tire steering angle
+steering_ratio: 0.05

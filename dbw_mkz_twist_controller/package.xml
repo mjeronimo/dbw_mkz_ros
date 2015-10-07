@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>dbw_mkz_twist_controller</name>
+  <version>0.0.0</version>
+  <description>The dbw_mkz_twist_controller package</description>
+  <maintainer email="dataspeed@todo.todo">dataspeed</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>dbw_mkz_msgs</build_depend>
+  <build_depend>roslib</build_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>dbw_mkz_msgs</run_depend>
+  <run_depend>roslib</run_depend>
+
+  <export>
+  </export>
+</package>

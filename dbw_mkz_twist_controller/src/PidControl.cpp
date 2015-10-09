@@ -12,6 +12,7 @@ PidControl::PidControl(double kp, double ki, double kd, double min, double max)
 {
   last_error_ = 0.0;
   int_val_ = 0.0;
+  last_int_val_ = 0.0;
 
   setGains(kp, ki, kd, min, max);
 }
@@ -28,10 +29,18 @@ void PidControl::setGains(double kp, double ki, double kd, double min, double ma
 void PidControl::resetIntegrator()
 {
   int_val_ = 0.0;
+  last_int_val_ = 0.0;
+}
+
+void PidControl::revertIntegrator()
+{
+  int_val_ = last_int_val_;
 }
 
 double PidControl::step(double error, double sample_time)
 {
+  last_int_val_ = int_val_;
+
   double integral = int_val_ + error * sample_time;
   double derivative = (error - last_error_) / sample_time;
 

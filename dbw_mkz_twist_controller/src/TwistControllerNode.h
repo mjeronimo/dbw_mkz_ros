@@ -19,6 +19,9 @@
 
 #include "YawControl.h"
 #include "PidControl.h"
+#include "LowPass.h"
+
+#include <std_msgs/Float64.h>
 
 namespace dbw_mkz_twist_controller{
 
@@ -40,6 +43,8 @@ private:
   ros::Publisher pub_throttle_;
   ros::Publisher pub_brake_;
   ros::Publisher pub_steering_;
+  ros::Publisher pub_accel_;
+  ros::Publisher pub_req_accel_;
   ros::Subscriber sub_steering_;
   ros::Subscriber sub_imu_;
   ros::Subscriber sub_enable_;
@@ -49,10 +54,14 @@ private:
 
   geometry_msgs::Twist cmd_vel_;
   geometry_msgs::Twist actual_;
+  double accel_;
   ros::Time cmd_stamp_;
   dynamic_reconfigure::Server<ControllerConfig> srv_;
 
   PidControl* pid_;
+  PidControl* accel_pid_;
+  YawControl* yaw_control_;
+  LowPass* low_pass_;
   ControllerConfig cfg_;
   bool sys_enable_;
   double fuel_level_;

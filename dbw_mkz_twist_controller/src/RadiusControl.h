@@ -14,7 +14,9 @@ public:
   double getSteeringWheel(double radius);
 private:
   double wheelbase_m_;
+  double track_m_;
   double steering_ratio_;
+  double max_steering_wheel_angle_;
 };
 
 }

@@ -13,10 +13,13 @@ public:
     double step(double error, double sample_time);
     void setGains(double kp, double ki, double kd, double min, double max);
     void resetIntegrator();
+    void revertIntegrator();
 
 private:
     double last_error_;
     double int_val_;
+
+    double last_int_val_;
 
     double kp_;
     double ki_;

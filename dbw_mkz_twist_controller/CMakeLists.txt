@@ -24,8 +24,9 @@ add_executable(twist_controller src/twist_controller_node.cpp src/TwistControlle
 add_dependencies(twist_controller ${PROJECT_NAME}_gencfg)
 target_link_libraries(twist_controller
   ${catkin_LIBRARIES}
-  yaw_control
+  yaw_control  
   pid_control
+  low_pass
 )
 
 add_executable(twist_tester src/twist_tester.cpp)
@@ -63,3 +64,5 @@ add_library(pid_control src/PidControl.cpp)
 target_link_libraries(pid_control
     ${catkin_LIBRARIES}
 )
+
+add_library(low_pass src/LowPass.cpp)

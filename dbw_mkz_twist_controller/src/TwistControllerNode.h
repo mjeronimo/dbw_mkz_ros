@@ -1,4 +1,3 @@
-
 #ifndef TWISTCONTROLLERNODE_H_
 #define TWISTCONTROLLERNODE_H_
 
@@ -54,24 +53,21 @@ private:
 
   geometry_msgs::Twist cmd_vel_;
   geometry_msgs::Twist actual_;
-  double accel_;
   ros::Time cmd_stamp_;
   dynamic_reconfigure::Server<ControllerConfig> srv_;
 
-  PidControl* pid_;
-  PidControl* accel_pid_;
-  YawControl* yaw_control_;
-  LowPass* low_pass_;
+  PidControl speed_pid_;
+  PidControl accel_pid_;
+  YawControl yaw_control_;
+  LowPass lpf_accel_;
+  LowPass lpf_fuel_;
   ControllerConfig cfg_;
   bool sys_enable_;
-  double fuel_level_;
 
   // Parameters
   double control_period_;
 };
 
 }
-
-
 
 #endif /* TWISTCONTROLLERNODE_H_ */

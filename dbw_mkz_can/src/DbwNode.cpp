@@ -5,13 +5,13 @@ namespace dbw_mkz_can
 {
 
 static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
-//  % , Nm
+// Duty,   Nm
  {0.150,    0},
  {0.173,    0},
  {0.181,    4},
  {0.204,  108},
- {0.207,  150},
- {0.230,  520},
+ {0.207,  519},
+ {0.230,  521},
  {0.242,  816},
  {0.279, 1832},
  {0.301, 2612},
@@ -19,8 +19,13 @@ static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
  {0.322, 3412},
  {0.330, 3412},
 };
+static const struct {float pedal; float percent;} THROTTLE_TABLE[] = {
+// Duty,   %
+ {0.150, 0.000},
+ {0.160, 0.001},
+ {0.800, 1.000},
+};
 static inline float brakeTorqueFromPedal(float pedal) {
-#if 1
   const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
   if (pedal <= BRAKE_TABLE[0].pedal) {
     return BRAKE_TABLE[0].torque;
@@ -41,11 +46,9 @@ static inline float brakeTorqueFromPedal(float pedal) {
       }
     }
   }
-#endif
   return 0.0;
 }
 static inline float brakePedalFromTorque(float torque) {
-#if 1
   const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
   if (torque <= BRAKE_TABLE[0].torque) {
     return BRAKE_TABLE[0].pedal;
@@ -66,7 +69,32 @@ static inline float brakePedalFromTorque(float torque) {
       }
     }
   }
-#endif
+  return 0.0;
+}
+static inline float brakePedalFromPercent(float percent) {
+  return brakePedalFromTorque(percent * BRAKE_TABLE[sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]) - 1].torque);
+}
+static inline float throttlePedalFromPercent(float percent) {
+  const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
+  if (percent <= THROTTLE_TABLE[0].percent) {
+    return THROTTLE_TABLE[0].pedal;
+  } else if (percent >= THROTTLE_TABLE[size - 1].percent) {
+    return THROTTLE_TABLE[size - 1].pedal;
+  } else {
+    for (unsigned int i = 1; i < size; i++) {
+      if (percent < THROTTLE_TABLE[i].percent) {
+        float start = THROTTLE_TABLE[i - 1].pedal;
+        float dinput = percent - THROTTLE_TABLE[i - 1].percent;
+        float dpedal = THROTTLE_TABLE[i].pedal - THROTTLE_TABLE[i - 1].pedal;
+        float dtorque = THROTTLE_TABLE[i].percent - THROTTLE_TABLE[i - 1].percent;
+        if (fabs(dtorque) > 1e-6) {
+          return start + (dinput * dpedal / dtorque);
+        } else {
+          return start + (dpedal / 2);
+        }
+      }
+    }
+  }
   return 0.0;
 }
 
@@ -412,6 +440,9 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
       case dbw_mkz_msgs::BrakeCmd::CMD_PEDAL:
         cmd = msg->pedal_cmd;
         break;
+      case dbw_mkz_msgs::BrakeCmd::CMD_PERCENT:
+        cmd = brakePedalFromPercent(msg->pedal_cmd);
+        break;
       case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE:
         cmd = brakePedalFromTorque(msg->pedal_cmd);
         break;
@@ -446,7 +477,19 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
   MsgThrottleCmd *ptr = (MsgThrottleCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd * UINT16_MAX));
+    float cmd = 0.0;
+    switch (msg->pedal_cmd_type) {
+      default:
+      case dbw_mkz_msgs::ThrottleCmd::CMD_NONE:
+        break;
+      case dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL:
+        cmd = msg->pedal_cmd;
+        break;
+      case dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT:
+        cmd = throttlePedalFromPercent(msg->pedal_cmd);
+        break;
+    }
+    ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));
     if (msg->enable) {
       ptr->EN = 1;
     }

@@ -24,9 +24,7 @@ add_executable(twist_controller src/twist_controller_node.cpp src/TwistControlle
 add_dependencies(twist_controller ${PROJECT_NAME}_gencfg)
 target_link_libraries(twist_controller
   ${catkin_LIBRARIES}
-  yaw_control  
-  pid_control
-  low_pass
+  yaml-cpp
 )
 
 add_executable(twist_tester src/twist_tester.cpp)
@@ -35,34 +33,7 @@ target_link_libraries(twist_tester
   ${catkin_LIBRARIES}
 )
 
-add_library(radius_control src/RadiusControl.cpp)
-target_link_libraries(radius_control
-    ${catkin_LIBRARIES}
-    yaml-cpp
+install(TARGETS twist_controller twist_tester
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
-
-add_library(yaw_control src/YawControl.cpp)
-target_link_libraries(yaw_control
-    ${catkin_LIBRARIES}
-    radius_control
-)
-
-add_library(heading_control src/HeadingControl.cpp)
-target_link_libraries(heading_control
-    ${catkin_LIBRARIES}
-    pid_control
-)
-
-add_library(speed_control src/SpeedControl.cpp)
-target_link_libraries(speed_control
-    ${catkin_LIBRARIES}
-    pid_control
-    yaml-cpp
-)
-
-add_library(pid_control src/PidControl.cpp)
-target_link_libraries(pid_control
-    ${catkin_LIBRARIES}
-)
-
-add_library(low_pass src/LowPass.cpp)

@@ -4,7 +4,7 @@ wheelbase: 112
 track: 0
 
 # Estimated ratio between steering wheel angle and tire steering angle
-steering_ratio: 0.045454545
+steering_ratio: 2.604353588
 
 # Maximum steering wheel angle, in degrees
 max_steering_wheel_angle: 470

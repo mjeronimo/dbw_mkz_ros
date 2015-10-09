@@ -2,7 +2,7 @@
 <launch>
   <include file="$(find dbw_mkz_can)/launch/dbw.launch" />
 
-  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="dbw_mkz_joystick_demo" name="joystick_demo" output="screen">
+  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen">
   </node>
 
   <node pkg="joy" type="joy_node" name="joy_node" >

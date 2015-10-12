@@ -75,7 +75,7 @@ static inline float brakePedalFromPercent(float percent) {
   return brakePedalFromTorque(percent * BRAKE_TABLE[sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]) - 1].torque);
 }
 static inline float throttlePedalFromPercent(float percent) {
-  const unsigned int size = sizeof(BRAKE_TABLE) / sizeof(BRAKE_TABLE[0]);
+  const unsigned int size = sizeof(THROTTLE_TABLE) / sizeof(THROTTLE_TABLE[0]);
   if (percent <= THROTTLE_TABLE[0].percent) {
     return THROTTLE_TABLE[0].pedal;
   } else if (percent >= THROTTLE_TABLE[size - 1].percent) {
@@ -86,9 +86,9 @@ static inline float throttlePedalFromPercent(float percent) {
         float start = THROTTLE_TABLE[i - 1].pedal;
         float dinput = percent - THROTTLE_TABLE[i - 1].percent;
         float dpedal = THROTTLE_TABLE[i].pedal - THROTTLE_TABLE[i - 1].pedal;
-        float dtorque = THROTTLE_TABLE[i].percent - THROTTLE_TABLE[i - 1].percent;
-        if (fabs(dtorque) > 1e-6) {
-          return start + (dinput * dpedal / dtorque);
+        float dpercent = THROTTLE_TABLE[i].percent - THROTTLE_TABLE[i - 1].percent;
+        if (fabs(dpercent) > 1e-6) {
+          return start + (dinput * dpedal / dpercent);
         } else {
           return start + (dpedal / 2);
         }

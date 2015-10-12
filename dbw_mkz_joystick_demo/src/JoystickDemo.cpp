@@ -34,15 +34,15 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   // Throttle
   dbw_mkz_msgs::ThrottleCmd throttle_msg;
   throttle_msg.enable = true;
-  throttle_msg.pedal_cmd = 0.15 + joy_data_.throttle_joy * (0.8 - 0.15);
+  throttle_msg.pedal_cmd_type = dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT;
+  throttle_msg.pedal_cmd = joy_data_.throttle_joy;
   pub_throttle_.publish(throttle_msg);
 
   // Brake
   dbw_mkz_msgs::BrakeCmd brake_msg;
-  brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
+  brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PERCENT;
   brake_msg.pedal_cmd = joy_data_.brake_cmd;
   brake_msg.enable = true;
-  brake_msg.boo_cmd = (brake_msg.pedal_cmd > 0.2);
   pub_brake_.publish(brake_msg);
 
   // Gear
@@ -86,12 +86,7 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 
   // Brake
   if (joy_data_.joy_brake_valid) {
-    double brake_joy = 0.5 - 0.5 * msg->axes[2];
-    if (brake_joy < 0.5) {
-      joy_data_.brake_cmd = 0.15 + brake_joy * (0.27 - 0.15) / 0.5;
-    } else {
-      joy_data_.brake_cmd = 0.27 + (brake_joy - 0.5) * (0.5 - 0.27) / 0.5;
-    }
+    joy_data_.brake_cmd = 0.5 - 0.5 * msg->axes[2];
   }
 
   // Gear

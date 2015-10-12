@@ -4,6 +4,7 @@ project(dbw_mkz_msgs)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
+  geometry_msgs
 )
 
 add_message_files(DIRECTORY msg FILES
@@ -23,15 +24,18 @@ add_message_files(DIRECTORY msg FILES
   TirePressureReport.msg
   TurnSignal.msg
   TurnSignalCmd.msg
+  TwistCmd.msg
   WheelSpeedReport.msg
   Wiper.msg
 )
 
 generate_messages(DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 catkin_package(CATKIN_DEPENDS
   message_runtime
   std_msgs
+  geometry_msgs
 )

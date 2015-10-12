@@ -22,6 +22,7 @@
 #include <dbw_mkz_msgs/TirePressureReport.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/JointState.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Bool.h>
 
@@ -63,6 +64,18 @@ private:
   void driverSteering(bool driver);
   void driverGear(bool driver);
 
+  enum {
+    JOINT_FL = 0,
+    JOINT_FR,
+    JOINT_RL,
+    JOINT_RR,
+    JOINT_SL,
+    JOINT_SR,
+    JOINT_COUNT,
+  };
+  sensor_msgs::JointState joint_state_;
+  void publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
+
   // Brake lights
   bool boo_status_;
   bool boo_control_;
@@ -91,6 +104,7 @@ private:
   ros::Publisher pub_imu_;
   ros::Publisher pub_gps_fix_;
   ros::Publisher pub_gps_vel_;
+  ros::Publisher pub_joint_states_;
   ros::Publisher pub_sys_enable_;
 
   // Time Synchronization

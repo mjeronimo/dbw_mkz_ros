@@ -129,6 +129,18 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
     std::swap(boo_thresh_lo_, boo_thresh_hi_);
   }
 
+  // Initialize joint states
+  joint_state_.position.resize(JOINT_COUNT);
+  joint_state_.velocity.resize(JOINT_COUNT);
+  joint_state_.effort.resize(JOINT_COUNT);
+  joint_state_.name.resize(JOINT_COUNT);
+  joint_state_.name[JOINT_FL] = "wheel_fl"; // Front Left
+  joint_state_.name[JOINT_FR] = "wheel_fr"; // Front Right
+  joint_state_.name[JOINT_RL] = "wheel_rl"; // Rear Left
+  joint_state_.name[JOINT_RR] = "wheel_rr"; // Rear Right
+  joint_state_.name[JOINT_SL] = "steering_left";
+  joint_state_.name[JOINT_SR] = "steering_right";
+
   // Set up Publishers
   pub_can_ = node.advertise<dataspeed_can_msgs::CanMessage>("can_tx", 10);
   pub_brake_ = node.advertise<dbw_mkz_msgs::BrakeReport>("brake_report", 2);
@@ -143,6 +155,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
+  pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10, false);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
 
@@ -227,6 +240,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_steering_.publish(out);
+          publishJointStates(NULL, &out);
         }
         break;
 
@@ -280,6 +294,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.rear_left   = (float)ptr->rear_left   * 0.01;
           out.rear_right  = (float)ptr->rear_right  * 0.01;
           pub_wheel_speeds_.publish(out);
+          publishJointStates(&out, NULL);
         }
         break;
 
@@ -682,6 +697,33 @@ void DbwNode::driverGear(bool driver)
       ROS_INFO("DBW system enabled.");
     }
   }
+}
+
+void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering)
+{
+  ros::Time now = ros::Time::now();
+  double dt = (now - joint_state_.header.stamp).toSec();
+  if (wheels) {
+    joint_state_.velocity[JOINT_FL] = wheels->front_left;
+    joint_state_.velocity[JOINT_FR] = wheels->front_right;
+    joint_state_.velocity[JOINT_RL] = wheels->rear_left;
+    joint_state_.velocity[JOINT_RR] = wheels->rear_right;
+  }
+  if (steering) {
+    const double L = 112.0 * 0.0254;
+    const double W = 63.0 * 0.0254;
+    const double RATIO = M_PI / 180 / 22.0;
+    double r = L * tan(steering->steering_wheel_angle * RATIO);
+    joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
+    joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
+  }
+  if (dt < 0.5) {
+    for (unsigned int i = JOINT_FL; i <= JOINT_RR; i++) {
+      joint_state_.position[i] = fmod(joint_state_.position[i] + dt * joint_state_.velocity[i], 2*M_PI);
+    }
+  }
+  joint_state_.header.stamp = now;
+  pub_joint_states_.publish(joint_state_);
 }
 
 } // namespace dbw_mkz_can

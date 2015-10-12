@@ -12,6 +12,7 @@
 #include <dbw_mkz_msgs/SteeringCmd.h>
 #include <dbw_mkz_msgs/SteeringReport.h>
 #include <dbw_mkz_msgs/FuelLevelReport.h>
+#include <dbw_mkz_msgs/TwistCmd.h>
 
 #include <dynamic_reconfigure/server.h>
 #include <dbw_mkz_twist_controller/ControllerConfig.h>
@@ -34,6 +35,7 @@ private:
   void loadParams(ros::NodeHandle pn);
   void controlCallback(const ros::TimerEvent& event);
   void recvTwist(const geometry_msgs::Twist::ConstPtr& msg);
+  void recvTwist2(const dbw_mkz_msgs::TwistCmd::ConstPtr& msg);
   void recvSteeringReport(const dbw_mkz_msgs::SteeringReport::ConstPtr& msg);
   void recvImu(const sensor_msgs::Imu::ConstPtr& msg);
   void recvEnable(const std_msgs::Bool::ConstPtr& msg);
@@ -48,10 +50,11 @@ private:
   ros::Subscriber sub_imu_;
   ros::Subscriber sub_enable_;
   ros::Subscriber sub_twist_;
+  ros::Subscriber sub_twist2_;
   ros::Subscriber sub_fuel_level_;
   ros::Timer control_timer_;
 
-  geometry_msgs::Twist cmd_vel_;
+  dbw_mkz_msgs::TwistCmd cmd_vel_;
   geometry_msgs::Twist actual_;
   ros::Time cmd_stamp_;
   dynamic_reconfigure::Server<ControllerConfig> srv_;

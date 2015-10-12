@@ -10,13 +10,15 @@ TwistControllerNode::TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn)
   // Initialize
   loadParams(pn);
 
-  // Topics
+  // Subscribers
   sub_twist_ = n.subscribe("cmd_vel", 1, &TwistControllerNode::recvTwist, this);
+  sub_twist2_ = n.subscribe("cmd_vel_with_limits", 1, &TwistControllerNode::recvTwist2, this);
   sub_steering_ = n.subscribe("steering_report", 1, &TwistControllerNode::recvSteeringReport, this);
   sub_imu_ = n.subscribe("imu/data_raw", 1, &TwistControllerNode::recvImu, this);
   sub_enable_ = n.subscribe("dbw_enabled", 1, &TwistControllerNode::recvEnable, this);
   sub_fuel_level_ = n.subscribe("fuel_level_report", 1, &TwistControllerNode::recvFuel, this);
 
+  // Publishers
   pub_throttle_ = n.advertise<dbw_mkz_msgs::ThrottleCmd>("throttle_cmd", 1);
   pub_brake_ = n.advertise<dbw_mkz_msgs::BrakeCmd>("brake_cmd", 1);
   pub_steering_ = n.advertise<dbw_mkz_msgs::SteeringCmd>("steering_cmd", 1);
@@ -41,14 +43,20 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
   }
 
   double vehicle_mass = cfg_.vehicle_mass + lpf_fuel_.get() / 100.0 * cfg_.fuel_capacity * GAS_DENSITY;
-  double vel_error = cmd_vel_.linear.x - actual_.linear.x;
-  if ((fabs(cmd_vel_.linear.x) < mphToMps(1.0)) || !cfg_.pub_pedals) {
+  double vel_error = cmd_vel_.twist.linear.x - actual_.linear.x;
+  if ((fabs(cmd_vel_.twist.linear.x) < mphToMps(1.0)) || !cfg_.pub_pedals) {
     speed_pid_.resetIntegrator();
   }
 
+  speed_pid_.setRange(
+      -std::min(fabs(cmd_vel_.decel_limit) > 0.0 ? fabs(cmd_vel_.decel_limit) : 9.8,
+                cfg_.decel_max > 0.0 ? cfg_.decel_max : 9.8),
+       std::min(fabs(cmd_vel_.accel_limit) > 0.0 ? fabs(cmd_vel_.accel_limit) : 9.8,
+                cfg_.accel_max > 0.0 ? cfg_.accel_max : 9.8)
+  );
   double accel_cmd = speed_pid_.step(vel_error, control_period_);
 
-  if (cmd_vel_.linear.x < mphToMps(5.0)) {
+  if (cmd_vel_.twist.linear.x < mphToMps(5.0)) {
     accel_cmd = std::min(accel_cmd, -530 / vehicle_mass / cfg_.wheel_radius);
   }
 
@@ -72,15 +80,15 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
 
     brake_cmd.enable = true;
     brake_cmd.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE;
-    if ((accel_cmd < -cfg_.brake_deadband) || (cmd_vel_.linear.x < mphToMps(5.0))) {
+    if ((accel_cmd < -cfg_.brake_deadband) || (cmd_vel_.twist.linear.x < mphToMps(5.0))) {
       brake_cmd.pedal_cmd = -accel_cmd * vehicle_mass * cfg_.wheel_radius;
     } else {
       brake_cmd.pedal_cmd = 0;
     }
 
     steering_cmd.enable = true;
-    steering_cmd.steering_wheel_angle_cmd = yaw_control_.getSteeringWheel(cmd_vel_.angular.z, actual_.linear.x)
-        + cfg_.steer_kp * (cmd_vel_.angular.z - actual_.angular.z);
+    steering_cmd.steering_wheel_angle_cmd = yaw_control_.getSteeringWheel(cmd_vel_.twist.linear.x, cmd_vel_.twist.angular.z, actual_.linear.x)
+        + cfg_.steer_kp * (cmd_vel_.twist.angular.z - actual_.angular.z);
 
     if (cfg_.pub_pedals) {
       pub_throttle_.publish(throttle_cmd);
@@ -102,13 +110,21 @@ void TwistControllerNode::reconfig(ControllerConfig& config, uint32_t level)
   cfg_.vehicle_mass -= cfg_.fuel_capacity * GAS_DENSITY; // Subtract weight of full gas tank
   cfg_.vehicle_mass += 150.0; // Account for some passengers
 
-  speed_pid_.setParams(cfg_.speed_kp, 0.0, 0.0, -cfg_.decel_max, cfg_.accel_max);
+  speed_pid_.setGains(cfg_.speed_kp, 0.0, 0.0);
   accel_pid_.setGains(cfg_.accel_kp, cfg_.accel_ki, 0.0);
   yaw_control_.setMaxLateralAccel(cfg_.max_lat_accel);
   lpf_accel_.setParams(cfg_.accel_tau, 0.02);
 }
 
 void TwistControllerNode::recvTwist(const geometry_msgs::Twist::ConstPtr& msg)
+{
+  cmd_vel_.twist = *msg;
+  cmd_vel_.accel_limit = 0;
+  cmd_vel_.decel_limit = 0;
+  cmd_stamp_ = ros::Time::now();
+}
+
+void TwistControllerNode::recvTwist2(const dbw_mkz_msgs::TwistCmd::ConstPtr& msg)
 {
   cmd_vel_ = *msg;
   cmd_stamp_ = ros::Time::now();

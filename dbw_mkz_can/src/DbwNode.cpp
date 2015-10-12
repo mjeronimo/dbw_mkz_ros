@@ -450,11 +450,16 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
     ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));
     if (msg->boo_cmd) {
       ptr->BCMD = 1;
+      boo_status_ = true;
     } else if (boo_control_) {
-      if (!boo_status_ && (msg->pedal_cmd > boo_thresh_hi_)) {
+      if (boo_status_) {
+        ptr->BCMD = 1;
+      }
+      if (!boo_status_ && (cmd > boo_thresh_hi_)) {
         ptr->BCMD = 1;
         boo_status_ = true;
-      } else if (boo_status_ && (msg->pedal_cmd < boo_thresh_lo_)) {
+      } else if (boo_status_ && (cmd < boo_thresh_lo_)) {
+        ptr->BCMD = 0;
         boo_status_ = false;
       }
     }

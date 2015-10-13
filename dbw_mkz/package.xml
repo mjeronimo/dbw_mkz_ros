@@ -13,9 +13,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>dwb_mkz_can</run_depend>
-  <run_depend>dwb_mkz_msgs</run_depend>
-  <run_depend>dwb_mkz_joystick_demo</run_depend>
+  <run_depend>dbw_mkz_can</run_depend>
+  <run_depend>dbw_mkz_msgs</run_depend>
+  <run_depend>dbw_mkz_joystick_demo</run_depend>
+  <run_depend>dbw_mkz_description</run_depend>
 
   <export>
     <metapackage/>

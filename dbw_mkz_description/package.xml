@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>dbw_mkz_description</name>
+  <version>0.0.1</version>
+  <description>.
+  </description>
+
+  <license>BSD</license>
+  <author>Dataspeed Inc.</author>
+  <maintainer email="khallenbeck@dataspeedinc.com">Dataspeed Inc.</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>urdf</run_depend>
+  <run_depend>xacro</run_depend>
+
+</package>

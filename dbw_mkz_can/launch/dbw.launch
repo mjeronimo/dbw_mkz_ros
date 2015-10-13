@@ -4,6 +4,7 @@
   <arg name="boo_thresh_lo" default="0.20"/>
   <arg name="boo_thresh_hi" default="0.22"/>
 
+
   <node ns="/" pkg="dataspeed_can_usb" type="can_node" name="can_node" output="screen">
     <remap from="can_bus_1" to="can_bus_1"/>
     <param name="bitrate_1" value="0" />
@@ -19,12 +20,15 @@
     <param name="bitrate_4" value="0" />
   </node>
 
-  <node ns="vehicle" pkg="dbw_mkz_can" type="dbw_node" name="dbw_node" output="screen">
-    <remap from="can_rx" to="/can_bus_dbw/can_rx"/>
-    <remap from="can_tx" to="/can_bus_dbw/can_tx"/>
-    <param name="boo_control" value="$(arg boo_control)" />
-    <param name="boo_thresh_lo" value="$(arg boo_thresh_lo)" />
-    <param name="boo_thresh_hi" value="$(arg boo_thresh_hi)" />
-  </node>
+  <group ns="vehicle" >
+    <include file="$(find dbw_mkz_description)/launch/mkz.launch" />
+    <node pkg="dbw_mkz_can" type="dbw_node" name="dbw_node" output="screen">
+      <remap from="can_rx" to="/can_bus_dbw/can_rx"/>
+      <remap from="can_tx" to="/can_bus_dbw/can_tx"/>
+      <param name="boo_control" value="$(arg boo_control)" />
+      <param name="boo_thresh_lo" value="$(arg boo_thresh_lo)" />
+      <param name="boo_thresh_hi" value="$(arg boo_thresh_hi)" />
+    </node>
+  </group>
 
 </launch>

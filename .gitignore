@@ -19,3 +19,6 @@ Makefile
 # Temporary files
 *~
 
+# Uncompressed meshes
+dbw_mkz_description/meshes/body.dae
+dbw_mkz_description/meshes/wheel.dae

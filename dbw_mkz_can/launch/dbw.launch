@@ -3,7 +3,10 @@
   <arg name="boo_control" default="true"/>
   <arg name="boo_thresh_lo" default="0.20"/>
   <arg name="boo_thresh_hi" default="0.22"/>
-
+  <arg name="twist_use_pedals" default="True"/>
+  <arg name="twist_use_steering" default="True"/>
+  <arg name="decel_max" default="3.0"/>
+  <arg name="accel_max" default="3.0"/>
 
   <node ns="/" pkg="dataspeed_can_usb" type="can_node" name="can_node" output="screen">
     <remap from="can_bus_1" to="can_bus_1"/>
@@ -21,7 +24,6 @@
   </node>
 
   <group ns="vehicle" >
-    <include file="$(find dbw_mkz_description)/launch/mkz.launch" />
     <node pkg="dbw_mkz_can" type="dbw_node" name="dbw_node" output="screen">
       <remap from="can_rx" to="/can_bus_dbw/can_rx"/>
       <remap from="can_tx" to="/can_bus_dbw/can_tx"/>
@@ -29,6 +31,13 @@
       <param name="boo_thresh_lo" value="$(arg boo_thresh_lo)" />
       <param name="boo_thresh_hi" value="$(arg boo_thresh_hi)" />
     </node>
+    <node pkg="dbw_mkz_twist_controller" type="twist_controller" name="twist_controller" output="screen">
+      <param name="pub_pedals" value="$(arg twist_use_pedals)" />
+      <param name="pub_steering" value="$(arg twist_use_steering)" />
+      <param name="decel_max" value="$(arg decel_max)" />
+      <param name="accel_max" value="$(arg accel_max)" />
+    </node>
+    <include file="$(find dbw_mkz_description)/launch/mkz.launch" />
   </group>
 
 </launch>

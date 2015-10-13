@@ -54,7 +54,7 @@
       <visual>
         <origin xyz="0 0.002 0" rpy="0 ${-M_PI/2 + flip*M_PI} 0"/>
         <geometry>
-          <mesh filename="package://mkz_description/meshes/wheel.dae" scale="1 1 1" />
+          <mesh filename="package://dbw_mkz_description/meshes/wheel.dae" scale="1 1 1" />
         </geometry>
       </visual>
     </link>
@@ -72,7 +72,7 @@
       <visual>
         <origin xyz="0 0.002 0" rpy="0 ${-M_PI/2 + flip*M_PI} 0"/>
         <geometry>
-          <mesh filename="package://mkz_description/meshes/wheel.dae" scale="1 1 1" />
+          <mesh filename="package://dbw_mkz_description/meshes/wheel.dae" scale="1 1 1" />
         </geometry>
       </visual>
     </link>
@@ -91,7 +91,7 @@
     <visual>
       <origin xyz="0 0 -0.3323" rpy="0 0 ${M_PI/2}" />
       <geometry>
-        <mesh filename="package://mkz_description/meshes/body.dae" />
+        <mesh filename="package://dbw_mkz_description/meshes/body.dae" />
       </geometry>
     </visual>
   </link>

@@ -17,4 +17,5 @@ ENDFOREACH(filename)
 
 install(DIRECTORY meshes urdf launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        PATTERN *.tar.gz EXCLUDE
 )

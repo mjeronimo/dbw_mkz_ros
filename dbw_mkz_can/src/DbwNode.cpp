@@ -713,7 +713,7 @@ void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, c
     const double L = 112.0 * 0.0254;
     const double W = 63.0 * 0.0254;
     const double RATIO = 1 / 22.0;
-    double r = L * tan(steering->steering_wheel_angle * RATIO);
+    double r = L / tan(steering->steering_wheel_angle * RATIO);
     joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
     joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
   }

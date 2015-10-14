@@ -138,8 +138,8 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   joint_state_.name[JOINT_FR] = "wheel_fr"; // Front Right
   joint_state_.name[JOINT_RL] = "wheel_rl"; // Rear Left
   joint_state_.name[JOINT_RR] = "wheel_rr"; // Rear Right
-  joint_state_.name[JOINT_SL] = "steering_left";
-  joint_state_.name[JOINT_SR] = "steering_right";
+  joint_state_.name[JOINT_SL] = "steer_fl";
+  joint_state_.name[JOINT_SR] = "steer_fr";
 
   // Set up Publishers
   pub_can_ = node.advertise<dataspeed_can_msgs::CanMessage>("can_tx", 10);
@@ -712,7 +712,7 @@ void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, c
   if (steering) {
     const double L = 112.0 * 0.0254;
     const double W = 63.0 * 0.0254;
-    const double RATIO = M_PI / 180 / 22.0;
+    const double RATIO = 1 / 22.0;
     double r = L * tan(steering->steering_wheel_angle * RATIO);
     joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
     joint_state_.position[JOINT_SR] = atan(L / (r + W/2));

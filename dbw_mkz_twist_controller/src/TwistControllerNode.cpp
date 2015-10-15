@@ -13,6 +13,7 @@ TwistControllerNode::TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn)
   // Subscribers
   sub_twist_ = n.subscribe("cmd_vel", 1, &TwistControllerNode::recvTwist, this);
   sub_twist2_ = n.subscribe("cmd_vel_with_limits", 1, &TwistControllerNode::recvTwist2, this);
+  sub_twist3_ = n.subscribe("cmd_vel_stamped", 1, &TwistControllerNode::recvTwist3, this);
   sub_steering_ = n.subscribe("steering_report", 1, &TwistControllerNode::recvSteeringReport, this);
   sub_imu_ = n.subscribe("imu/data_raw", 1, &TwistControllerNode::recvImu, this);
   sub_enable_ = n.subscribe("dbw_enabled", 1, &TwistControllerNode::recvEnable, this);
@@ -127,6 +128,14 @@ void TwistControllerNode::recvTwist(const geometry_msgs::Twist::ConstPtr& msg)
 void TwistControllerNode::recvTwist2(const dbw_mkz_msgs::TwistCmd::ConstPtr& msg)
 {
   cmd_vel_ = *msg;
+  cmd_stamp_ = ros::Time::now();
+}
+
+void TwistControllerNode::recvTwist3(const geometry_msgs::TwistStamped::ConstPtr& msg)
+{
+  cmd_vel_.twist = msg->twist;
+  cmd_vel_.accel_limit = 0;
+  cmd_vel_.decel_limit = 0;
   cmd_stamp_ = ros::Time::now();
 }
 

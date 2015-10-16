@@ -57,10 +57,12 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
   );
   double accel_cmd = speed_pid_.step(vel_error, control_period_);
 
-  if (cmd_vel_.twist.linear.x <= 0.0) {
+  const double MIN_SPEED = mphToMps(5.0);
+  if (cmd_vel_.twist.linear.x <= (double)1e-2) {
     accel_cmd = std::min(accel_cmd, -530 / vehicle_mass / cfg_.wheel_radius);
-  } else if (cmd_vel_.twist.linear.x < mphToMps(5.0)) {
-    cmd_vel_.twist.linear.x = mphToMps(5.0);
+  } else if (cmd_vel_.twist.linear.x < MIN_SPEED) {
+    cmd_vel_.twist.angular.z *= MIN_SPEED / cmd_vel_.twist.linear.x;
+    cmd_vel_.twist.linear.x = MIN_SPEED;
   }
 
   std_msgs::Float64 accel_cmd_msg;

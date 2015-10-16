@@ -85,7 +85,7 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
 
     brake_cmd.enable = true;
     brake_cmd.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE;
-    if ((accel_cmd < -cfg_.brake_deadband) || (cmd_vel_.twist.linear.x < mphToMps(5.0))) {
+    if ((accel_cmd < -cfg_.brake_deadband) || (cmd_vel_.twist.linear.x < MIN_SPEED)) {
       brake_cmd.pedal_cmd = -accel_cmd * vehicle_mass * cfg_.wheel_radius;
     } else {
       brake_cmd.pedal_cmd = 0;

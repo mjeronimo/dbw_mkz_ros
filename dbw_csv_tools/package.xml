@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>dbw_csv_tools</name>
+  <version>0.0.0</version>
+  <description>The dbw_csv_tools package</description>
+  <maintainer email="dataspeed@todo.todo">dataspeed</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>dbw_mkz_msgs</build_depend>
+  <build_depend>rosbag</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <run_depend>dbw_mkz_msgs</run_depend>
+  <run_depend>rosbag</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+
+  <export>
+  </export>
+</package>

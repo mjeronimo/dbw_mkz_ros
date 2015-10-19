@@ -4,6 +4,8 @@ import rospkg
 import rosbag
 import sys
 import csv
+import glob
+from math import floor
 
 bag_topics = []
 csv_topics = []
@@ -12,6 +14,7 @@ csv_types = []
 TWIST_TYPE = 'geometry_msgs/Twist'
 TWISTSTAMPED_TYPE = 'geometry_msgs/TwistStamped'
 FIX_TYPE = 'sensor_msgs/NavSatFix'
+IMU_TYPE = 'sensor_msgs/Imu'
 THROTTLE_REPORT_TYPE = 'dbw_mkz_msgs/ThrottleReport'
 BRAKE_REPORT_TYPE = 'dbw_mkz_msgs/BrakeReport'
 STEERING_REPORT_TYPE = 'dbw_mkz_msgs/SteeringReport'
@@ -19,6 +22,7 @@ GEAR_REPORT_TYPE = 'dbw_mkz_msgs/GearReport'
 FUEL_LEVEL_REPORT_TYPE = 'dbw_mkz_msgs/FuelLevelReport'
 TIRE_PRESSURE_REPORT_TYPE = 'dbw_mkz_msgs/TirePressureReport'
 WHEEL_SPEED_REPORT_TYPE = 'dbw_mkz_msgs/TirePressureReport'
+MISC1_REPORT_TYPE = 'dbw_mkz_msgs/Misc1Report'
 
 def write_twist_msg(t, topic, msg, csv_writer):        
     csv_writer.writerow([t, topic+'/linear/x', msg.linear.x])
@@ -33,6 +37,18 @@ def write_fix_msg(t, topic, msg, csv_writer):
     csv_writer.writerow([t, topic+'/longitude', msg.longitude])
     csv_writer.writerow([t, topic+'/altitude', msg.altitude])
     csv_writer.writerow([t, topic+'/status', msg.status.status])
+    
+def write_imu_msg(t, topic, msg, csv_writer):
+    csv_writer.writerow([t, topic+'/orientation/w', msg.orientation.w])
+    csv_writer.writerow([t, topic+'/orientation/x', msg.orientation.x])
+    csv_writer.writerow([t, topic+'/orientation/y', msg.orientation.y])
+    csv_writer.writerow([t, topic+'/orientation/z', msg.orientation.z])
+    csv_writer.writerow([t, topic+'/linear_acceleration/x', msg.linear_acceleration.x])
+    csv_writer.writerow([t, topic+'/linear_acceleration/y', msg.linear_acceleration.y])
+    csv_writer.writerow([t, topic+'/linear_acceleration/z', msg.linear_acceleration.z])
+    csv_writer.writerow([t, topic+'/angular_velocity/x', msg.angular_velocity.x])
+    csv_writer.writerow([t, topic+'/angular_velocity/y', msg.angular_velocity.y])
+    csv_writer.writerow([t, topic+'/angular_velocity/z', msg.angular_velocity.z])
 
 def write_throttle_report_msg(t, topic, msg, csv_writer):
     csv_writer.writerow([t, topic+'/pedal_input', msg.pedal_input])
@@ -66,11 +82,11 @@ def write_steering_report_msg(t, topic, msg, csv_writer):
     csv_writer.writerow([t, topic+'/steering_wheel_angle_cmd', msg.steering_wheel_angle_cmd])
     csv_writer.writerow([t, topic+'/steering_wheel_torque', msg.steering_wheel_torque])
     csv_writer.writerow([t, topic+'/speed', msg.speed])
-    csv_writer.writerow([t, topic+'/enabled', msg.enabled])
-    csv_writer.writerow([t, topic+'/driver', msg.driver])
-    csv_writer.writerow([t, topic+'/fault_bus1', msg.fault_bus1])
-    csv_writer.writerow([t, topic+'/fault_bus2', msg.fault_bus2])
-    csv_writer.writerow([t, topic+'/fault_connector', msg.fault_connector])
+    csv_writer.writerow([t, topic+'/enabled', int(msg.enabled)])
+    csv_writer.writerow([t, topic+'/driver', int(msg.driver)])
+    csv_writer.writerow([t, topic+'/fault_bus1', int(msg.fault_bus1)])
+    csv_writer.writerow([t, topic+'/fault_bus2', int(msg.fault_bus2)])
+    csv_writer.writerow([t, topic+'/fault_connector', int(msg.fault_connector)])
     
 def write_gear_report_msg(t, topic, msg, csv_writer):  
     csv_writer.writerow([t, topic+'/state', msg.state])
@@ -92,6 +108,20 @@ def write_wheel_speed_msg(t, topic, msg, csv_writer):
     csv_writer.writerow([t, topic+'/front_right', msg.front_right])
     csv_writer.writerow([t, topic+'/rear_left', msg.rear_left])
     csv_writer.writerow([t, topic+'/rear_right', msg.rear_right])
+    
+def write_misc1_msg(t, topic, msg, csv_writer):
+    csv_writer.writerow([t, topic+'/turn_signal', msg.turn_signal])
+    csv_writer.writerow([t, topic+'/high_beam_headlights', int(msg.high_beam_headlights)])
+    csv_writer.writerow([t, topic+'/wiper', msg.wiper])
+    csv_writer.writerow([t, topic+'/ambient_light', msg.ambient_light])
+    csv_writer.writerow([t, topic+'/btn_cc_on_off', int(msg.btn_cc_on_off)])
+    csv_writer.writerow([t, topic+'/btn_cc_res_cncl', int(msg.btn_cc_res_cncl)])
+    csv_writer.writerow([t, topic+'/btn_cc_set_inc', int(msg.btn_cc_set_inc)])
+    csv_writer.writerow([t, topic+'/btn_cc_set_dec', int(msg.btn_cc_set_dec)])
+    csv_writer.writerow([t, topic+'/btn_cc_gap_inc', int(msg.btn_cc_gap_inc)])
+    csv_writer.writerow([t, topic+'/btn_cc_gap_dec', int(msg.btn_cc_gap_dec)])
+    csv_writer.writerow([t, topic+'/btn_la_on_off', int(msg.btn_la_on_off)])
+    csv_writer.writerow([t, topic+'/fault_bus', int(msg.fault_bus)])
   
 def get_csv_type(topic_name):
     global csv_topics
@@ -108,80 +138,95 @@ def bag_to_csv():
     global csv_topics
     global csv_types
     
+    bags = glob.glob('*.bag')
+    print 'Found ' + str(len(bags)) + ' bag files:'
+    for fname in bags:
+        print '    ' + fname
+    
     # Initialize node
     rospy.init_node('bag_to_csv')
     
-    # Load relative time param
-    use_relative_time = rospy.get_param('~relative_time', True)
+    # Load parameters
+    use_relative_time = rospy.get_param('relative_time', True)
    
-    # Load bag file
-    if not rospy.has_param('~file'):
-        rospy.logerr('Bag filename not set!')
-        sys.exit()        
-    bag_filename = str(rospy.get_param('~file'))
-    rospy.loginfo('loading bag file ' + bag_filename)
-    bag = rosbag.Bag(bag_filename)
-    
     # Load desired topics
-    csv_topics = rospy.get_param('~topics')
-    bag_types = bag.get_type_and_topic_info(csv_topics)[1].values()
-    bag_topics = bag.get_type_and_topic_info(csv_topics)[1].keys()
-    start_time = bag.get_start_time()
+    csv_topics = rospy.get_param('topics')
     
-    if not use_relative_time:
-        start_time = 0
-    
-    for i in xrange(0, len(csv_topics)):
-        for j in xrange(0, len(bag_topics)):
-            if csv_topics[i] == bag_topics[j]:
-                csv_types.append(bag_types[j].msg_type)
-    
-    for i in xrange(0, len(csv_topics)):
-        rospy.loginfo('name: ' + csv_topics[i] + ' type: ' + csv_types[i])
-    
-    
-#     for i in xrange(0, len(bag_types)):
-#         rospy.loginfo('type: ' + str(bag_types[i].msg_type))
-#         rospy.loginfo('name: ' + str(bag_topics[i]))
+    for fname in bags:
+        csv_filename = fname.split('.')[0] + '.csv'    
+        csvfile = open(csv_filename, 'w')
+        csv_writer = csv.writer(csvfile, delimiter=',')
         
-#     rospy.loginfo('Published topics:')
-#     for i in xrange(0,len(published_topics)):
-#         rospy.loginfo('name: ' + published_topics[i][0] + ' type: ' + published_topics[i][1])        
-#     
-#     rospy.loginfo('CSV topics:')
-#     for i in xrange(0, len(csv_topics)):
-#         rospy.loginfo('  ' + csv_topics[i])
-    
-    csvfile = open(rospkg.RosPack().get_path('dbw_csv_tools') + '/can_csv_data.csv', 'w')
-    csv_writer = csv.writer(csvfile, delimiter=',')
-    rospy.loginfo('start time: ' + str(start_time))
-    
-    for topic, msg, t in bag.read_messages(csv_topics, start_time=rospy.Time(bag.get_start_time()), end_time=rospy.Time(bag.get_start_time())+rospy.Duration(10.0)):
-        type_idx = get_csv_type(topic)
-        if type_idx >= 0:
-            # Found desired topic, determine type and write it to CSV
-            if csv_types[type_idx] == TWIST_TYPE:
-                write_twist_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == TWISTSTAMPED_TYPE:
-                write_twist_msg(t.to_sec()-start_time, topic, msg.twist, csv_writer)
-            elif csv_types[type_idx] == FIX_TYPE:
-                write_fix_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == THROTTLE_REPORT_TYPE:
-                write_throttle_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)                
-            elif csv_types[type_idx] == BRAKE_REPORT_TYPE:
-                write_brake_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == STEERING_REPORT_TYPE:
-                write_steering_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == GEAR_REPORT_TYPE:
-                write_gear_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == FUEL_LEVEL_REPORT_TYPE:
-                write_fuel_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == TIRE_PRESSURE_REPORT_TYPE:
-                write_tire_pressure_msg(t.to_sec()-start_time, topic, msg, csv_writer)
-            elif csv_types[type_idx] == WHEEL_SPEED_REPORT_TYPE:
-                write_wheel_speed_msg(t.to_sec()-start_time, topic, msg, csv_writer)                
-    
-    csvfile.close()
+        # Load bag file    
+        print 'Loading bag file: ' + fname
+        bag = rosbag.Bag(fname)
+        bag_types = bag.get_type_and_topic_info(csv_topics)[1].values()
+        bag_topics = bag.get_type_and_topic_info(csv_topics)[1].keys()
+        start_time = bag.get_start_time()
+        
+        if not use_relative_time:
+            start_time = 0
+        
+        for i in xrange(0, len(csv_topics)):
+            for j in xrange(0, len(bag_topics)):
+                if csv_topics[i] == bag_topics[j]:
+                    csv_types.append(bag_types[j].msg_type)
+        
+        print 'Topics being converted:'
+        for i in xrange(0, len(csv_topics)):
+            print '    ' + csv_topics[i] + ' (' + csv_types[i] + ')'
+        
+        
+        # Initialize
+        unsupported_topics = []
+        num_messages = bag.get_message_count(csv_topics)
+        message_count = 0.0
+        percent_thres = 10.0
+        
+        # Convert
+        print 'Converting...'
+        for topic, msg, t in bag.read_messages(csv_topics):
+            if rospy.is_shutdown():
+                rospy.loginfo('User hit Ctrl-C, shutting down')
+                break
+            
+            type_idx = get_csv_type(topic)
+            if type_idx >= 0:
+                # Found desired topic, determine type and write it to CSV
+                if csv_types[type_idx] == TWIST_TYPE:
+                    write_twist_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == TWISTSTAMPED_TYPE:
+                    write_twist_msg(t.to_sec()-start_time, topic, msg.twist, csv_writer)
+                elif csv_types[type_idx] == FIX_TYPE:
+                    write_fix_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == IMU_TYPE:                
+                    write_imu_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == THROTTLE_REPORT_TYPE:
+                    write_throttle_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)                
+                elif csv_types[type_idx] == BRAKE_REPORT_TYPE:
+                    write_brake_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == STEERING_REPORT_TYPE:
+                    write_steering_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == GEAR_REPORT_TYPE:
+                    write_gear_report_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == FUEL_LEVEL_REPORT_TYPE:
+                    write_fuel_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == TIRE_PRESSURE_REPORT_TYPE:
+                    write_tire_pressure_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif csv_types[type_idx] == WHEEL_SPEED_REPORT_TYPE:
+                    write_wheel_speed_msg(t.to_sec()-start_time, topic, msg, csv_writer)         
+                elif csv_types[type_idx] == MISC1_REPORT_TYPE:
+                    write_misc1_msg(t.to_sec()-start_time, topic, msg, csv_writer)
+                elif type_idx not in unsupported_topics:
+                    rospy.logwarn(topic + ': Message type not supported by CSV converter (' + csv_types[type_idx] + ')')
+                    unsupported_topics.append(type_idx)      
+            message_count += 1
+            if (100.0 * message_count / num_messages) >= percent_thres:
+                percent_thres += 10
+                print str(int(100 * message_count / num_messages)) + '% Complete'       
+              
+        print 'Finished conversion! Saved CSV data to ' + csv_filename
+        csvfile.close()
     
 if __name__ == '__main__':
     try:

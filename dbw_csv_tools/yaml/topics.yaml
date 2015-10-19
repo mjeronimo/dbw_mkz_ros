@@ -1,0 +1,5 @@
+topics:
+  - /vehicle/throttle_report
+  - /vehicle/brake_report
+  - /vehicle/steering_report
+  - /vehicle/gps/fix

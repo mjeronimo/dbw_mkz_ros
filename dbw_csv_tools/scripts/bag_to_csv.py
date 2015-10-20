@@ -6,11 +6,23 @@ import sys
 import csv
 import glob
 from math import floor
+from yaml import load
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 bag_topics = []
 csv_topics = []
 csv_types = []
 
+BOOL_TYPE = 'std_msgs/Bool'
 TWIST_TYPE = 'geometry_msgs/Twist'
 TWISTSTAMPED_TYPE = 'geometry_msgs/TwistStamped'
 FIX_TYPE = 'sensor_msgs/NavSatFix'
@@ -23,6 +35,9 @@ FUEL_LEVEL_REPORT_TYPE = 'dbw_mkz_msgs/FuelLevelReport'
 TIRE_PRESSURE_REPORT_TYPE = 'dbw_mkz_msgs/TirePressureReport'
 WHEEL_SPEED_REPORT_TYPE = 'dbw_mkz_msgs/TirePressureReport'
 MISC1_REPORT_TYPE = 'dbw_mkz_msgs/Misc1Report'
+
+def write_bool_msg(t, topic, msg, csv_writer):        
+    csv_writer.writerow([t, topic, int(msg.data)])
 
 def write_twist_msg(t, topic, msg, csv_writer):        
     csv_writer.writerow([t, topic+'/linear/x', msg.linear.x])
@@ -139,18 +154,15 @@ def bag_to_csv():
     global csv_types
     
     bags = glob.glob('*.bag')
-    print 'Found ' + str(len(bags)) + ' bag files:'
+    print 'Bag files found: ' + str(len(bags))
     for fname in bags:
         print '    ' + fname
     
-    # Initialize node
-    rospy.init_node('bag_to_csv')
-    
-    # Load parameters
-    use_relative_time = rospy.get_param('relative_time', True)
    
-    # Load desired topics
-    csv_topics = rospy.get_param('topics')
+    yaml_file = open('params.yaml', 'r')
+    params = load(yaml_file)
+    csv_topics = params['topics']
+    use_relative_time = params['relative_time']
     
     for fname in bags:
         csv_filename = fname.split('.')[0] + '.csv'    
@@ -158,7 +170,7 @@ def bag_to_csv():
         csv_writer = csv.writer(csvfile, delimiter=',')
         
         # Load bag file    
-        print 'Loading bag file: ' + fname
+        print 'Loading bag file: [' + fname + ']'
         bag = rosbag.Bag(fname)
         bag_types = bag.get_type_and_topic_info(csv_topics)[1].values()
         bag_topics = bag.get_type_and_topic_info(csv_topics)[1].keys()
@@ -186,14 +198,12 @@ def bag_to_csv():
         # Convert
         print 'Converting...'
         for topic, msg, t in bag.read_messages(csv_topics):
-            if rospy.is_shutdown():
-                rospy.loginfo('User hit Ctrl-C, shutting down')
-                break
-            
             type_idx = get_csv_type(topic)
             if type_idx >= 0:
                 # Found desired topic, determine type and write it to CSV
-                if csv_types[type_idx] == TWIST_TYPE:
+                if csv_types[type_idx] == BOOL_TYPE:
+                    write_bool_msg(t.to_sec()-start_time, topic, msg, csv_writer)                    
+                elif csv_types[type_idx] == TWIST_TYPE:
                     write_twist_msg(t.to_sec()-start_time, topic, msg, csv_writer)
                 elif csv_types[type_idx] == TWISTSTAMPED_TYPE:
                     write_twist_msg(t.to_sec()-start_time, topic, msg.twist, csv_writer)
@@ -218,14 +228,14 @@ def bag_to_csv():
                 elif csv_types[type_idx] == MISC1_REPORT_TYPE:
                     write_misc1_msg(t.to_sec()-start_time, topic, msg, csv_writer)
                 elif type_idx not in unsupported_topics:
-                    rospy.logwarn(topic + ': Message type not supported by CSV converter (' + csv_types[type_idx] + ')')
+                    print bcolors.WARNING + topic + ': Message type not supported by CSV converter (' + csv_types[type_idx] + ')' + bcolors.ENDC
                     unsupported_topics.append(type_idx)      
             message_count += 1
             if (100.0 * message_count / num_messages) >= percent_thres:
                 percent_thres += 10
                 print str(int(100 * message_count / num_messages)) + '% Complete'       
               
-        print 'Finished conversion! Saved CSV data to ' + csv_filename
+        print bcolors.OKGREEN + 'Finished conversion! Saved CSV data to [' + csv_filename + ']' + bcolors.ENDC
         csvfile.close()
     
 if __name__ == '__main__':

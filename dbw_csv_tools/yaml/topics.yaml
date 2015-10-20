@@ -1,8 +1,0 @@
-topics:
-  - /vehicle/throttle_report
-  - /vehicle/brake_report
-  - /vehicle/steering_report
-  - /vehicle/gps/fix
-  - /oxford_gps/gps/fix
-  - /oxford_gps/imu/data
-  - /vehicle/fuel_level_report

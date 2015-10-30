@@ -1,0 +1,12 @@
+- hg:
+    local-name: lusb
+    uri: ssh://hg@bitbucket.org/DataspeedInc/lusb
+    version: default
+- hg:
+    local-name: dataspeed_can
+    uri: ssh://hg@bitbucket.org/DataspeedInc/dataspeed_can
+    version: default
+- hg:
+    local-name: dbw_mkz_ros
+    uri: ssh://hg@bitbucket.org/DataspeedInc/dbw_mkz_ros
+    version: default

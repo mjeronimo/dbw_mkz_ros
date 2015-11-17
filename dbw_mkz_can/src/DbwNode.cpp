@@ -531,7 +531,7 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
   if (enabled()) {
     ptr->SCMD = std::max((float)-4700, std::min((float)4700, (float)(msg->steering_wheel_angle_cmd * (180 / M_PI * 10))));
     if (fabsf(msg->steering_wheel_angle_velocity) > 0) {
-      ptr->SVEL = std::max((float)1, std::min((float)254, (float)(fabsf(msg->steering_wheel_angle_velocity) / 2)));
+      ptr->SVEL = std::max((float)1, std::min((float)254, (float)roundf(fabsf(msg->steering_wheel_angle_velocity) * 180 / M_PI / 2)));
     }
     if (msg->enable) {
       ptr->EN = 1;

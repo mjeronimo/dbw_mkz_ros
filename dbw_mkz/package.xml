@@ -6,10 +6,12 @@
     Drive-by-wire interface to the Dataspeed Inc. Lincoln MKZ DBW kit
   </description>
 
-  <maintainer email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</maintainer>
+  <license>BSD</license>
   <author email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</author>
-
-  <license>Proprietary</license>
+  <maintainer email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</maintainer>
+  <url type="website">http://dataspeedinc.com</url>
+  <url type="repository">https://bitbucket.org/dataspeedinc/dbw_mkz_ros</url>
+  <url type="bugtracker">https://bitbucket.org/dataspeedinc/dbw_mkz_ros/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 

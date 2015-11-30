@@ -2,12 +2,16 @@
 <package>
   <name>dbw_mkz_description</name>
   <version>0.0.1</version>
-  <description>.
+  <description>
+    URDF and meshes describing the Lincoln MKZ.
   </description>
 
   <license>BSD</license>
-  <author>Dataspeed Inc.</author>
-  <maintainer email="khallenbeck@dataspeedinc.com">Dataspeed Inc.</maintainer>
+  <author email="mradovnikovich@dataspeedinc.com">Micho Radovnikovich</author>
+  <maintainer email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</maintainer>
+  <url type="website">http://dataspeedinc.com</url>
+  <url type="repository">https://bitbucket.org/dataspeedinc/dbw_mkz_ros</url>
+  <url type="bugtracker">https://bitbucket.org/dataspeedinc/dbw_mkz_ros/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 

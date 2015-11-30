@@ -6,9 +6,9 @@
     Drive-by-wire messages for the Lincoln MKZ
   </description>
 
-  <license>Proprietary</license>
-  <author>Dataspeed Inc.</author>
-  <maintainer email="khallenbeck@dataspeedinc.com">Dataspeed Inc.</maintainer>
+  <license>BSD</license>
+  <author email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</author>
+  <maintainer email="khallenbeck@dataspeedinc.com">Kevin Hallenbeck</maintainer>
   <url type="website">http://dataspeedinc.com</url>
   <url type="repository">https://bitbucket.org/dataspeedinc/dbw_mkz_ros</url>
   <url type="bugtracker">https://bitbucket.org/dataspeedinc/dbw_mkz_ros/issues</url>

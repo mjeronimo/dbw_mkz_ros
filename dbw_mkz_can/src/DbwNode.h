@@ -74,7 +74,7 @@ private:
     JOINT_COUNT,
   };
   sensor_msgs::JointState joint_state_;
-  void publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
+  void publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
 
   // Brake lights
   bool boo_status_;

@@ -240,7 +240,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_steering_.publish(out);
-          publishJointStates(NULL, &out);
+          publishJointStates(msg->header.stamp, NULL, &out);
         }
         break;
 
@@ -294,7 +294,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.rear_left   = (float)ptr->rear_left   * 0.01;
           out.rear_right  = (float)ptr->rear_right  * 0.01;
           pub_wheel_speeds_.publish(out);
-          publishJointStates(&out, NULL);
+          publishJointStates(msg->header.stamp, &out, NULL);
         }
         break;
 
@@ -702,10 +702,9 @@ void DbwNode::driverGear(bool driver)
   }
 }
 
-void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering)
+void DbwNode::publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering)
 {
-  ros::Time now = ros::Time::now();
-  double dt = (now - joint_state_.header.stamp).toSec();
+  double dt = (stamp - joint_state_.header.stamp).toSec();
   if (wheels) {
     joint_state_.velocity[JOINT_FL] = wheels->front_left;
     joint_state_.velocity[JOINT_FR] = wheels->front_right;
@@ -715,7 +714,7 @@ void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, c
   if (steering) {
     const double L = 112.0 * 0.0254;
     const double W = 63.0 * 0.0254;
-    const double RATIO = 1 / 22.0;
+    const double RATIO = 1 / 16.0;
     double r = L / tan(steering->steering_wheel_angle * RATIO);
     joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
     joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
@@ -725,7 +724,7 @@ void DbwNode::publishJointStates(const dbw_mkz_msgs::WheelSpeedReport *wheels, c
       joint_state_.position[i] = fmod(joint_state_.position[i] + dt * joint_state_.velocity[i], 2*M_PI);
     }
   }
-  joint_state_.header.stamp = now;
+  joint_state_.header.stamp = stamp;
   pub_joint_states_.publish(joint_state_);
 }
 

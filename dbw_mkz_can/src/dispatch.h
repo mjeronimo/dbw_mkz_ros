@@ -67,7 +67,8 @@ typedef struct {
   uint8_t :8;
   uint8_t EN :1;
   uint8_t CLEAR :1;
-  uint8_t :6;
+  uint8_t IGNORE :1;
+  uint8_t :5;
 } MsgThrottleCmd;
 
 typedef struct {

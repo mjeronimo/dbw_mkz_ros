@@ -163,6 +163,10 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
     std::swap(boo_thresh_lo_, boo_thresh_hi_);
   }
 
+  // Throttle ignore
+  throttle_ignore_ = false;
+  priv_nh.getParam("throttle_ignore", throttle_ignore_);
+
   // Initialize joint states
   joint_state_.position.resize(JOINT_COUNT);
   joint_state_.velocity.resize(JOINT_COUNT);
@@ -548,8 +552,11 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
       ptr->EN = 1;
     }
   }
-  if (clear()) {
+  if (clear() || throttle_ignore_) {
     ptr->CLEAR = 1;
+  }
+  if (throttle_ignore_) {
+    ptr->IGNORE = 1;
   }
   pub_can_.publish(out);
 }

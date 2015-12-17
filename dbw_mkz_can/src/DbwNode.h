@@ -116,6 +116,9 @@ private:
   double boo_thresh_lo_;
   double boo_thresh_hi_;
 
+  // Throttle ignore driver override
+  bool throttle_ignore_;
+
   // Subscribed topics
   ros::Subscriber sub_can_;
   ros::Subscriber sub_brake_;

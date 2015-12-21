@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <launch>
-<!--
-  <include file="$(find dbw_mkz_can)/launch/dbw.launch" />
--->
-  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen">
-  </node>
 
-  <node pkg="joy" type="joy_node" name="joy_node" >
-  </node>
+  <!-- DBW system -->
+  <arg name="sys" default="false"/>
+  <group if="$(arg sys)">
+    <include file="$(find dbw_mkz_can)/launch/dbw.launch" />
+  </group>
+
+  <!-- Joystick demo -->
+  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" />
+
+  <!-- Joystick driver -->
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen" />
 
 </launch>

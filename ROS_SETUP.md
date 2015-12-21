@@ -13,6 +13,12 @@ wstool update -t src
 rosdep update && rosdep install --from-paths src --ignore-src
 ```
 
+# Install udev rules
+```
+sudo cp ~/catkin_ws/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm trigger
+```
+
 # Build workspace
 ```
 catkin_make -DCMAKE_BUILD_TYPE=Release

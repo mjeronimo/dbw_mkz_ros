@@ -100,6 +100,16 @@ class MkzGui(Plugin):
         self.brake_fltboo = False
         self.brake_fltcon = False
         
+        # Steering faults
+        self.steering_driver = False
+        self.steering_flt1 = False
+        self.steering_flt2 = False
+        self.steering_fltcon = False
+        
+        # Gear faults
+        self.gear_driver = False
+        self.gear_fltbus = False
+        
     def updateGuiCallback(self):
         current_time = rospy.Time.now()
         
@@ -238,8 +248,49 @@ class MkzGui(Plugin):
             self._widget.brake_flt2_led.setPalette(self.gray_palette)
             self._widget.brake_fltcon_led.setPalette(self.gray_palette)
             self._widget.brake_fltb_led.setPalette(self.gray_palette)
+            
+        # Steering faults
+        if (current_time - self.steering_stamp) < rospy.Duration(0.25):
+            if self.steering_driver:
+                self._widget.steering_driver_led.setPalette(self.yellow_palette)
+            else:
+                self._widget.steering_driver_led.setPalette(self.green_palette)
+                
+            if self.steering_flt1:
+                self._widget.steering_flt1_led.setPalette(self.red_palette)
+            else:
+                self._widget.steering_flt1_led.setPalette(self.green_palette)      
+                
+            if self.steering_flt2:
+                self._widget.steering_flt2_led.setPalette(self.red_palette)
+            else:
+                self._widget.steering_flt2_led.setPalette(self.green_palette) 
+                
+            if self.steering_fltcon:
+                self._widget.steering_fltcon_led.setPalette(self.red_palette)
+            else:
+                self._widget.steering_flt2_led.setPalette(self.green_palette)                 
+        else:
+            self._widget.steering_driver_led.setPalette(self.gray_palette)
+            self._widget.steering_flt1_led.setPalette(self.gray_palette)
+            self._widget.steering_flt2_led.setPalette(self.gray_palette)
+            self._widget.steering_fltcon_led.setPalette(self.gray_palette)
+            
+        # Gear faults
+        if (current_time - self.gear_stamp) < rospy.Duration(0.25):
+            if self.gear_driver:
+                self._widget.gear_driver_led.setPalette(self.yellow_palette)
+            else:
+                self._widget.gear_driver_led.setPalette(self.green_palette)
+                
+            if self.gear_fltbus:
+                self._widget.gear_fltbus_led.setPalette(self.red_palette)
+            else:
+                self._widget.gear_fltbus_led.setPalette(self.green_palette)                        
+        else:
+            self._widget.gear_driver_led.setPalette(self.gray_palette)
+            self._widget.gear_fltbus_led.setPalette(self.gray_palette)
 
-                     
         # Vehicle data labels
         self._widget.lat_lbl.setText(str(self.gps_lat))
         self._widget.lon_lbl.setText(str(self.gps_lon))
@@ -257,6 +308,42 @@ class MkzGui(Plugin):
         else:
             self._widget.boo_led.setPalette(self.gray_palette)
     
+        # Steering wheel buttons
+        if self.on_off_btn:
+            self._widget.on_off_led.setPalette(self.green_palette)
+        else:
+            self._widget.on_off_led.setPalette(self.gray_palette)
+    
+        if self.res_cncl_btn:
+            self._widget.res_cncl_led.setPalette(self.green_palette)
+        else:
+            self._widget.res_cncl_led.setPalette(self.gray_palette)    
+
+        if self.set_inc_btn:
+            self._widget.set_inc_led.setPalette(self.green_palette)
+        else:
+            self._widget.set_inc_led.setPalette(self.gray_palette)     
+    
+        if self.set_dec_btn:
+            self._widget.set_dec_led.setPalette(self.green_palette)
+        else:
+            self._widget.set_dec_led.setPalette(self.gray_palette)  
+            
+        if self.gap_inc_btn:
+            self._widget.gap_inc_led.setPalette(self.green_palette)
+        else:
+            self._widget.gap_inc_led.setPalette(self.gray_palette)           
+    
+        if self.gap_dec_btn:
+            self._widget.gap_dec_led.setPalette(self.green_palette)
+        else:
+            self._widget.gap_dec_led.setPalette(self.gray_palette)
+            
+        if self.la_on_off_btn:
+            self._widget.la_on_off_led.setPalette(self.green_palette)
+        else:
+            self._widget.la_on_off_led.setPalette(self.gray_palette)           
+                
     def initGraphics(self):
         
         # LED color palettes
@@ -305,7 +392,15 @@ class MkzGui(Plugin):
         self._widget.brake_fltcon_led.setText('')
         self._widget.brake_fltcon_led.setPalette(self.gray_palette)         
         self._widget.brake_fltb_led.setText('')
-        self._widget.brake_fltb_led.setPalette(self.gray_palette)       
+        self._widget.brake_fltb_led.setPalette(self.gray_palette)   
+        
+        self._widget.steering_driver_led.setText('')
+        self._widget.steering_flt1_led.setText('')
+        self._widget.steering_flt2_led.setText('')
+        self._widget.steering_fltcon_led.setText('')
+        
+        self._widget.gear_driver_led.setText('')
+        self._widget.gear_fltbus_led.setText('')    
         
         # Steering wheel buttons
         self._widget.on_off_led.setText('')
@@ -372,10 +467,18 @@ class MkzGui(Plugin):
         self.speed = 0.1 * math.floor(10 * msg.speed)
         self.reported_steering = 0.1 * math.floor(self.rad_to_deg * 10 * msg.steering_wheel_angle)
         self.steering_cmd = 0.1 * math.floor(self.rad_to_deg * 10 * msg.steering_wheel_angle_cmd)
+        
+        self.steering_driver = msg.driver
+        self.steering_flt1 = msg.fault_bus1
+        self.steering_flt2 = msg.fault_bus2
+        self.steering_fltcon = msg.fault_connector
     
     def recvGearReport(self, msg):
         self.gear_stamp = rospy.Time.now()
         self.reported_gear = self.gear_map[msg.state.gear]
+
+        self.gear_driver = msg.driver
+        self.gear_fltbus = msg.fault_bus
         
     def recvMisc1Report(self, msg):
         self.on_off_btn = msg.btn_cc_on_off

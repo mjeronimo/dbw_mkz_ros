@@ -35,3 +35,9 @@ roslaunch dbw_mkz_joystick_demo joystick_demo.launch sys:=true
 source ~/catkin_ws/devel/setup.bash
 roslaunch dbw_mkz_can dbw.launch
 ```
+
+# Launch RViz visualization
+```
+source ~/catkin_ws/devel/setup.bash
+roslaunch dbw_mkz_description rviz.launch
+```

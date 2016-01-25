@@ -1,4 +1,5 @@
 # Dataspeed ADAS Development Vehicle Kit
+![rviz screenshot](img/mkz_rviz.png)
 
 ## Documentation and firmware updates
 The latest release can be found on the [downloads](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/downloads) page

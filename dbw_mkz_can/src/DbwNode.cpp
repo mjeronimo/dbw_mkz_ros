@@ -276,6 +276,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.driver = ptr->DRIVER ? true : false;
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
+          out.fault_calibration = ptr->FLTCAL ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_steering_.publish(out);
           publishJointStates(msg->header.stamp, NULL, &out);

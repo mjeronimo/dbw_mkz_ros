@@ -103,7 +103,7 @@ typedef struct {
   uint8_t :2;
   uint8_t FLTBUS1 :1;
   uint8_t FLTBUS2 :1;
-  uint8_t :1;
+  uint8_t FLTCAL :1;
   uint8_t FLTCON :1;
 } MsgSteeringReport;
 

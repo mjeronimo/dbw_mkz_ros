@@ -15,4 +15,5 @@ bool driver
 # Faults
 bool fault_bus1
 bool fault_bus2
+bool fault_calibration
 bool fault_connector

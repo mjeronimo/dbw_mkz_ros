@@ -1,8 +1,8 @@
 # Setup workspace
 ```
 sudo apt-get install python-wstool
-mkdir -p ~/catkin_ws/src
-cd ~/catkin_ws
+mkdir -p ~/dbw_ws/src
+cd ~/dbw_ws
 wstool init src
 wstool merge -t src https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz.rosinstall
 ```
@@ -15,7 +15,7 @@ rosdep update && rosdep install --from-paths src --ignore-src
 
 # Install udev rules
 ```
-sudo cp ~/catkin_ws/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/
+sudo cp ~/dbw_ws/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm trigger
 ```
 
@@ -26,18 +26,18 @@ catkin_make -DCMAKE_BUILD_TYPE=Release
 
 # Launch joystick demo
 ```
-source ~/catkin_ws/devel/setup.bash
+source ~/dbw_ws/devel/setup.bash
 roslaunch dbw_mkz_joystick_demo joystick_demo.launch sys:=true
 ```
 
 # Launch Drive-By-Wire system only
 ```
-source ~/catkin_ws/devel/setup.bash
+source ~/dbw_ws/devel/setup.bash
 roslaunch dbw_mkz_can dbw.launch
 ```
 
 # Launch RViz visualization
 ```
-source ~/catkin_ws/devel/setup.bash
+source ~/dbw_ws/devel/setup.bash
 roslaunch dbw_mkz_description rviz.launch
 ```

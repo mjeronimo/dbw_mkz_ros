@@ -4,7 +4,6 @@ project(dbw_mkz_can)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   nodelet
-  message_filters
   sensor_msgs
   dataspeed_can_msgs
   dataspeed_can_msg_filters

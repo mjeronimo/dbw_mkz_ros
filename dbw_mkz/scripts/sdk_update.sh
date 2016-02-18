@@ -9,7 +9,7 @@ rosdep update && rosdep install --from-paths $MY_WORKSPACE/src --ignore-src
 
 # Build workspace
 cd $MY_WORKSPACE
-catkin_make -DCMAKE_BUILD_TYPE=Release
+catkin_make -DCMAKE_BUILD_TYPE=Release -j1
 
 echo 'SDK update: Done'
 

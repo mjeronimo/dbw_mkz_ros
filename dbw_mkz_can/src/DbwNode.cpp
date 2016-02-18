@@ -132,6 +132,85 @@ static inline float throttlePedalFromPercent(float percent) {
   return 0.0;
 }
 
+
+static const struct {float x; float y; float z; float a;} SONAR_TABLE[] = {
+//   x,      y,     z,     angle
+ { 4.000,  0.900, 0.100, 0.500 * M_PI}, // Front left side
+ { 4.000,  0.500, 0.100, 0.100 * M_PI}, // Front left corner
+ { 4.000,  0.200, 0.100, 0.000 * M_PI}, // Front left center
+ { 4.000, -0.200, 0.100, 0.000 * M_PI}, // Front right center
+ { 4.000, -0.500, 0.100, 1.900 * M_PI}, // Front right corner
+ { 4.000, -0.900, 0.100, 1.500 * M_PI}, // Front right side
+ {-1.000,  0.900, 0.100, 0.500 * M_PI}, // Rear left side
+ {-1.000,  0.500, 0.100, 0.900 * M_PI}, // Rear left corner
+ {-1.000,  0.200, 0.100, 1.000 * M_PI}, // Rear left center
+ {-1.000, -0.200, 0.100, 1.000 * M_PI}, // Rear right center
+ {-1.000, -0.500, 0.100, 1.100 * M_PI}, // Rear right corner
+ {-1.000, -0.900, 0.100, 1.500 * M_PI}, // Rear right side
+};
+static inline float sonarMetersFromBits(uint8_t bits) {
+  return bits ? ((float)bits * 0.15) + 0.15 : 0.0;
+}
+static inline void sonarBuildPointCloud2(sensor_msgs::PointCloud2 &cloud, const dbw_mkz_msgs::SurroundReport &surround) {
+  // Populate message fields
+  const uint32_t POINT_STEP = 16;
+  cloud.header.frame_id = "base_link";
+  cloud.header.stamp = surround.header.stamp;
+  cloud.fields.resize(4);
+  cloud.fields[0].name = "x";
+  cloud.fields[0].offset = 0;
+  cloud.fields[0].datatype = sensor_msgs::PointField::FLOAT32;
+  cloud.fields[0].count = 1;
+  cloud.fields[1].name = "y";
+  cloud.fields[1].offset = 4;
+  cloud.fields[1].datatype = sensor_msgs::PointField::FLOAT32;
+  cloud.fields[1].count = 1;
+  cloud.fields[2].name = "z";
+  cloud.fields[2].offset = 8;
+  cloud.fields[2].datatype = sensor_msgs::PointField::FLOAT32;
+  cloud.fields[2].count = 1;
+  cloud.fields[3].name = "rgba";
+  cloud.fields[3].offset = 12;
+  cloud.fields[3].datatype = sensor_msgs::PointField::FLOAT32;
+  cloud.fields[3].count = 1;
+  cloud.data.resize(12 * POINT_STEP);
+
+  uint8_t *ptr = cloud.data.data();
+  for (unsigned int i = 0; i < 12; i++) {
+    const float range = surround.sonar[i];
+    if (range > 0.0) {
+      *((float*)(ptr + 0)) = SONAR_TABLE[i].x + cosf(SONAR_TABLE[i].a) * range; // x
+      *((float*)(ptr + 4)) = SONAR_TABLE[i].y + sinf(SONAR_TABLE[i].a) * range; // y
+      *((float*)(ptr + 8)) = SONAR_TABLE[i].z; // z
+      if (range < 0.7) {
+        *((uint32_t*)(ptr + 12)) = 0xC0FF0000; // rgba = RED
+      } else if (range < 1.3) {
+        *((uint32_t*)(ptr + 12)) = 0xC0FFFF00; // rgba = YELLOW
+      } else {
+        *((uint32_t*)(ptr + 12)) = 0xC000FF00; // rgba = GREEN
+      }
+      ptr += POINT_STEP;
+    }
+  }
+  if (ptr == cloud.data.data()) {
+    // Prevent rviz from latching the last message
+    *((float*)(ptr + 0)) = NAN; // x
+    *((float*)(ptr + 4)) = NAN; // y
+    *((float*)(ptr + 8)) = NAN; // z
+    *((uint32_t*)(ptr + 12)) = 0x00000000; // rgba
+    ptr += POINT_STEP;
+  }
+
+  // Populate message with number of valid points
+  cloud.point_step = POINT_STEP;
+  cloud.row_step = ptr - cloud.data.data();
+  cloud.height = 1;
+  cloud.width = cloud.row_step / POINT_STEP;
+  cloud.is_bigendian = false;
+  cloud.is_dense = true;
+  cloud.data.resize(cloud.row_step); // Shrink to actual size
+}
+
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
 , sync_gps_(10, boost::bind(&DbwNode::recvCanGps, this, _1), ID_REPORT_GPS1, ID_REPORT_GPS2, ID_REPORT_GPS3)
@@ -190,6 +269,8 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_suspension_ = node.advertise<dbw_mkz_msgs::SuspensionReport>("suspension_report", 2);
   pub_tire_pressure_ = node.advertise<dbw_mkz_msgs::TirePressureReport>("tire_pressure_report", 2);
   pub_fuel_level_ = node.advertise<dbw_mkz_msgs::FuelLevelReport>("fuel_level_report", 2);
+  pub_surround_ = node.advertise<dbw_mkz_msgs::SurroundReport>("surround_report", 2);
+  pub_sonar_cloud_ = node.advertise<sensor_msgs::PointCloud2>("sonar_cloud", 2);
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
@@ -370,6 +451,42 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.header.stamp = msg->header.stamp;
           out.fuel_level  = (float)ptr->fuel_level * 0.108696;
           pub_fuel_level_.publish(out);
+        }
+        break;
+
+      case ID_REPORT_SURROUND:
+        if (msg->msg.dlc >= sizeof(MsgReportSurround)) {
+          const MsgReportSurround *ptr = (const MsgReportSurround*)msg->msg.data.elems;
+          dbw_mkz_msgs::SurroundReport out;
+          out.header.stamp = msg->header.stamp;
+          out.cta_left_alert = ptr->l_cta_alert ? true : false;
+          out.cta_right_alert = ptr->r_cta_alert ? true : false;
+          out.cta_left_enabled = ptr->l_cta_enabled ? true : false;
+          out.cta_right_enabled = ptr->r_cta_enabled ? true : false;
+          out.blis_left_alert = ptr->l_blis_alert ? true : false;
+          out.blis_right_alert = ptr->r_blis_alert ? true : false;
+          out.blis_left_enabled = ptr->l_blis_enabled ? true : false;
+          out.blis_right_enabled = ptr->r_blis_enabled ? true : false;
+          out.sonar_enabled = ptr->sonar_enabled ? true : false;
+          out.sonar_fault = ptr->sonar_fault ? true : false;
+          if (out.sonar_enabled) {
+            out.sonar[0] = sonarMetersFromBits(ptr->sonar_00);
+            out.sonar[1] = sonarMetersFromBits(ptr->sonar_01);
+            out.sonar[2] = sonarMetersFromBits(ptr->sonar_02);
+            out.sonar[3] = sonarMetersFromBits(ptr->sonar_03);
+            out.sonar[4] = sonarMetersFromBits(ptr->sonar_04);
+            out.sonar[5] = sonarMetersFromBits(ptr->sonar_05);
+            out.sonar[6] = sonarMetersFromBits(ptr->sonar_06);
+            out.sonar[7] = sonarMetersFromBits(ptr->sonar_07);
+            out.sonar[8] = sonarMetersFromBits(ptr->sonar_08);
+            out.sonar[9] = sonarMetersFromBits(ptr->sonar_09);
+            out.sonar[10] = sonarMetersFromBits(ptr->sonar_10);
+            out.sonar[11] = sonarMetersFromBits(ptr->sonar_11);
+          }
+          pub_surround_.publish(out);
+          sensor_msgs::PointCloud2 cloud;
+          sonarBuildPointCloud2(cloud, out);
+          pub_sonar_cloud_.publish(cloud);
         }
         break;
 

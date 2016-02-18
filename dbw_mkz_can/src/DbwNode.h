@@ -54,9 +54,11 @@
 #include <dbw_mkz_msgs/FuelLevelReport.h>
 #include <dbw_mkz_msgs/SuspensionReport.h>
 #include <dbw_mkz_msgs/TirePressureReport.h>
+#include <dbw_mkz_msgs/SurroundReport.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/JointState.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Bool.h>
 
@@ -138,6 +140,8 @@ private:
   ros::Publisher pub_suspension_;
   ros::Publisher pub_tire_pressure_;
   ros::Publisher pub_fuel_level_;
+  ros::Publisher pub_surround_;
+  ros::Publisher pub_sonar_cloud_;
   ros::Publisher pub_imu_;
   ros::Publisher pub_gps_fix_;
   ros::Publisher pub_gps_vel_;

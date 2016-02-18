@@ -215,6 +215,32 @@ typedef struct {
   int16_t fuel_level;
 } MsgReportFuelLevel;
 
+typedef struct {
+  uint8_t l_cta_alert :1;
+  uint8_t l_cta_enabled :1;
+  uint8_t l_blis_alert :1;
+  uint8_t l_blis_enabled :1;
+  uint8_t r_cta_alert :1;
+  uint8_t r_cta_enabled :1;
+  uint8_t r_blis_alert :1;
+  uint8_t r_blis_enabled :1;
+  uint8_t sonar_00 :4;
+  uint8_t sonar_01 :4;
+  uint8_t sonar_02 :4;
+  uint8_t sonar_03 :4;
+  uint8_t sonar_04 :4;
+  uint8_t sonar_05 :4;
+  uint8_t sonar_06 :4;
+  uint8_t sonar_07 :4;
+  uint8_t sonar_08 :4;
+  uint8_t sonar_09 :4;
+  uint8_t sonar_10 :4;
+  uint8_t sonar_11 :4;
+  uint8_t :6;
+  uint8_t sonar_enabled :1;
+  uint8_t sonar_fault :1;
+} MsgReportSurround;
+
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
   BUILD_ASSERT(4 == sizeof(MsgBrakeCmd));
@@ -236,6 +262,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportSuspension));
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
   BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
+  BUILD_ASSERT(8 == sizeof(MsgReportSurround));
 }
 #undef BUILD_ASSERT
 
@@ -259,6 +286,7 @@ enum {
   ID_REPORT_SUSPENSION    = 0x070,
   ID_REPORT_TIRE_PRESSURE = 0x071,
   ID_REPORT_FUEL_LEVEL    = 0x072,
+  ID_REPORT_SURROUND      = 0x073,
 };
 
 #endif // _DISPATCH_H

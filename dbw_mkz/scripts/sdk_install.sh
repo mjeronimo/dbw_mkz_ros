@@ -17,7 +17,7 @@ sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm
 echo "source ~/dbw_ws/devel/setup.bash" >> ~/.bashrc
 
 # Call SDK Update script
-$MY_WORKSPACE/dbw_mkz_ros/dbw_mkz/scripts/sdk_update.sh
+$MY_WORKSPACE/src/dbw_mkz_ros/dbw_mkz/scripts/sdk_update.sh
 
 echo 'SDK install: Done'
 

@@ -7,6 +7,12 @@
     <include file="$(find dbw_mkz_can)/launch/dbw.launch" />
   </group>
 
+  <!-- Rviz -->
+  <arg name="rviz" default="false"/>
+  <group if="$(arg rviz)">
+    <include file="$(find dbw_mkz_description)/launch/rviz.launch" />
+  </group>
+
   <!-- Joystick demo -->
   <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" />
 

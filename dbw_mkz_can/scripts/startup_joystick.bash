@@ -4,7 +4,7 @@
 # gnome-terminal -e "/path/to/this/file/startup_joystick.bash"
 
 # Source ~/.bashrc, the required workspace must be in your .bashrc file
-source $HOME/.bashrc
+source $HOME/dbw_ws/devel/setup.bash
 
 # Launch
 roslaunch dbw_mkz_joystick_demo joystick_demo.launch sys:=true rviz:=false

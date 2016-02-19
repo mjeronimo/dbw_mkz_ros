@@ -2,6 +2,7 @@
 MY_WORKSPACE=$HOME/dbw_ws
 
 # Update workspace
+wstool merge -t $MY_WORKSPACE/src https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz.rosinstall
 wstool update -t $MY_WORKSPACE/src
 
 # Resolve dependencies

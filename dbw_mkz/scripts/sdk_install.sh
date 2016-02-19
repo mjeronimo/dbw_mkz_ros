@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 MY_WORKSPACE=$HOME/dbw_ws
 
+# Install wstool
+sudo apt-get install -y python-wstool
+
 # Setup workspace
 mkdir -p $MY_WORKSPACE/src
 wstool init $MY_WORKSPACE/src

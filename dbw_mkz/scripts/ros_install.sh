@@ -34,8 +34,8 @@ rosdep update
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 
 # Install SDK
-echo 'Installing SDK...'
-wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/sdk_install.sh | sh
+echo "The next step is to install the SDK"
+echo "In a NEW TAB, please run: wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/sdk_install.sh | sh"
 
 echo 'ROS Indigo install: Done'
 

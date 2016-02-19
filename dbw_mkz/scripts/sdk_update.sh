@@ -6,7 +6,7 @@ wstool merge -t $MY_WORKSPACE/src https://bitbucket.org/DataspeedInc/dbw_mkz_ros
 wstool update -t $MY_WORKSPACE/src
 
 # Resolve dependencies
-rosdep update && rosdep install --from-paths $MY_WORKSPACE/src --ignore-src
+rosdep update && rosdep install -y -r --from-paths $MY_WORKSPACE/src --ignore-src
 
 # Build workspace
 cd $MY_WORKSPACE

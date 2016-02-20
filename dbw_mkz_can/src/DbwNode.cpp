@@ -229,6 +229,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   driver_throttle_ = false;
   driver_steering_ = false;
   driver_gear_ = false;
+  fault_steering_cal_ = false;
 
   // Setup brake lights (BOO)
   boo_status_ = false;
@@ -346,6 +347,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_STEERING_REPORT:
         if (msg->msg.dlc >= sizeof(MsgSteeringReport)) {
           const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->msg.data.elems;
+          faultSteeringCal(ptr->FLTCAL);
           driverSteering(ptr->DRIVER);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
@@ -855,6 +857,22 @@ void DbwNode::driverGear(bool driver)
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on shifter.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
+  }
+}
+
+void DbwNode::faultSteeringCal(bool fault)
+{
+  bool en = enabled();
+  if (fault && en) {
+    enable_ = false;
+  }
+  fault_steering_cal_ = fault;
+  if (publishDbwEnabled()) {
+    if (en) {
+      ROS_ERROR("DBW system disabled. Steering calibration fault.");
     } else {
       ROS_INFO("DBW system enabled.");
     }

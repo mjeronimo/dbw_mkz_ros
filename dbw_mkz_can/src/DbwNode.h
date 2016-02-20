@@ -89,9 +89,11 @@ private:
   bool driver_throttle_;
   bool driver_steering_;
   bool driver_gear_;
+  bool fault_steering_cal_;
+  inline bool fault() { return fault_steering_cal_; }
   inline bool driver() { return driver_brake_ || driver_throttle_ || driver_steering_ || driver_gear_; }
   inline bool clear() { return enable_ && driver(); }
-  inline bool enabled() { return enable_ && !driver(); }
+  inline bool enabled() { return enable_ && !fault() && !driver(); }
   bool publishDbwEnabled();
   void enableSystem();
   void driverCancel();
@@ -99,6 +101,7 @@ private:
   void driverThrottle(bool driver);
   void driverSteering(bool driver);
   void driverGear(bool driver);
+  void faultSteeringCal(bool fault);
 
   enum {
     JOINT_FL = 0,

@@ -229,6 +229,8 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   driver_throttle_ = false;
   driver_steering_ = false;
   driver_gear_ = false;
+  fault_brakes_ = false;
+  fault_throttle_ = false;
   fault_steering_cal_ = false;
 
   // Setup brake lights (BOO)
@@ -304,6 +306,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_BRAKE_REPORT:
         if (msg->msg.dlc >= sizeof(MsgBrakeReport)) {
           const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->msg.data.elems;
+          faultBrakes(ptr->FLT1 && ptr->FLT2);
           driverBrake(ptr->DRIVER);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
@@ -329,6 +332,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_THROTTLE_REPORT:
         if (msg->msg.dlc >= sizeof(MsgThrottleReport)) {
           const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->msg.data.elems;
+          faultThrottle(ptr->FLT1 && ptr->FLT2);
           driverThrottle(ptr->DRIVER);
           dbw_mkz_msgs::ThrottleReport out;
           out.header.stamp = msg->header.stamp;
@@ -785,7 +789,19 @@ void DbwNode::enableSystem()
     if (publishDbwEnabled()) {
       ROS_INFO("DBW system enabled.");
     } else {
-      ROS_INFO("DBW system enable requested. Waiting for ready.");
+      if (fault()) {
+        if (fault_steering_cal_) {
+          ROS_WARN("DBW system not enabled. Steering calibration fault.");
+        }
+        if (fault_brakes_) {
+          ROS_WARN("DBW system not enabled. Braking fault.");
+        }
+        if (fault_throttle_) {
+          ROS_WARN("DBW system not enabled. Throttle fault.");
+        }
+      } else {
+        ROS_INFO("DBW system enable requested. Waiting for ready.");
+      }
     }
   }
 }
@@ -857,6 +873,38 @@ void DbwNode::driverGear(bool driver)
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on shifter.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
+  }
+}
+
+void DbwNode::faultBrakes(bool fault)
+{
+  bool en = enabled();
+  if (fault && en) {
+    enable_ = false;
+  }
+  fault_brakes_ = fault;
+  if (publishDbwEnabled()) {
+    if (en) {
+      ROS_ERROR("DBW system disabled. Braking fault.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
+  }
+}
+
+void DbwNode::faultThrottle(bool fault)
+{
+  bool en = enabled();
+  if (fault && en) {
+    enable_ = false;
+  }
+  fault_throttle_ = fault;
+  if (publishDbwEnabled()) {
+    if (en) {
+      ROS_ERROR("DBW system disabled. Throttle fault.");
     } else {
       ROS_INFO("DBW system enabled.");
     }

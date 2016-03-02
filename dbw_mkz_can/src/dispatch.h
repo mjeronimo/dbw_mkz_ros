@@ -139,6 +139,17 @@ typedef struct {
   uint8_t btn_cc_gap_dec :1;
   uint8_t btn_la_on_off :1;
   uint8_t FLTBUS :1;
+  uint8_t door_driver :1;
+  uint8_t door_passenger :1;
+  uint8_t door_rear_left :1;
+  uint8_t door_rear_right :1;
+  uint8_t door_hood :1;
+  uint8_t door_trunk :1;
+  uint8_t pasngr_detect :1;
+  uint8_t pasngr_airbag :1;
+  uint8_t buckle_driver :1;
+  uint8_t buckle_pasngr :1;
+  uint8_t :6;
 } MsgMiscReport;
 
 typedef struct {
@@ -252,7 +263,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(1 == sizeof(MsgGearCmd));
   BUILD_ASSERT(1 == sizeof(MsgGearReport));
   BUILD_ASSERT(1 == sizeof(MsgTurnSignalCmd));
-  BUILD_ASSERT(3 == sizeof(MsgMiscReport));
+  BUILD_ASSERT(5 == sizeof(MsgMiscReport));
   BUILD_ASSERT(8 == sizeof(MsgReportWheelSpeed));
   BUILD_ASSERT(6 == sizeof(MsgReportAccel));
   BUILD_ASSERT(4 == sizeof(MsgReportGyro));

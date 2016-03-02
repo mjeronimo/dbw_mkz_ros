@@ -326,6 +326,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_boo = ptr->FLTB ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_brake_.publish(out);
+          if (ptr->FLT1 || ptr->FLT2) {
+            ROS_WARN_THROTTLE(0.5, "Brake pedal fault. Check brake pedal wiring.");
+          }
         }
         break;
 
@@ -345,6 +348,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_throttle_.publish(out);
+          if (ptr->FLT1 || ptr->FLT2) {
+            ROS_WARN_THROTTLE(0.5, "Throttle pedal fault. Check throttle pedal wiring.");
+          }
         }
         break;
 
@@ -367,6 +373,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_steering_.publish(out);
           publishJointStates(msg->header.stamp, NULL, &out);
+          if (ptr->FLTCAL) {
+            ROS_WARN_THROTTLE(0.5, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
+          }
         }
         break;
 
@@ -385,7 +394,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_MISC_REPORT:
-        if (msg->msg.dlc >= sizeof(MsgMiscReport)) {
+        if (msg->msg.dlc >= 3) {
           const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
           if (ptr->btn_cc_gap_inc) {
             driverCancel();
@@ -406,6 +415,18 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.btn_cc_gap_dec = ptr->btn_cc_gap_dec ? true : false;
           out.btn_la_on_off = ptr->btn_la_on_off ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
+          if (msg->msg.dlc >= sizeof(MsgMiscReport)) {
+            out.door_driver = ptr->door_driver ? true : false;
+            out.door_passenger = ptr->door_passenger ? true : false;
+            out.door_rear_left = ptr->door_rear_left ? true : false;
+            out.door_rear_right = ptr->door_rear_right ? true : false;
+            out.door_hood = ptr->door_hood ? true : false;
+            out.door_trunk = ptr->door_trunk ? true : false;
+            out.passenger_detect = ptr->pasngr_detect ? true : false;
+            out.passenger_airbag = ptr->pasngr_airbag ? true : false;
+            out.buckle_driver = ptr->buckle_driver ? true : false;
+            out.buckle_passenger = ptr->buckle_pasngr ? true : false;
+          }
           pub_misc_1_.publish(out);
         }
         break;

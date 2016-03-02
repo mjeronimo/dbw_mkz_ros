@@ -23,3 +23,19 @@ bool btn_la_on_off    # Lane Assist On/Off
 
 # Faults
 bool fault_bus
+
+# Doors
+bool door_driver
+bool door_passenger
+bool door_rear_left
+bool door_rear_right
+bool door_hood
+bool door_trunk
+
+# Passenger seat
+bool passenger_detect
+bool passenger_airbag
+
+# Seat Belts
+bool buckle_driver
+bool buckle_passenger

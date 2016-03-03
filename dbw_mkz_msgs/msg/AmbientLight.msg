@@ -1,4 +1,4 @@
-uint8 ambient_light
+uint8 status
 
 uint8 DARK=0
 uint8 LIGHT=1

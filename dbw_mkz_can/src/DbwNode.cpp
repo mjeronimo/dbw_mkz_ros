@@ -274,6 +274,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_fuel_level_ = node.advertise<dbw_mkz_msgs::FuelLevelReport>("fuel_level_report", 2);
   pub_surround_ = node.advertise<dbw_mkz_msgs::SurroundReport>("surround_report", 2);
   pub_sonar_cloud_ = node.advertise<sensor_msgs::PointCloud2>("sonar_cloud", 2);
+  pub_brake_info_ = node.advertise<dbw_mkz_msgs::BrakeInfoReport>("brake_info_report", 2);
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
@@ -327,7 +328,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_brake_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(0.5, "Brake pedal fault. Check brake pedal wiring.");
+            ROS_WARN_THROTTLE(5.0, "Brake pedal fault. Check brake pedal wiring.");
           }
         }
         break;
@@ -349,7 +350,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_throttle_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(0.5, "Throttle pedal fault. Check throttle pedal wiring.");
+            ROS_WARN_THROTTLE(5.0, "Throttle pedal fault. Check throttle pedal wiring.");
           }
         }
         break;
@@ -374,7 +375,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           pub_steering_.publish(out);
           publishJointStates(msg->header.stamp, NULL, &out);
           if (ptr->FLTCAL) {
-            ROS_WARN_THROTTLE(0.5, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
+            ROS_WARN_THROTTLE(5.0, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
           }
         }
         break;
@@ -403,10 +404,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           }
           dbw_mkz_msgs::Misc1Report out;
           out.header.stamp = msg->header.stamp;
-          out.turn_signal.turn_signal = ptr->turn_signal;
+          out.turn_signal.value = ptr->turn_signal;
           out.high_beam_headlights = ptr->head_light_hi ? true : false;
-          out.wiper.wiper = ptr->wiper_front;
-          out.ambient_light.ambient_light = ptr->light_ambient;
+          out.wiper.status = ptr->wiper_front;
+          out.ambient_light.status = ptr->light_ambient;
           out.btn_cc_on_off = ptr->btn_cc_on_off ? true : false;
           out.btn_cc_res_cncl = ptr->btn_cc_res_cncl ? true : false;
           out.btn_cc_set_inc = ptr->btn_cc_set_inc ? true : false;
@@ -514,6 +515,29 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           sensor_msgs::PointCloud2 cloud;
           sonarBuildPointCloud2(cloud, out);
           pub_sonar_cloud_.publish(cloud);
+        }
+        break;
+
+      case ID_REPORT_BRAKE_INFO:
+        if (msg->msg.dlc >= sizeof(MsgReportBrakeInfo)) {
+          const MsgReportBrakeInfo *ptr = (const MsgReportBrakeInfo*)msg->msg.data.elems;
+          dbw_mkz_msgs::BrakeInfoReport out;
+          out.header.stamp = msg->header.stamp;
+          out.brake_torque_request = (float)ptr->brake_torque_request * 4.0;
+          out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0;
+          out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0;
+          out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035;
+          out.hsa.status = ptr->hsa_stat;
+          out.hsa.mode = ptr->hsa_mode;
+          out.abs_active = ptr->abs_active ? true : false;
+          out.abs_enabled = ptr->abs_enabled ? true : false;
+          out.stab_active = ptr->stab_active ? true : false;
+          out.stab_enabled = ptr->stab_enabled ? true : false;
+          out.trac_active = ptr->trac_active ? true : false;
+          out.trac_enabled = ptr->trac_enabled ? true : false;
+          out.parking_brake.status = ptr->parking_brake;
+          out.stationary = ptr->stationary;
+          pub_brake_info_.publish(out);
         }
         break;
 
@@ -752,7 +776,7 @@ void DbwNode::recvTurnSignalCmd(const dbw_mkz_msgs::TurnSignalCmd::ConstPtr& msg
   MsgTurnSignalCmd *ptr = (MsgTurnSignalCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    ptr->TRNCMD = msg->cmd.turn_signal;
+    ptr->TRNCMD = msg->cmd.value;
   }
   pub_can_.publish(out);
 }
@@ -806,20 +830,20 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
 void DbwNode::enableSystem()
 {
   if (!enable_) {
-    enable_ = true;
-    if (publishDbwEnabled()) {
-      ROS_INFO("DBW system enabled.");
+    if (fault()) {
+      if (fault_steering_cal_) {
+        ROS_WARN("DBW system not enabled. Steering calibration fault.");
+      }
+      if (fault_brakes_) {
+        ROS_WARN("DBW system not enabled. Braking fault.");
+      }
+      if (fault_throttle_) {
+        ROS_WARN("DBW system not enabled. Throttle fault.");
+      }
     } else {
-      if (fault()) {
-        if (fault_steering_cal_) {
-          ROS_WARN("DBW system not enabled. Steering calibration fault.");
-        }
-        if (fault_brakes_) {
-          ROS_WARN("DBW system not enabled. Braking fault.");
-        }
-        if (fault_throttle_) {
-          ROS_WARN("DBW system not enabled. Throttle fault.");
-        }
+      enable_ = true;
+      if (publishDbwEnabled()) {
+        ROS_INFO("DBW system enabled.");
       } else {
         ROS_INFO("DBW system enable requested. Waiting for ready.");
       }
@@ -845,7 +869,7 @@ void DbwNode::driverBrake(bool driver)
   driver_brake_ = driver;
   if (publishDbwEnabled()) {
     if (en) {
-      ROS_WARN("DBW system disabled. Driver override on brake pedal.");
+      ROS_WARN("DBW system disabled. Driver override on brake/throttle pedal.");
     } else {
       ROS_INFO("DBW system enabled.");
     }
@@ -861,7 +885,7 @@ void DbwNode::driverThrottle(bool driver)
   driver_throttle_ = driver;
   if (publishDbwEnabled()) {
     if (en) {
-      ROS_WARN("DBW system disabled. Driver override on throttle pedal.");
+      ROS_WARN("DBW system disabled. Driver override on brake/throttle pedal.");
     } else {
       ROS_INFO("DBW system enabled.");
     }

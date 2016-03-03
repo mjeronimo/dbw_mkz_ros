@@ -10,12 +10,15 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(DIRECTORY msg FILES
   AmbientLight.msg
   BrakeCmd.msg
+  BrakeInfoReport.msg
   BrakeReport.msg
   FuelLevelReport.msg
   Gear.msg
   GearCmd.msg
   GearReport.msg
+  HillStartAssist.msg
   Misc1Report.msg
+  ParkingBrake.msg
   SteeringCmd.msg
   SteeringReport.msg
   SurroundReport.msg

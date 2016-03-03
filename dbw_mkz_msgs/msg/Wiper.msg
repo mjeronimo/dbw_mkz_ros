@@ -1,4 +1,4 @@
-uint8 wiper
+uint8 status
 
 uint8 OFF=0
 uint8 AUTO_OFF=1

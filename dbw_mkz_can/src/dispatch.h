@@ -252,6 +252,24 @@ typedef struct {
   uint8_t sonar_fault :1;
 } MsgReportSurround;
 
+typedef struct {
+  uint16_t brake_torque_request :12;
+  uint16_t hsa_stat :3;
+  uint16_t stationary :1;
+  uint16_t brake_torque_actual :12;
+  uint16_t hsa_mode :2;
+  uint16_t parking_brake :2;
+  int16_t wheel_torque :14;
+  uint16_t :2;
+  int16_t accel_over_ground_est :10;
+  uint16_t abs_active :1;
+  uint16_t abs_enabled :1;
+  uint16_t stab_active :1;
+  uint16_t stab_enabled :1;
+  uint16_t trac_active :1;
+  uint16_t trac_enabled :1;
+} MsgReportBrakeInfo;
+
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
   BUILD_ASSERT(4 == sizeof(MsgBrakeCmd));
@@ -274,6 +292,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
   BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
+  BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
 }
 #undef BUILD_ASSERT
 
@@ -298,6 +317,7 @@ enum {
   ID_REPORT_TIRE_PRESSURE = 0x071,
   ID_REPORT_FUEL_LEVEL    = 0x072,
   ID_REPORT_SURROUND      = 0x073,
+  ID_REPORT_BRAKE_INFO    = 0x074,
 };
 
 #endif // _DISPATCH_H

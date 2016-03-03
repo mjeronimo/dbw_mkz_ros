@@ -1,4 +1,4 @@
-uint8 turn_signal
+uint8 value
 
 uint8 NONE=0
 uint8 LEFT=1

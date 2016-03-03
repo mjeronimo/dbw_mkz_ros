@@ -95,7 +95,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 
   // Turn signal
   dbw_mkz_msgs::TurnSignalCmd turn_signal_msg;
-  turn_signal_msg.cmd.turn_signal = joy_data_.turn_signal_cmd;
+  turn_signal_msg.cmd.value = joy_data_.turn_signal_cmd;
   pub_turn_signal_.publish(turn_signal_msg);
 }
 

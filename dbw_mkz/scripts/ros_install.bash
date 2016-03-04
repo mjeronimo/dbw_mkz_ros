@@ -54,7 +54,7 @@ cp $MY_WORKSPACE/src/dbw_mkz_ros/dbw_mkz/scripts/joystick_demo.desktop $HOME/.co
 ### Misc fixes ###
 # Fix launcher icons
 echo 'Setting up launcher icons...'
-gsettings set com.canonical.Unity.Launcher favorites "['application://nautilus.desktop', 'application://thg.desktop', 'application://gnome-terminal.desktop']"
+gsettings set com.canonical.Unity.Launcher favorites "['application://nautilus.desktop', 'application://gnome-terminal.desktop']"
 
 # List view in folders
 echo 'Setting list view in folders...'
@@ -65,4 +65,7 @@ echo 'Configuring launch files to open in gedit...'
 xdg-mime default gedit.desktop application/xml
 
 echo 'ROS Indigo install: Done'
+
+# Reboot
+sudo reboot
 

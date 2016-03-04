@@ -12,7 +12,7 @@
 
 # One Line ROS and SDK Install
 
-* Use this option to install ROS Indigo and this SDK on a virgin workstation.
+* Use this option to install ROS Indigo and this SDK on a clean Ubuntu install.
 * This should ONLY be run on a fresh install of [Ubuntu 14.04 Desktop](http://releases.ubuntu.com/releases/14.04/).
 * Paste the following into a terminal to install ROS Indigo and this SDK. This script will change some operating system parameters, install [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu), and install the SDK.
 * ```bash <(wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/ros_install.bash)```

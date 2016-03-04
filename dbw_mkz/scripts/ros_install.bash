@@ -66,6 +66,3 @@ xdg-mime default gedit.desktop application/xml
 
 echo 'ROS Indigo install: Done'
 
-# Reboot
-sudo reboot
-

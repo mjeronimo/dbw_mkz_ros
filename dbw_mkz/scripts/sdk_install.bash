@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#! /bin/bash
 MY_WORKSPACE=$HOME/dbw_ws
 
 # Install wstool
@@ -17,7 +17,7 @@ sudo cp $MY_WORKSPACE/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanTool
 sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm trigger
 
 # Setup environment
-echo "source ~/dbw_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/dbw_ws/devel/setup.bash" >> $HOME/.bashrc
 
 # Call SDK Update script
 $MY_WORKSPACE/src/dbw_mkz_ros/dbw_mkz/scripts/sdk_update.sh

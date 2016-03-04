@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal -e "/home/user/dbw_ws/src/dbw_mkz_ros/dbw_mkz_can/scripts/startup_joystick_rviz.bash"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Joystick Demo
+Name=Joystick Demo
+Comment[en_US]=
+Comment=

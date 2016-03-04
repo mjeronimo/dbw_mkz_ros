@@ -1,4 +1,10 @@
-#!/usr/bin/env sh
+#! /bin/bash
+MY_WORKSPACE=$HOME/dbw_ws
+
+# Screen lock settings
+echo 'Disabling screen lock...'
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.session idle-delay 0
 
 # Disable suspend on lid close
 echo 'Disabling suspend on lid close...'
@@ -10,6 +16,10 @@ echo 'Removing unnecessary packages...'
 sudo apt-get update
 sudo apt-get remove -y thunderbird transmission-gtk transmission-common unity-webapps-common brasero-common
 sudo apt-get autoremove -y
+
+# Disable error reporting and Amazon search results
+gsettings set com.canonical.Unity.Lenses remote-content-search 'none'
+sudo apt-get purge unity-webapps-common apport -y
 
 # Upgrade
 echo 'Upgrading system...'
@@ -34,8 +44,12 @@ rosdep update
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 
 # Install SDK
-echo "The next step is to install the SDK"
-echo "In a NEW TAB, please run: wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/sdk_install.sh | sh"
+echo "Installing SDK..."
+bash <(wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/sdk_install.bash)
+
+# Configure startup script
+mkdir -p $HOME/.config/autostart
+cp $MY_WORKSPACE/src/dbw_mkz_ros/dbw_mkz/scripts/joystick_demo.desktop $HOME/.config/autostart
 
 echo 'ROS Indigo install: Done'
 

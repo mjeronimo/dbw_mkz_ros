@@ -61,6 +61,7 @@
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
 
 namespace dbw_mkz_can
@@ -74,6 +75,8 @@ public:
 
 private:
   void timerCallback(const ros::TimerEvent& event);
+  void recvEnable(const std_msgs::Empty::ConstPtr& msg);
+  void recvDisable(const std_msgs::Empty::ConstPtr& msg);
   void recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg);
   void recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
   void recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
@@ -99,6 +102,7 @@ private:
   inline bool enabled() { return enable_ && !fault() && !driver(); }
   bool publishDbwEnabled();
   void enableSystem();
+  void disableSystem();
   void driverCancel();
   void driverBrake(bool driver);
   void driverThrottle(bool driver);
@@ -109,13 +113,13 @@ private:
   void faultSteeringCal(bool fault);
 
   enum {
-    JOINT_FL = 0,
-    JOINT_FR,
-    JOINT_RL,
-    JOINT_RR,
-    JOINT_SL,
-    JOINT_SR,
-    JOINT_COUNT,
+    JOINT_FL = 0, // Front left wheel
+    JOINT_FR, // Front right wheel
+    JOINT_RL, // Rear left wheel
+    JOINT_RR, // Rear right wheel
+    JOINT_SL, // Steering left
+    JOINT_SR, // Steering right
+    JOINT_COUNT, // Number of joints
   };
   sensor_msgs::JointState joint_state_;
   void publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
@@ -130,6 +134,8 @@ private:
   bool throttle_ignore_;
 
   // Subscribed topics
+  ros::Subscriber sub_enable_;
+  ros::Subscriber sub_disable_;
   ros::Subscriber sub_can_;
   ros::Subscriber sub_brake_;
   ros::Subscriber sub_throttle_;

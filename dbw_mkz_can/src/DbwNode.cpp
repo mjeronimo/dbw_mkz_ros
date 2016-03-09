@@ -283,6 +283,8 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   publishDbwEnabled();
 
   // Set up Subscribers
+  sub_enable_ = node.subscribe("enable", 10, &DbwNode::recvEnable, this, ros::TransportHints().tcpNoDelay(true));
+  sub_disable_ = node.subscribe("disable", 10, &DbwNode::recvDisable, this, ros::TransportHints().tcpNoDelay(true));
   sub_can_ = node.subscribe("can_rx", 100, &DbwNode::recvCAN, this, ros::TransportHints().tcpNoDelay(true));
   sub_brake_ = node.subscribe("brake_cmd", 1, &DbwNode::recvBrakeCmd, this, ros::TransportHints().tcpNoDelay(true));
   sub_throttle_ = node.subscribe("throttle_cmd", 1, &DbwNode::recvThrottleCmd, this, ros::TransportHints().tcpNoDelay(true));
@@ -296,6 +298,16 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 
 DbwNode::~DbwNode()
 {
+}
+
+void DbwNode::recvEnable(const std_msgs::Empty::ConstPtr& msg)
+{
+  enableSystem();
+}
+
+void DbwNode::recvDisable(const std_msgs::Empty::ConstPtr& msg)
+{
+  disableSystem();
 }
 
 void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg)
@@ -848,6 +860,15 @@ void DbwNode::enableSystem()
         ROS_INFO("DBW system enable requested. Waiting for ready.");
       }
     }
+  }
+}
+
+void DbwNode::disableSystem()
+{
+  if (enable_) {
+    enable_ = false;
+    publishDbwEnabled();
+    ROS_WARN("DBW system disabled.");
   }
 }
 

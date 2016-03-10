@@ -66,7 +66,7 @@ typedef struct {
 
 class JoystickDemo {
 public:
-  JoystickDemo(ros::NodeHandle n);
+  JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh);
 private:
   void recvJoy(const sensor_msgs::Joy::ConstPtr& msg);
   void recvEnable(const std_msgs::Bool::ConstPtr& msg);

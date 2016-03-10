@@ -37,13 +37,13 @@
 namespace joystick_demo
 {
 
-JoystickDemo::JoystickDemo(ros::NodeHandle n)
+JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 {
   last_joy_.axes.resize(8, 0);
   last_joy_.buttons.resize(11, 0);
 
-  sub_joy_ = n.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
-  sub_enable_ = n.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
+  sub_joy_ = node.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
+  sub_enable_ = node.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
 
   joy_data_.brake_cmd = 0.0;
   joy_data_.gear_cmd = dbw_mkz_msgs::Gear::NONE;
@@ -54,13 +54,13 @@ JoystickDemo::JoystickDemo(ros::NodeHandle n)
   joy_data_.joy_throttle_valid = false;
   joy_data_.joy_brake_valid = false;
 
-  pub_throttle_ = n.advertise<dbw_mkz_msgs::ThrottleCmd>("throttle_cmd", 1);
-  pub_brake_ = n.advertise<dbw_mkz_msgs::BrakeCmd>("brake_cmd", 1);
-  pub_turn_signal_ = n.advertise<dbw_mkz_msgs::TurnSignalCmd>("turn_signal_cmd", 1);
-  pub_steering_ = n.advertise<dbw_mkz_msgs::SteeringCmd>("steering_cmd", 1);
-  pub_gear_ = n.advertise<dbw_mkz_msgs::GearCmd>("gear_cmd", 1);
+  pub_throttle_ = node.advertise<dbw_mkz_msgs::ThrottleCmd>("throttle_cmd", 1);
+  pub_brake_ = node.advertise<dbw_mkz_msgs::BrakeCmd>("brake_cmd", 1);
+  pub_turn_signal_ = node.advertise<dbw_mkz_msgs::TurnSignalCmd>("turn_signal_cmd", 1);
+  pub_steering_ = node.advertise<dbw_mkz_msgs::SteeringCmd>("steering_cmd", 1);
+  pub_gear_ = node.advertise<dbw_mkz_msgs::GearCmd>("gear_cmd", 1);
 
-  cmd_timer_ = n.createTimer(ros::Duration(0.02), &JoystickDemo::cmdCallback, this);
+  cmd_timer_ = node.createTimer(ros::Duration(0.02), &JoystickDemo::cmdCallback, this);
 }
 
 void JoystickDemo::cmdCallback(const ros::TimerEvent& event)

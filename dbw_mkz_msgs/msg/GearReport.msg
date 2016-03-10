@@ -7,7 +7,7 @@ Gear state
 Gear cmd
 
 # Status
-bool driver
+bool override
 
 # Faults
 bool fault_bus

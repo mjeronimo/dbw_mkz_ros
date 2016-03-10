@@ -9,11 +9,12 @@ float32 steering_wheel_torque     # Nm
 float32 speed                     # m/s
 
 # Status
-bool enabled
-bool driver
+bool enabled  # Enabled
+bool override # Driver override
+bool driver   # Driver activity
 
 # Faults
 bool fault_bus1
 bool fault_bus2
 bool fault_calibration
-bool fault_connector
+bool fault_connector # This fault can be ignored

@@ -70,7 +70,7 @@ namespace dbw_mkz_can
 class DbwNode
 {
 public:
-  DbwNode(ros::NodeHandle &node, ros::NodeHandle &private_nh);
+  DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh);
   ~DbwNode();
 
 private:
@@ -89,25 +89,25 @@ private:
   ros::Timer timer_;
   bool prev_enable_;
   bool enable_;
-  bool driver_brake_;
-  bool driver_throttle_;
-  bool driver_steering_;
-  bool driver_gear_;
+  bool override_brake_;
+  bool override_throttle_;
+  bool override_steering_;
+  bool override_gear_;
   bool fault_brakes_;
   bool fault_throttle_;
   bool fault_steering_cal_;
   inline bool fault() { return fault_brakes_ || fault_throttle_ || fault_steering_cal_; }
-  inline bool driver() { return driver_brake_ || driver_throttle_ || driver_steering_ || driver_gear_; }
-  inline bool clear() { return enable_ && driver(); }
-  inline bool enabled() { return enable_ && !fault() && !driver(); }
+  inline bool override() { return override_brake_ || override_throttle_ || override_steering_ || override_gear_; }
+  inline bool clear() { return enable_ && override(); }
+  inline bool enabled() { return enable_ && !fault() && !override(); }
   bool publishDbwEnabled();
   void enableSystem();
   void disableSystem();
-  void driverCancel();
-  void driverBrake(bool driver);
-  void driverThrottle(bool driver);
-  void driverSteering(bool driver);
-  void driverGear(bool driver);
+  void buttonCancel();
+  void overrideBrake(bool override);
+  void overrideThrottle(bool override);
+  void overrideSteering(bool override);
+  void overrideGear(bool override);
   void faultBrakes(bool fault);
   void faultThrottle(bool fault);
   void faultSteeringCal(bool fault);
@@ -129,9 +129,6 @@ private:
   bool boo_control_;
   double boo_thresh_lo_;
   double boo_thresh_hi_;
-
-  // Throttle ignore driver override
-  bool throttle_ignore_;
 
   // Subscribed topics
   ros::Subscriber sub_enable_;

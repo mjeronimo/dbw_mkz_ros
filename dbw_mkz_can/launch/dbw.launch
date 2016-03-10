@@ -3,7 +3,6 @@
   <arg name="boo_control" default="true"/>
   <arg name="boo_thresh_lo" default="0.20"/>
   <arg name="boo_thresh_hi" default="0.22"/>
-  <arg name="throttle_ignore" default="false"/>
   <arg name="twist_use_pedals" default="True"/>
   <arg name="twist_use_steering" default="True"/>
   <arg name="decel_max" default="3.0"/>

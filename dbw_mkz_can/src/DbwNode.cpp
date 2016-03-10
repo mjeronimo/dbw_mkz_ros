@@ -225,10 +225,10 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   // Initialize enable state machine
   prev_enable_ = true;
   enable_ = false;
-  driver_brake_ = false;
-  driver_throttle_ = false;
-  driver_steering_ = false;
-  driver_gear_ = false;
+  override_brake_ = false;
+  override_throttle_ = false;
+  override_steering_ = false;
+  override_gear_ = false;
   fault_brakes_ = false;
   fault_throttle_ = false;
   fault_steering_cal_ = false;
@@ -244,10 +244,6 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   if (boo_thresh_lo_ > boo_thresh_hi_) {
     std::swap(boo_thresh_lo_, boo_thresh_hi_);
   }
-
-  // Throttle ignore
-  throttle_ignore_ = false;
-  priv_nh.getParam("throttle_ignore", throttle_ignore_);
 
   // Initialize joint states
   joint_state_.position.resize(JOINT_COUNT);
@@ -320,7 +316,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgBrakeReport)) {
           const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->msg.data.elems;
           faultBrakes(ptr->FLT1 && ptr->FLT2);
-          driverBrake(ptr->DRIVER);
+          overrideBrake(ptr->OVERRIDE);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
@@ -333,6 +329,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.boo_cmd    = ptr->BC ? true : false;
           out.boo_output = ptr->BO ? true : false;
           out.enabled = ptr->ENABLED ? true : false;
+          out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
@@ -349,13 +346,14 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgThrottleReport)) {
           const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->msg.data.elems;
           faultThrottle(ptr->FLT1 && ptr->FLT2);
-          driverThrottle(ptr->DRIVER);
+          overrideThrottle(ptr->OVERRIDE);
           dbw_mkz_msgs::ThrottleReport out;
           out.header.stamp = msg->header.stamp;
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
           out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
           out.pedal_output = (float)ptr->PO / UINT16_MAX;
           out.enabled = ptr->ENABLED ? true : false;
+          out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
@@ -371,7 +369,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgSteeringReport)) {
           const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->msg.data.elems;
           faultSteeringCal(ptr->FLTCAL);
-          driverSteering(ptr->DRIVER);
+          overrideSteering(ptr->OVERRIDE);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
           out.steering_wheel_angle     = (float)ptr->ANGLE * (0.1 * M_PI / 180);
@@ -379,6 +377,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.steering_wheel_torque = (float)ptr->TORQUE * 0.0625;
           out.speed = (float)ptr->SPEED * (0.01 / 3.6);
           out.enabled = ptr->ENABLED ? true : false;
+          out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
@@ -395,12 +394,12 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_GEAR_REPORT:
         if (msg->msg.dlc >= sizeof(MsgGearReport)) {
           const MsgGearReport *ptr = (const MsgGearReport*)msg->msg.data.elems;
-          driverGear(ptr->DRIVER);
+          overrideGear(ptr->OVERRIDE);
           dbw_mkz_msgs::GearReport out;
           out.header.stamp = msg->header.stamp;
           out.state.gear = ptr->STATE;
           out.cmd.gear = ptr->CMD;
-          out.driver = ptr->DRIVER ? true : false;
+          out.override = ptr->OVERRIDE ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
           pub_gear_.publish(out);
         }
@@ -410,7 +409,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= 3) {
           const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
           if (ptr->btn_cc_gap_inc) {
-            driverCancel();
+            buttonCancel();
           } else if (ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) {
             enableSystem();
           }
@@ -574,10 +573,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
   ROS_INFO("ena: %s, clr: %s, brake: %s, throttle: %s, steering: %s, gear: %s",
            enabled() ? "true " : "false",
            clear() ? "true " : "false",
-           driver_brake_ ? "true " : "false",
-           driver_throttle_ ? "true " : "false",
-           driver_steering_ ? "true " : "false",
-           driver_gear_ ? "true " : "false"
+           override_brake_ ? "true " : "false",
+           override_throttle_ ? "true " : "false",
+           override_steering_ ? "true " : "false",
+           override_gear_ ? "true " : "false"
        );
 #endif
 }
@@ -704,6 +703,9 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   if (clear()) {
     ptr->CLEAR = 1;
   }
+  if (msg->ignore) {
+    ptr->IGNORE = 1;
+  }
   pub_can_.publish(out);
 }
 
@@ -733,10 +735,10 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
       ptr->EN = 1;
     }
   }
-  if (clear() || throttle_ignore_) {
+  if (clear()) {
     ptr->CLEAR = 1;
   }
-  if (throttle_ignore_) {
+  if (msg->ignore) {
     ptr->IGNORE = 1;
   }
   pub_can_.publish(out);
@@ -761,6 +763,9 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
   }
   if (clear()) {
     ptr->CLEAR = 1;
+  }
+  if (msg->ignore) {
+    ptr->IGNORE = 1;
   }
   pub_can_.publish(out);
 }
@@ -872,7 +877,7 @@ void DbwNode::disableSystem()
   }
 }
 
-void DbwNode::driverCancel()
+void DbwNode::buttonCancel()
 {
   if (enable_) {
     enable_ = false;
@@ -881,13 +886,13 @@ void DbwNode::driverCancel()
   }
 }
 
-void DbwNode::driverBrake(bool driver)
+void DbwNode::overrideBrake(bool override)
 {
   bool en = enabled();
-  if (driver && en) {
+  if (override && en) {
     enable_ = false;
   }
-  driver_brake_ = driver;
+  override_brake_ = override;
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on brake/throttle pedal.");
@@ -897,13 +902,13 @@ void DbwNode::driverBrake(bool driver)
   }
 }
 
-void DbwNode::driverThrottle(bool driver)
+void DbwNode::overrideThrottle(bool override)
 {
   bool en = enabled();
-  if (driver && en) {
+  if (override && en) {
     enable_ = false;
   }
-  driver_throttle_ = driver;
+  override_throttle_ = override;
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on brake/throttle pedal.");
@@ -913,13 +918,13 @@ void DbwNode::driverThrottle(bool driver)
   }
 }
 
-void DbwNode::driverSteering(bool driver)
+void DbwNode::overrideSteering(bool override)
 {
   bool en = enabled();
-  if (driver && en) {
+  if (override && en) {
     enable_ = false;
   }
-  driver_steering_ = driver;
+  override_steering_ = override;
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on steering wheel.");
@@ -929,13 +934,13 @@ void DbwNode::driverSteering(bool driver)
   }
 }
 
-void DbwNode::driverGear(bool driver)
+void DbwNode::overrideGear(bool override)
 {
   bool en = enabled();
-  if (driver && en) {
+  if (override && en) {
     enable_ = false;
   }
-  driver_gear_ = driver;
+  override_gear_ = override;
   if (publishDbwEnabled()) {
     if (en) {
       ROS_WARN("DBW system disabled. Driver override on shifter.");

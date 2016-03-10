@@ -7,10 +7,11 @@ float32 pedal_cmd
 float32 pedal_output
 
 # Status
-bool enabled
-bool driver
+bool enabled  # Enabled
+bool override # Driver override
+bool driver   # Driver activity
 
 # Faults
 bool fault_ch1
 bool fault_ch2
-bool fault_connector
+bool fault_connector # This fault can be ignored

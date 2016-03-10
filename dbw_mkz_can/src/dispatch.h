@@ -42,7 +42,8 @@ typedef struct {
   uint8_t :7;
   uint8_t EN :1;
   uint8_t CLEAR :1;
-  uint8_t :6;
+  uint8_t IGNORE :1;
+  uint8_t :5;
 } MsgBrakeCmd;
 
 typedef struct {
@@ -54,8 +55,9 @@ typedef struct {
   uint8_t BI :1;
   uint8_t :5;
   uint8_t ENABLED :1;
+  uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :2;
+  uint8_t :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
   uint8_t FLTB :1;
@@ -77,8 +79,9 @@ typedef struct {
   uint16_t PO;
   uint8_t :8;
   uint8_t ENABLED :1;
+  uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :2;
+  uint8_t :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
   uint8_t :1;
@@ -89,7 +92,8 @@ typedef struct {
   int16_t SCMD;
   uint8_t EN :1;
   uint8_t CLEAR :1;
-  uint8_t :6;
+  uint8_t IGNORE :1;
+  uint8_t :5;
   uint8_t SVEL;
 } MsgSteeringCmd;
 
@@ -99,8 +103,9 @@ typedef struct {
   uint16_t SPEED;
   int8_t TORQUE;
   uint8_t ENABLED :1;
+  uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :2;
+  uint8_t :1;
   uint8_t FLTBUS1 :1;
   uint8_t FLTBUS2 :1;
   uint8_t FLTCAL :1;
@@ -115,7 +120,7 @@ typedef struct {
 
 typedef struct {
   uint8_t STATE :3;
-  uint8_t DRIVER :1;
+  uint8_t OVERRIDE :1;
   uint8_t CMD :3;
   uint8_t FLTBUS :1;
 } MsgGearReport;

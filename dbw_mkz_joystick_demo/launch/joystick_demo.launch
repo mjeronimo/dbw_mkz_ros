@@ -14,7 +14,12 @@
   </group>
 
   <!-- Joystick demo -->
-  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" />
+  <arg name="ignore" default="false"/>
+  <arg name="enable" default="false"/>
+  <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" >
+    <param name="ignore" value="$(arg ignore)" />
+    <param name="enable" value="$(arg enable)" />
+  </node>
 
   <!-- Joystick driver -->
   <node pkg="joy" type="joy_node" name="joy_node" output="screen" />

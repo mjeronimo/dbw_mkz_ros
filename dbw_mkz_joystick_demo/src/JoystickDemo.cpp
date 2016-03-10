@@ -42,6 +42,11 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   last_joy_.axes.resize(8, 0);
   last_joy_.buttons.resize(11, 0);
 
+  ignore_ = false;
+  enable_ = false;
+  priv_nh.getParam("ignore", ignore_);
+  priv_nh.getParam("enable", enable_);
+
   sub_joy_ = node.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
   sub_enable_ = node.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
 
@@ -59,6 +64,10 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_turn_signal_ = node.advertise<dbw_mkz_msgs::TurnSignalCmd>("turn_signal_cmd", 1);
   pub_steering_ = node.advertise<dbw_mkz_msgs::SteeringCmd>("steering_cmd", 1);
   pub_gear_ = node.advertise<dbw_mkz_msgs::GearCmd>("gear_cmd", 1);
+  if (enable_) {
+    pub_enable_ = node.advertise<std_msgs::Empty>("enable", 1);
+    pub_disable_ = node.advertise<std_msgs::Empty>("disable", 1);
+  }
 
   cmd_timer_ = node.createTimer(ros::Duration(0.02), &JoystickDemo::cmdCallback, this);
 }
@@ -68,15 +77,17 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   // Throttle
   dbw_mkz_msgs::ThrottleCmd throttle_msg;
   throttle_msg.enable = true;
+  throttle_msg.ignore = ignore_;
   throttle_msg.pedal_cmd_type = dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT;
   throttle_msg.pedal_cmd = joy_data_.throttle_joy;
   pub_throttle_.publish(throttle_msg);
 
   // Brake
   dbw_mkz_msgs::BrakeCmd brake_msg;
+  brake_msg.enable = true;
+  brake_msg.ignore = ignore_;
   brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PERCENT;
   brake_msg.pedal_cmd = joy_data_.brake_cmd;
-  brake_msg.enable = true;
   pub_brake_.publish(brake_msg);
 
   // Gear
@@ -87,6 +98,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   // Steering
   dbw_mkz_msgs::SteeringCmd steering_msg;
   steering_msg.enable = true;
+  steering_msg.ignore = ignore_;
   steering_msg.steering_wheel_angle_cmd = joy_data_.steering_joy;
   if (joy_data_.steering_mult) {
     steering_msg.steering_wheel_angle_cmd *= 2.0;
@@ -106,64 +118,75 @@ void JoystickDemo::recvEnable(const std_msgs::Bool::ConstPtr& msg)
 void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 {
   // Handle joystick startup
-  if (msg->axes[5] != 0.0) {
+  if (msg->axes[AXIS_THROTTLE] != 0.0) {
     joy_data_.joy_throttle_valid = true;
   }
-  if (msg->axes[2] != 0.0) {
+  if (msg->axes[AXIS_BRAKE] != 0.0) {
     joy_data_.joy_brake_valid = true;
   }
 
   // Throttle
   if (joy_data_.joy_throttle_valid) {
-    joy_data_.throttle_joy = 0.5 - 0.5 * msg->axes[5];
+    joy_data_.throttle_joy = 0.5 - 0.5 * msg->axes[AXIS_THROTTLE];
   }
 
   // Brake
   if (joy_data_.joy_brake_valid) {
-    joy_data_.brake_cmd = 0.5 - 0.5 * msg->axes[2];
+    joy_data_.brake_cmd = 0.5 - 0.5 * msg->axes[AXIS_BRAKE];
   }
 
   // Gear
-  if (msg->buttons[3]) {
+  if (msg->buttons[BTN_PARK]) {
     joy_data_.gear_cmd = dbw_mkz_msgs::Gear::PARK;
-  } else if (msg->buttons[1]) {
+  } else if (msg->buttons[BTN_REVERSE]) {
     joy_data_.gear_cmd = dbw_mkz_msgs::Gear::REVERSE;
-  } else if (msg->buttons[0]) {
+  } else if (msg->buttons[BTN_DRIVE]) {
     joy_data_.gear_cmd = dbw_mkz_msgs::Gear::DRIVE;
-  } else if (msg->buttons[2]) {
+  } else if (msg->buttons[BTN_NEUTRAL]) {
     joy_data_.gear_cmd = dbw_mkz_msgs::Gear::NEUTRAL;
   } else {
     joy_data_.gear_cmd = dbw_mkz_msgs::Gear::NONE;
   }
 
   // Steering
-  joy_data_.steering_joy = 235.0 * M_PI / 180.0 * ((fabs(msg->axes[0]) > fabs(msg->axes[3])) ? msg->axes[0] : msg->axes[3]);
-  joy_data_.steering_mult = msg->buttons[6] || msg->buttons[7];
+  joy_data_.steering_joy = 235.0 * M_PI / 180.0 * ((fabs(msg->axes[AXIS_STEER_1]) > fabs(msg->axes[AXIS_STEER_2])) ? msg->axes[AXIS_STEER_1] : msg->axes[AXIS_STEER_2]);
+  joy_data_.steering_mult = msg->buttons[BTN_STEER_MULT_1] || msg->buttons[BTN_STEER_MULT_2];
 
   // Turn signal
-  if (msg->axes[6] != last_joy_.axes[6]) {
+  if (msg->axes[AXIS_TURN_SIG] != last_joy_.axes[AXIS_TURN_SIG]) {
     switch (joy_data_.turn_signal_cmd) {
       case dbw_mkz_msgs::TurnSignal::NONE:
-        if (msg->axes[6] < -0.5) {
+        if (msg->axes[AXIS_TURN_SIG] < -0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::RIGHT;
-        } else if (msg->axes[6] > 0.5) {
+        } else if (msg->axes[AXIS_TURN_SIG] > 0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::LEFT;
         }
         break;
       case dbw_mkz_msgs::TurnSignal::LEFT:
-        if (msg->axes[6] < -0.5) {
+        if (msg->axes[AXIS_TURN_SIG] < -0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::RIGHT;
-        } else if (msg->axes[6] > 0.5) {
+        } else if (msg->axes[AXIS_TURN_SIG] > 0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::NONE;
         }
         break;
       case dbw_mkz_msgs::TurnSignal::RIGHT:
-        if (msg->axes[6] < -0.5) {
+        if (msg->axes[AXIS_TURN_SIG] < -0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::NONE;
-        } else if (msg->axes[6] > 0.5) {
+        } else if (msg->axes[AXIS_TURN_SIG] > 0.5) {
           joy_data_.turn_signal_cmd = dbw_mkz_msgs::TurnSignal::LEFT;
         }
         break;
+    }
+  }
+
+  // Optional enable and disable buttons
+  if (enable_) {
+    const std_msgs::Empty empty;
+    if (msg->buttons[BTN_ENABLE]) {
+      pub_enable_.publish(empty);
+    }
+    if (msg->buttons[BTN_DISABLE]) {
+      pub_disable_.publish(empty);
     }
   }
 

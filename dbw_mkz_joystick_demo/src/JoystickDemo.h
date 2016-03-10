@@ -38,6 +38,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Empty.h>
 
 #include <dbw_mkz_msgs/ThrottleCmd.h>
 #include <dbw_mkz_msgs/BrakeCmd.h>
@@ -72,6 +73,7 @@ private:
   void recvEnable(const std_msgs::Bool::ConstPtr& msg);
   void cmdCallback(const ros::TimerEvent& event);
 
+  // Topics
   ros::Subscriber sub_joy_;
   ros::Subscriber sub_enable_;
   ros::Publisher pub_throttle_;
@@ -79,11 +81,33 @@ private:
   ros::Publisher pub_steering_;
   ros::Publisher pub_gear_;
   ros::Publisher pub_turn_signal_;
-  ros::Timer cmd_timer_;
+  ros::Publisher pub_enable_;
+  ros::Publisher pub_disable_;
 
+  // Parameters
+  bool ignore_; // Ignore driver overrides
+  bool enable_; // Use enable and disable buttons
+
+  // Variables
+  ros::Timer cmd_timer_;
   JoystickDataStruct joy_data_;
   sensor_msgs::Joy last_joy_;
 
+  enum {
+    BTN_PARK = 3,
+    BTN_REVERSE = 1,
+    BTN_NEUTRAL = 0,
+    BTN_DRIVE = 2,
+    BTN_ENABLE = 5,
+    BTN_DISABLE = 4,
+    BTN_STEER_MULT_1 = 6,
+    BTN_STEER_MULT_2 = 7,
+    AXIS_THROTTLE = 5,
+    AXIS_BRAKE = 2,
+    AXIS_STEER_1 = 0,
+    AXIS_STEER_2 = 3,
+    AXIS_TURN_SIG = 6,
+  };
 };
 
 }

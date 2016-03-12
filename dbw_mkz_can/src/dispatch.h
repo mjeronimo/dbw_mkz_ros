@@ -44,6 +44,10 @@ typedef struct {
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
   uint8_t :5;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t count;
 } MsgBrakeCmd;
 
 typedef struct {
@@ -53,11 +57,12 @@ typedef struct {
   uint8_t BO :1;
   uint8_t BC :1;
   uint8_t BI :1;
-  uint8_t :5;
+  uint8_t WDCBRK :1;
+  uint8_t WDCSRC :4;
   uint8_t ENABLED :1;
   uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :1;
+  uint8_t FLTWDC :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
   uint8_t FLTB :1;
@@ -71,17 +76,22 @@ typedef struct {
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
   uint8_t :5;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t count;
 } MsgThrottleCmd;
 
 typedef struct {
   uint16_t PI;
   uint16_t PC;
   uint16_t PO;
-  uint8_t :8;
+  uint8_t :4;
+  uint8_t WDCSRC :4;
   uint8_t ENABLED :1;
   uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :1;
+  uint8_t FLTWDC :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
   uint8_t :1;
@@ -95,6 +105,10 @@ typedef struct {
   uint8_t IGNORE :1;
   uint8_t :5;
   uint8_t SVEL;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t count;
 } MsgSteeringCmd;
 
 typedef struct {
@@ -105,7 +119,7 @@ typedef struct {
   uint8_t ENABLED :1;
   uint8_t OVERRIDE :1;
   uint8_t DRIVER :1;
-  uint8_t :1;
+  uint8_t FLTWDC :1;
   uint8_t FLTBUS1 :1;
   uint8_t FLTBUS2 :1;
   uint8_t FLTCAL :1;
@@ -277,11 +291,11 @@ typedef struct {
 
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
-  BUILD_ASSERT(4 == sizeof(MsgBrakeCmd));
+  BUILD_ASSERT(8 == sizeof(MsgBrakeCmd));
   BUILD_ASSERT(8 == sizeof(MsgBrakeReport));
-  BUILD_ASSERT(4 == sizeof(MsgThrottleCmd));
+  BUILD_ASSERT(8 == sizeof(MsgThrottleCmd));
   BUILD_ASSERT(8 == sizeof(MsgThrottleReport));
-  BUILD_ASSERT(4 == sizeof(MsgSteeringCmd));
+  BUILD_ASSERT(8 == sizeof(MsgSteeringCmd));
   BUILD_ASSERT(8 == sizeof(MsgSteeringReport));
   BUILD_ASSERT(1 == sizeof(MsgGearCmd));
   BUILD_ASSERT(1 == sizeof(MsgGearReport));

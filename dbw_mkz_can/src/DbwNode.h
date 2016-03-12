@@ -96,7 +96,10 @@ private:
   bool fault_brakes_;
   bool fault_throttle_;
   bool fault_steering_cal_;
-  inline bool fault() { return fault_brakes_ || fault_throttle_ || fault_steering_cal_; }
+  bool fault_watchdog_;
+  bool fault_watchdog_using_brakes_;
+  bool fault_watchdog_warned_;
+  inline bool fault() { return fault_brakes_ || fault_throttle_ || fault_steering_cal_ || fault_watchdog_; }
   inline bool override() { return override_brake_ || override_throttle_ || override_steering_ || override_gear_; }
   inline bool clear() { return enable_ && override(); }
   inline bool enabled() { return enable_ && !fault() && !override(); }
@@ -111,6 +114,8 @@ private:
   void faultBrakes(bool fault);
   void faultThrottle(bool fault);
   void faultSteeringCal(bool fault);
+  void faultWatchdog(bool fault, uint8_t src, bool braking);
+  void faultWatchdog(bool fault, uint8_t src = 0);
 
   enum {
     JOINT_FL = 0, // Front left wheel

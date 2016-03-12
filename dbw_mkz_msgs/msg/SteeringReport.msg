@@ -13,6 +13,9 @@ bool enabled  # Enabled
 bool override # Driver override
 bool driver   # Driver activity
 
+# Watchdog Counter
+bool fault_wdc
+
 # Faults
 bool fault_bus1
 bool fault_bus2

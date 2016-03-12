@@ -7,3 +7,6 @@ bool enable
 
 # Ignore driver overrides
 bool ignore
+
+# Watchdog counter (optional)
+uint8 count

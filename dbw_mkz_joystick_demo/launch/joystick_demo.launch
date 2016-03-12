@@ -16,9 +16,11 @@
   <!-- Joystick demo -->
   <arg name="ignore" default="false"/>
   <arg name="enable" default="false"/>
+  <arg name="count" default="false"/>
   <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" >
     <param name="ignore" value="$(arg ignore)" />
     <param name="enable" value="$(arg enable)" />
+    <param name="count" value="$(arg count)" />
   </node>
 
   <!-- Joystick driver -->

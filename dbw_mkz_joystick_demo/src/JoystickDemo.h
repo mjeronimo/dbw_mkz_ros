@@ -87,11 +87,13 @@ private:
   // Parameters
   bool ignore_; // Ignore driver overrides
   bool enable_; // Use enable and disable buttons
+  bool count_; // Increment counter to enable watchdog
 
   // Variables
   ros::Timer cmd_timer_;
   JoystickDataStruct joy_data_;
   sensor_msgs::Joy last_joy_;
+  uint8_t counter_;
 
   enum {
     BTN_PARK = 3,

@@ -29,6 +29,7 @@ add_message_files(DIRECTORY msg FILES
   TurnSignal.msg
   TurnSignalCmd.msg
   TwistCmd.msg
+  WatchdogCounter.msg
   WheelSpeedReport.msg
   Wiper.msg
 )

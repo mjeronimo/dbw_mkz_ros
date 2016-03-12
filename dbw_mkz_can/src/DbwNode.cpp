@@ -232,6 +232,9 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   fault_brakes_ = false;
   fault_throttle_ = false;
   fault_steering_cal_ = false;
+  fault_watchdog_ = false;
+  fault_watchdog_using_brakes_ = false;
+  fault_watchdog_warned_ = false;
 
   // Setup brake lights (BOO)
   boo_status_ = false;
@@ -316,6 +319,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgBrakeReport)) {
           const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->msg.data.elems;
           faultBrakes(ptr->FLT1 && ptr->FLT2);
+          faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           overrideBrake(ptr->OVERRIDE);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
@@ -331,6 +335,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
+          out.watchdog_counter.source = ptr->WDCSRC;
+          out.watchdog_braking = ptr->WDCBRK ? true : false;
+          out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_boo = ptr->FLTB ? true : false;
@@ -346,6 +353,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgThrottleReport)) {
           const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->msg.data.elems;
           faultThrottle(ptr->FLT1 && ptr->FLT2);
+          faultWatchdog(ptr->FLTWDC, ptr->WDCSRC);
           overrideThrottle(ptr->OVERRIDE);
           dbw_mkz_msgs::ThrottleReport out;
           out.header.stamp = msg->header.stamp;
@@ -355,6 +363,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
+          out.watchdog_counter.source = ptr->WDCSRC;
+          out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
@@ -369,6 +379,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         if (msg->msg.dlc >= sizeof(MsgSteeringReport)) {
           const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->msg.data.elems;
           faultSteeringCal(ptr->FLTCAL);
+          faultWatchdog(ptr->FLTWDC);
           overrideSteering(ptr->OVERRIDE);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
@@ -379,6 +390,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;
+          out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_calibration = ptr->FLTCAL ? true : false;
@@ -706,6 +718,7 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   if (msg->ignore) {
     ptr->IGNORE = 1;
   }
+  ptr->count = msg->count;
   pub_can_.publish(out);
 }
 
@@ -741,6 +754,7 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
   if (msg->ignore) {
     ptr->IGNORE = 1;
   }
+  ptr->count = msg->count;
   pub_can_.publish(out);
 }
 
@@ -767,6 +781,7 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
   if (msg->ignore) {
     ptr->IGNORE = 1;
   }
+  ptr->count = msg->count;
   pub_can_.publish(out);
 }
 
@@ -856,6 +871,9 @@ void DbwNode::enableSystem()
       }
       if (fault_throttle_) {
         ROS_WARN("DBW system not enabled. Throttle fault.");
+      }
+      if (fault_watchdog_) {
+        ROS_WARN("DBW system not enabled. Watchdog fault.");
       }
     } else {
       enable_ = true;
@@ -996,6 +1014,87 @@ void DbwNode::faultSteeringCal(bool fault)
       ROS_INFO("DBW system enabled.");
     }
   }
+}
+
+void DbwNode::faultWatchdog(bool fault, uint8_t src, bool braking)
+{
+  bool en = enabled();
+  if (fault && en) {
+    enable_ = false;
+  }
+  fault_watchdog_ = fault;
+  if (publishDbwEnabled()) {
+    if (en) {
+      ROS_ERROR("DBW system disabled. Watchdog fault.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
+  }
+  if (braking && !fault_watchdog_using_brakes_) {
+    ROS_WARN("Watchdog event: Alerting driver and applying brakes.");
+  } else if (!braking && fault_watchdog_using_brakes_) {
+    ROS_INFO("Watchdog event: Driver has successfully taken control.");
+  }
+  if (fault && src && !fault_watchdog_warned_) {
+      switch (src) {
+        case dbw_mkz_msgs::WatchdogCounter::OTHER_BRAKE:
+          ROS_WARN("Watchdog event: Fault determined by brake controller");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::OTHER_THROTTLE:
+          ROS_WARN("Watchdog event: Fault determined by throttle controller");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::OTHER_STEERING:
+          ROS_WARN("Watchdog event: Fault determined by steering controller");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::BRAKE_COUNTER:
+          ROS_WARN("Watchdog event: Brake command counter failed to increment");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::BRAKE_DISABLED:
+          ROS_WARN("Watchdog event: Brake transition to disabled while in gear or moving");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::BRAKE_COMMAND:
+          ROS_WARN("Watchdog event: Brake command timeout after 100ms");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::BRAKE_REPORT:
+          ROS_WARN("Watchdog event: Brake report timeout after 100ms");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::THROTTLE_COUNTER:
+          ROS_WARN("Watchdog event: Throttle command counter failed to increment");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::THROTTLE_DISABLED:
+          ROS_WARN("Watchdog event: Throttle transition to disabled while in gear or moving");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::THROTTLE_COMMAND:
+          ROS_WARN("Watchdog event: Throttle command timeout after 100ms");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::THROTTLE_REPORT:
+          ROS_WARN("Watchdog event: Throttle report timeout after 100ms");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::STEERING_COUNTER:
+          ROS_WARN("Watchdog event: Steering command counter failed to increment");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::STEERING_DISABLED:
+          ROS_WARN("Watchdog event: Steering transition to disabled while in gear or moving");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::STEERING_COMMAND:
+          ROS_WARN("Watchdog event: Steering command timeout after 100ms");
+          break;
+        case dbw_mkz_msgs::WatchdogCounter::STEERING_REPORT:
+          ROS_WARN("Watchdog event: Steering report timeout after 100ms");
+          break;
+      }
+      fault_watchdog_warned_ = true;
+  } else if (!fault) {
+    fault_watchdog_warned_ = false;
+  }
+  fault_watchdog_using_brakes_ = braking;
+  if (fault && !fault_watchdog_using_brakes_ && fault_watchdog_warned_) {
+    ROS_WARN_THROTTLE(2.0, "Watchdog event: Press left OK button on the steering wheel or cycle power to clear event.");
+  }
+}
+
+void DbwNode::faultWatchdog(bool fault, uint8_t src) {
+  faultWatchdog(fault, src, fault_watchdog_using_brakes_); // No change to 'using brakes' status
 }
 
 void DbwNode::publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering)

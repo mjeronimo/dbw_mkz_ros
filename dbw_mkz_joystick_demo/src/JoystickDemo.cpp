@@ -37,15 +37,17 @@
 namespace joystick_demo
 {
 
-JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
+JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : counter_(0)
 {
   last_joy_.axes.resize(8, 0);
   last_joy_.buttons.resize(11, 0);
 
   ignore_ = false;
   enable_ = false;
+  count_ = false;
   priv_nh.getParam("ignore", ignore_);
   priv_nh.getParam("enable", enable_);
+  priv_nh.getParam("count", count_);
 
   sub_joy_ = node.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
   sub_enable_ = node.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
@@ -74,10 +76,16 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 
 void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 {
+  // Optional watchdog counter
+  if (count_) {
+    counter_++;
+  }
+
   // Throttle
   dbw_mkz_msgs::ThrottleCmd throttle_msg;
   throttle_msg.enable = true;
   throttle_msg.ignore = ignore_;
+  throttle_msg.count = counter_;
   throttle_msg.pedal_cmd_type = dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT;
   throttle_msg.pedal_cmd = joy_data_.throttle_joy;
   pub_throttle_.publish(throttle_msg);
@@ -86,24 +94,28 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   dbw_mkz_msgs::BrakeCmd brake_msg;
   brake_msg.enable = true;
   brake_msg.ignore = ignore_;
+  brake_msg.count = counter_;
   brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PERCENT;
   brake_msg.pedal_cmd = joy_data_.brake_cmd;
   pub_brake_.publish(brake_msg);
-
-  // Gear
-  dbw_mkz_msgs::GearCmd gear_msg;
-  gear_msg.cmd.gear = joy_data_.gear_cmd;
-  pub_gear_.publish(gear_msg);
 
   // Steering
   dbw_mkz_msgs::SteeringCmd steering_msg;
   steering_msg.enable = true;
   steering_msg.ignore = ignore_;
+  steering_msg.count = counter_;
   steering_msg.steering_wheel_angle_cmd = joy_data_.steering_joy;
   if (joy_data_.steering_mult) {
     steering_msg.steering_wheel_angle_cmd *= 2.0;
   }
   pub_steering_.publish(steering_msg);
+
+  // Gear
+  if (joy_data_.gear_cmd != dbw_mkz_msgs::Gear::NONE) {
+    dbw_mkz_msgs::GearCmd gear_msg;
+    gear_msg.cmd.gear = joy_data_.gear_cmd;
+    pub_gear_.publish(gear_msg);
+  }
 
   // Turn signal
   dbw_mkz_msgs::TurnSignalCmd turn_signal_msg;

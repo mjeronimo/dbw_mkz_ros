@@ -96,8 +96,8 @@ private:
   enum {
     BTN_PARK = 3,
     BTN_REVERSE = 1,
-    BTN_NEUTRAL = 0,
-    BTN_DRIVE = 2,
+    BTN_NEUTRAL = 2,
+    BTN_DRIVE = 0,
     BTN_ENABLE = 5,
     BTN_DISABLE = 4,
     BTN_STEER_MULT_1 = 6,

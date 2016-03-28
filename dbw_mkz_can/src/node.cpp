@@ -37,7 +37,7 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "dwb_mkz");
+  ros::init(argc, argv, "dbw_mkz");
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");
 

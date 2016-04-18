@@ -277,6 +277,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
+  pub_gps_time_ = node.advertise<sensor_msgs::TimeReference>("gps/time", 10);
   pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10, false);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
@@ -628,6 +629,7 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
     const MsgReportGps1 *ptr1 = (const MsgReportGps1*)msgs[0]->msg.data.elems;
     const MsgReportGps2 *ptr2 = (const MsgReportGps2*)msgs[1]->msg.data.elems;
     const MsgReportGps3 *ptr3 = (const MsgReportGps3*)msgs[2]->msg.data.elems;
+
     sensor_msgs::NavSatFix msg_fix;
     msg_fix.header.stamp =  msgs[0]->header.stamp;
     msg_fix.latitude = (double)ptr1->latitude / 3e6;
@@ -655,6 +657,24 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
     msg_vel.twist.linear.y = sin(heading) * speed;
     pub_gps_vel_.publish(msg_vel);
 
+    sensor_msgs::TimeReference msg_time;
+    struct tm unix_time;
+    unix_time.tm_year = ptr2->utc_year + 100; // [1900] <-- [2000]
+    unix_time.tm_mon = ptr2->utc_month - 1;   // [0-11] <-- [1-12]
+    unix_time.tm_mday = ptr2->utc_day;        // [1-31] <-- [1-31]
+    unix_time.tm_hour = ptr2->utc_hours;      // [0-23] <-- [0-23]
+    unix_time.tm_min = ptr2->utc_minutes;     // [0-59] <-- [0-59]
+    unix_time.tm_sec = ptr2->utc_seconds;     // [0-59] <-- [0-59]
+    msg_time.header.stamp = msgs[0]->header.stamp;
+    msg_time.time_ref.sec = timegm(&unix_time);
+    msg_time.time_ref.nsec = 0;
+    pub_gps_time_.publish(msg_time);
+
+#if 0
+    ROS_INFO("UTC Time: %04d-%02d-%02d %02d:%02d:%02d",
+             2000 + ptr2->utc_year, ptr2->utc_month, ptr2->utc_day,
+             ptr2->utc_hours, ptr2->utc_minutes, ptr2->utc_seconds);
+#endif
   }
 #if 0
   ROS_INFO("Time: %u.%u, %u.%u, %u.%u, delta: %fms",

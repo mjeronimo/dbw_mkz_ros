@@ -58,6 +58,7 @@
 #include <dbw_mkz_msgs/BrakeInfoReport.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/TimeReference.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -162,6 +163,7 @@ private:
   ros::Publisher pub_imu_;
   ros::Publisher pub_gps_fix_;
   ros::Publisher pub_gps_vel_;
+  ros::Publisher pub_gps_time_;
   ros::Publisher pub_joint_states_;
   ros::Publisher pub_sys_enable_;
 

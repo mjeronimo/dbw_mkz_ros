@@ -197,8 +197,8 @@ typedef struct {
 } MsgReportGps1;
 
 typedef struct {
-  uint8_t utc_year :5;
-  uint8_t :3;
+  uint8_t utc_year :7;
+  uint8_t :1;
   uint8_t utc_month :4;
   uint8_t :4;
   uint8_t utc_day :5;

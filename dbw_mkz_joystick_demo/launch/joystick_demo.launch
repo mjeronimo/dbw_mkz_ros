@@ -24,6 +24,8 @@
   </node>
 
   <!-- Joystick driver -->
-  <node pkg="joy" type="joy_node" name="joy_node" output="screen" />
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen" >
+    <param name="deadzone" value="0.01" />
+  </node>
 
 </launch>

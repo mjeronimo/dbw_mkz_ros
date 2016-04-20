@@ -855,7 +855,7 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
 
     if (override_brake_) {
       out.id = ID_BRAKE_CMD;
-      out.dlc = sizeof(MsgBrakeCmd);
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
       memset(out.data.elems, 0x00, 8);
       ((MsgBrakeCmd*)out.data.elems)->CLEAR = 1;
       pub_can_.publish(out);
@@ -863,7 +863,7 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
 
     if (override_throttle_) {
       out.id = ID_THROTTLE_CMD;
-      out.dlc = sizeof(MsgThrottleCmd);
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
       memset(out.data.elems, 0x00, 8);
       ((MsgThrottleCmd*)out.data.elems)->CLEAR = 1;
       pub_can_.publish(out);
@@ -871,7 +871,7 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
 
     if (override_steering_) {
       out.id = ID_STEERING_CMD;
-      out.dlc = sizeof(MsgSteeringCmd);
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
       memset(out.data.elems, 0x00, 8);
       ((MsgSteeringCmd*)out.data.elems)->CLEAR = 1;
       pub_can_.publish(out);

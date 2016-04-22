@@ -421,9 +421,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_MISC_REPORT:
         if (msg->msg.dlc >= 3) {
           const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
-          if (ptr->btn_cc_gap_inc) {
+          if (ptr->btn_cc_gap_inc || ptr->btn_cc_cncl) {
             buttonCancel();
-          } else if (ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) {
+          } else if ((ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) || (ptr->btn_cc_set_inc && ptr->btn_cc_off)) {
             enableSystem();
           }
           dbw_mkz_msgs::Misc1Report out;
@@ -432,7 +432,11 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.high_beam_headlights = ptr->head_light_hi ? true : false;
           out.wiper.status = ptr->wiper_front;
           out.ambient_light.status = ptr->light_ambient;
+          out.btn_cc_on = ptr->btn_cc_on ? true : false;
+          out.btn_cc_off = ptr->btn_cc_off ? true : false;
           out.btn_cc_on_off = ptr->btn_cc_on_off ? true : false;
+          out.btn_cc_res = ptr->btn_cc_res ? true : false;
+          out.btn_cc_cncl = ptr->btn_cc_cncl ? true : false;
           out.btn_cc_res_cncl = ptr->btn_cc_res_cncl ? true : false;
           out.btn_cc_set_inc = ptr->btn_cc_set_inc ? true : false;
           out.btn_cc_set_dec = ptr->btn_cc_set_dec ? true : false;
@@ -853,29 +857,37 @@ void DbwNode::timerCallback(const ros::TimerEvent& event)
     dataspeed_can_msgs::CanMessage out;
     out.extended = false;
 
-    out.id = ID_BRAKE_CMD;
-    out.dlc = sizeof(MsgBrakeCmd);
-    memset(out.data.elems, 0x00, 8);
-    ((MsgBrakeCmd*)out.data.elems)->CLEAR = 1;
-    pub_can_.publish(out);
+    if (override_brake_) {
+      out.id = ID_BRAKE_CMD;
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
+      memset(out.data.elems, 0x00, 8);
+      ((MsgBrakeCmd*)out.data.elems)->CLEAR = 1;
+      pub_can_.publish(out);
+    }
 
-    out.id = ID_THROTTLE_CMD;
-    out.dlc = sizeof(MsgThrottleCmd);
-    memset(out.data.elems, 0x00, 8);
-    ((MsgThrottleCmd*)out.data.elems)->CLEAR = 1;
-    pub_can_.publish(out);
+    if (override_throttle_) {
+      out.id = ID_THROTTLE_CMD;
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
+      memset(out.data.elems, 0x00, 8);
+      ((MsgThrottleCmd*)out.data.elems)->CLEAR = 1;
+      pub_can_.publish(out);
+    }
 
-    out.id = ID_STEERING_CMD;
-    out.dlc = sizeof(MsgSteeringCmd);
-    memset(out.data.elems, 0x00, 8);
-    ((MsgSteeringCmd*)out.data.elems)->CLEAR = 1;
-    pub_can_.publish(out);
+    if (override_steering_) {
+      out.id = ID_STEERING_CMD;
+      out.dlc = 4; // Sending the full eight bytes will fault the watchdog counter (if enabled)
+      memset(out.data.elems, 0x00, 8);
+      ((MsgSteeringCmd*)out.data.elems)->CLEAR = 1;
+      pub_can_.publish(out);
+    }
 
-    out.id = ID_GEAR_CMD;
-    out.dlc = sizeof(MsgGearCmd);
-    memset(out.data.elems, 0x00, 8);
-    ((MsgGearCmd*)out.data.elems)->CLEAR = 1;
-    pub_can_.publish(out);
+    if (override_gear_) {
+      out.id = ID_GEAR_CMD;
+      out.dlc = sizeof(MsgGearCmd);
+      memset(out.data.elems, 0x00, 8);
+      ((MsgGearCmd*)out.data.elems)->CLEAR = 1;
+      pub_can_.publish(out);
+    }
   }
 }
 

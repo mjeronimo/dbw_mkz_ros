@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dbw_mkz_can)
 
 find_package(catkin REQUIRED COMPONENTS
+  rospy
   roscpp
   nodelet
   sensor_msgs

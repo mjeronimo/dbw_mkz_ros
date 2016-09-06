@@ -274,6 +274,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_surround_ = node.advertise<dbw_mkz_msgs::SurroundReport>("surround_report", 2);
   pub_sonar_cloud_ = node.advertise<sensor_msgs::PointCloud2>("sonar_cloud", 2);
   pub_brake_info_ = node.advertise<dbw_mkz_msgs::BrakeInfoReport>("brake_info_report", 2);
+  pub_throttle_info_ = node.advertise<dbw_mkz_msgs::ThrottleInfoReport>("throttle_info_report", 2);
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
@@ -566,6 +567,18 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.parking_brake.status = ptr->parking_brake;
           out.stationary = ptr->stationary;
           pub_brake_info_.publish(out);
+        }
+        break;
+
+      case ID_REPORT_THROTTLE_INFO:
+        if (msg->msg.dlc >= sizeof(MsgReportThrottleInfo)) {
+          const MsgReportThrottleInfo *ptr = (const MsgReportThrottleInfo*)msg->msg.data.elems;
+          dbw_mkz_msgs::ThrottleInfoReport out;
+          out.header.stamp = msg->header.stamp;
+          out.throttle_pc = (float)ptr->throttle_pc * 1e-3;
+          out.throttle_rate = (float)ptr->throttle_rate * 4e-4;
+          out.engine_rpm = (float)ptr->engine_rpm * 0.25;
+          pub_throttle_info_.publish(out);
         }
         break;
 

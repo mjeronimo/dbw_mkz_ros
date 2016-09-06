@@ -19,8 +19,8 @@
     <param name="channel_3_match_0" value="0x00000060" /> <!-- SID 0x060 to 0x06F -->
     <param name="channel_3_mask_1"  value="0x800007FC" />
     <param name="channel_3_match_1" value="0x00000070" /> <!-- SID 0x070 to 0x073 -->
-    <param name="channel_3_mask_2"  value="0x800007FF" />
-    <param name="channel_3_match_2" value="0x00000074" /> <!-- SID 0x074 to 0x074 -->
+    <param name="channel_3_mask_2"  value="0x800007FE" />
+    <param name="channel_3_match_2" value="0x00000074" /> <!-- SID 0x074 to 0x075 -->
     <!--param name="channel_3_mask_3"  value="0x80000000" /-->
     <!--param name="channel_3_match_3" value="0x00000000" /--> <!-- SID 0x000 to 0x7FF -->
     <remap from="can_bus_4" to="can_bus_4"/>

@@ -293,6 +293,16 @@ typedef struct {
   uint16_t trac_enabled :1;
 } MsgReportBrakeInfo;
 
+typedef struct {
+  uint16_t engine_rpm :16;
+  uint16_t throttle_pc :10;
+  uint16_t :6;
+  int16_t throttle_rate :8;
+  uint16_t :8;
+  uint16_t :8;
+  uint16_t :8;
+} MsgReportThrottleInfo;
+
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgBrakeCmd));
@@ -316,6 +326,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
   BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
+  BUILD_ASSERT(8 == sizeof(MsgReportThrottleInfo));
 }
 #undef BUILD_ASSERT
 
@@ -341,6 +352,7 @@ enum {
   ID_REPORT_FUEL_LEVEL    = 0x072,
   ID_REPORT_SURROUND      = 0x073,
   ID_REPORT_BRAKE_INFO    = 0x074,
+  ID_REPORT_THROTTLE_INFO = 0x075,
 };
 
 #endif // _DISPATCH_H

@@ -56,6 +56,7 @@
 #include <dbw_mkz_msgs/TirePressureReport.h>
 #include <dbw_mkz_msgs/SurroundReport.h>
 #include <dbw_mkz_msgs/BrakeInfoReport.h>
+#include <dbw_mkz_msgs/ThrottleInfoReport.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/TimeReference.h>
@@ -160,6 +161,7 @@ private:
   ros::Publisher pub_surround_;
   ros::Publisher pub_sonar_cloud_;
   ros::Publisher pub_brake_info_;
+  ros::Publisher pub_throttle_info_;
   ros::Publisher pub_imu_;
   ros::Publisher pub_gps_fix_;
   ros::Publisher pub_gps_vel_;

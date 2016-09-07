@@ -72,7 +72,7 @@ static inline float brakeTorqueFromPedal(float pedal) {
         float dinput = pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
-        if (fabs(dpedal) > 1e-6) {
+        if (fabsf(dpedal) > (float)1e-6) {
           return start + (dinput * dtorque / dpedal);
         } else {
           return start + (dtorque / 2);
@@ -95,7 +95,7 @@ static inline float brakePedalFromTorque(float torque) {
         float dinput = torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
-        if (fabs(dtorque) > 1e-6) {
+        if (fabsf(dtorque) > (float)1e-6) {
           return start + (dinput * dpedal / dtorque);
         } else {
           return start + (dpedal / 2);
@@ -121,7 +121,7 @@ static inline float throttlePedalFromPercent(float percent) {
         float dinput = percent - THROTTLE_TABLE[i - 1].percent;
         float dpedal = THROTTLE_TABLE[i].pedal - THROTTLE_TABLE[i - 1].pedal;
         float dpercent = THROTTLE_TABLE[i].percent - THROTTLE_TABLE[i - 1].percent;
-        if (fabs(dpercent) > 1e-6) {
+        if (fabsf(dpercent) > (float)1e-6) {
           return start + (dinput * dpedal / dpercent);
         } else {
           return start + (dpedal / 2);

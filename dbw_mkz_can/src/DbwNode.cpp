@@ -41,22 +41,23 @@ namespace dbw_mkz_can
 static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
 // Duty,   Nm
  {0.150,    0},
- {0.173,    0},
- {0.181,    4},
- {0.204,  108},
- {0.207,  519},
- {0.230,  521},
- {0.242,  816},
- {0.279, 1832},
- {0.301, 2612},
- {0.319, 3316},
- {0.322, 3412},
+ {0.175,    0},
+ {0.184,    4},
+ {0.208,  108},
+ {0.211,  519},
+ {0.234,  521},
+ {0.246,  816},
+ {0.283, 1832},
+ {0.305, 2612},
+ {0.323, 3316},
+ {0.326, 3412},
  {0.330, 3412},
 };
 static const struct {float pedal; float percent;} THROTTLE_TABLE[] = {
 // Duty,   %
  {0.150, 0.000},
- {0.160, 0.001},
+ {0.165, 0.001},
+ {0.166, 0.020},
  {0.800, 1.000},
 };
 static inline float brakeTorqueFromPedal(float pedal) {
@@ -72,7 +73,7 @@ static inline float brakeTorqueFromPedal(float pedal) {
         float dinput = pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
-        if (fabs(dpedal) > 1e-6) {
+        if (fabsf(dpedal) > (float)1e-6) {
           return start + (dinput * dtorque / dpedal);
         } else {
           return start + (dtorque / 2);
@@ -95,7 +96,7 @@ static inline float brakePedalFromTorque(float torque) {
         float dinput = torque - BRAKE_TABLE[i - 1].torque;
         float dpedal = BRAKE_TABLE[i].pedal - BRAKE_TABLE[i - 1].pedal;
         float dtorque = BRAKE_TABLE[i].torque - BRAKE_TABLE[i - 1].torque;
-        if (fabs(dtorque) > 1e-6) {
+        if (fabsf(dtorque) > (float)1e-6) {
           return start + (dinput * dpedal / dtorque);
         } else {
           return start + (dpedal / 2);
@@ -121,7 +122,7 @@ static inline float throttlePedalFromPercent(float percent) {
         float dinput = percent - THROTTLE_TABLE[i - 1].percent;
         float dpedal = THROTTLE_TABLE[i].pedal - THROTTLE_TABLE[i - 1].pedal;
         float dpercent = THROTTLE_TABLE[i].percent - THROTTLE_TABLE[i - 1].percent;
-        if (fabs(dpercent) > 1e-6) {
+        if (fabsf(dpercent) > (float)1e-6) {
           return start + (dinput * dpedal / dpercent);
         } else {
           return start + (dpedal / 2);

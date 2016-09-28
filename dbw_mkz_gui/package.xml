@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>dbw_mkz_gui</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>The dbw_mkz_gui package</description>
   <maintainer email="denso@todo.todo">denso</maintainer>
   <license>TODO</license>

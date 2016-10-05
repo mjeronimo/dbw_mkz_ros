@@ -167,6 +167,7 @@ private:
   ros::Publisher pub_gps_vel_;
   ros::Publisher pub_gps_time_;
   ros::Publisher pub_joint_states_;
+  ros::Publisher pub_twist_;
   ros::Publisher pub_sys_enable_;
 
   // Time Synchronization

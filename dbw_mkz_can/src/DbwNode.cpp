@@ -281,6 +281,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
   pub_gps_time_ = node.advertise<sensor_msgs::TimeReference>("gps/time", 10);
   pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10, false);
+  pub_twist_ = node.advertise<geometry_msgs::TwistStamped>("twist", 10);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
 
@@ -399,6 +400,11 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_calibration = ptr->FLTCAL ? true : false;
           out.fault_connector = ptr->FLTCON ? true : false;
           pub_steering_.publish(out);
+          geometry_msgs::TwistStamped twist;
+          twist.header.stamp = out.header.stamp;
+          twist.twist.linear.x = out.speed;
+          twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / 16.0) / (112.0 * 0.0254);
+          pub_twist_.publish(twist);
           publishJointStates(msg->header.stamp, NULL, &out);
           if (ptr->FLTCAL) {
             ROS_WARN_THROTTLE(5.0, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");

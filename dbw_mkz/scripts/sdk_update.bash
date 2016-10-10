@@ -1,19 +1,26 @@
 #! /bin/bash
+
+# Perform an SDK Install
+#./sdk_install.bash
+bash <(wget -q -O - https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz/scripts/sdk_install.bash)
+
+# Update with apt-get
+#sudo apt-get update && sudo apt-get upgrade && rosdep update
+
+# Detect and update legacy source installation
 MY_WORKSPACE=$HOME/dbw_ws
+if [ -e "$MY_WORKSPACE/devel/setup.bash" ]; then
+  if [ -e "$MY_WORKSPACE/src/.rosinstall" ]; then
+    if [ -e "$MY_WORKSPACE/src/dbw_mkz_ros/LICENSE" ]; then
+      echo "Detected source installation. Updating..."
+      source `find /opt/ros -name setup.bash | sort -r | head -1`
+      wstool update -t $MY_WORKSPACE/src
+      rosdep update && rosdep install -y -r --from-paths $MY_WORKSPACE/src --ignore-src
+      cd $MY_WORKSPACE
+      catkin_make -DCMAKE_BUILD_TYPE=Release
+    fi
+  fi
+fi
 
-# Update workspace
-source /opt/ros/indigo/setup.bash
-wstool merge -t $MY_WORKSPACE/src https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz.rosinstall
-wstool update -t $MY_WORKSPACE/src
-
-# Resolve dependencies
-rosdep update
-rosdep install -y -r --from-paths $MY_WORKSPACE/src --ignore-src
-
-# Build workspace
-cd $MY_WORKSPACE
-source /opt/ros/indigo/setup.bash
-catkin_make -DCMAKE_BUILD_TYPE=Release
-
-echo 'SDK update: Done'
+echo "SDK update: Done"
 

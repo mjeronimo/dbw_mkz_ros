@@ -1,26 +1,34 @@
 #! /bin/bash
-MY_WORKSPACE=$HOME/dbw_ws
 
-# Install wstool
-sudo apt-get install -y python-wstool
+# Detect ROS version
+if [ -e /opt/ros/indigo/setup.bash ]; then
+  echo "Detected ROS Indigo."
+  source /opt/ros/indigo/setup.bash
+elif [ -e /opt/ros/kinetic/setup.bash ]; then
+  echo "Detected ROS Kinetic."
+  source /opt/ros/kinetic/setup.bash
+else
+  echo "Failed to detected ROS version."
+  exit 1
+fi
 
-# Setup workspace
-mkdir -p $MY_WORKSPACE/src
-wstool init $MY_WORKSPACE/src
-wstool merge -t $MY_WORKSPACE/src https://bitbucket.org/DataspeedInc/dbw_mkz_ros/raw/default/dbw_mkz.rosinstall
+# Setup apt-get
+echo "Adding Dataspeed server to apt..."
+sudo sh -c 'echo "deb [ arch=amd64 ] http://packages.dataspeedinc.com/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-dataspeed-public.list'
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FF6D3CDA
+sudo apt-get update
 
-# Update workspace
-wstool update -t $MY_WORKSPACE/src
+# Setup rosdep
+echo "Setting up rosdep..."
+if [ -z "$ROS_DISTRO" ]; then
+  echo "Error! ROS not detected. Not updating rosdep!"
+else
+  sudo sh -c 'echo "yaml http://packages.dataspeedinc.com/ros/ros-public-'$ROS_DISTRO'.yaml '$ROS_DISTRO'" > /etc/ros/rosdep/sources.list.d/30-dataspeed-public-'$ROS_DISTRO'.list'
+  rosdep update
+fi
 
-# Install udev rules
-sudo cp $MY_WORKSPACE/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm trigger
+sudo apt-get install -y ros-$ROS_DISTRO-dbw-mkz
+sudo apt-get upgrade
 
-# Setup environment
-echo "source ~/dbw_ws/devel/setup.bash" >> $HOME/.bashrc
-
-# Call SDK Update script
-$MY_WORKSPACE/src/dbw_mkz_ros/dbw_mkz/scripts/sdk_update.bash
-
-echo 'SDK install: Done'
+echo "SDK install: Done"
 

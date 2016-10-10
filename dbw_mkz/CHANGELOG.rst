@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2016-10-10)
+------------------
 * Added support for apt-get binary packages
 * Contributors: Kevin Hallenbeck
 

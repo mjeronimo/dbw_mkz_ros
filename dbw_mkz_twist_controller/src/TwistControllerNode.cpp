@@ -34,15 +34,28 @@
 
 #include "TwistControllerNode.h"
 
-namespace dbw_mkz_twist_controller{
+namespace dbw_mkz_twist_controller {
 
 TwistControllerNode::TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn)
 {
   lpf_fuel_.setParams(60.0, 0.1);
   accel_pid_.setRange(0.0, 1.0);
 
-  // Initialize
-  loadParams(pn);
+  // Control rate parameter
+  double control_rate;
+  pn.param("control_rate", control_rate, 50.0);
+  control_period_ = 1.0 / control_rate;
+
+  // Ackermann steering parameters
+  acker_wheelbase_ = 2.8498;
+  acker_track_ = 1.6002;
+  steering_ratio_ = 16.0;
+  pn.getParam("ackermann_wheelbase", acker_wheelbase_);
+  pn.getParam("ackermann_track", acker_track_);
+  pn.getParam("steering_ratio", steering_ratio_);
+  yaw_control_.setWheelBase(acker_wheelbase_);
+  yaw_control_.setSteeringRatio(steering_ratio_);
+  yaw_control_.setSpeedMin(mphToMps(4.0));
 
   // Subscribers
   sub_twist_ = n.subscribe("cmd_vel", 1, &TwistControllerNode::recvTwist, this);
@@ -126,7 +139,7 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
     }
 
     steering_cmd.enable = true;
-    steering_cmd.steering_wheel_angle_cmd = yaw_control_.getSteeringWheel(cmd_vel_.twist.linear.x, cmd_vel_.twist.angular.z, actual_.linear.x)
+    steering_cmd.steering_wheel_angle_cmd = yaw_control_.getSteeringWheelAngle(cmd_vel_.twist.linear.x, cmd_vel_.twist.angular.z, actual_.linear.x)
         + cfg_.steer_kp * (cmd_vel_.twist.angular.z - actual_.angular.z);
 
     if (cfg_.pub_pedals) {
@@ -151,7 +164,7 @@ void TwistControllerNode::reconfig(ControllerConfig& config, uint32_t level)
 
   speed_pid_.setGains(cfg_.speed_kp, 0.0, 0.0);
   accel_pid_.setGains(cfg_.accel_kp, cfg_.accel_ki, 0.0);
-  yaw_control_.setMaxLateralAccel(cfg_.max_lat_accel);
+  yaw_control_.setLateralAccelMax(cfg_.max_lat_accel);
   lpf_accel_.setParams(cfg_.accel_tau, 0.02);
 }
 
@@ -180,13 +193,6 @@ void TwistControllerNode::recvTwist3(const geometry_msgs::TwistStamped::ConstPtr
 void TwistControllerNode::recvFuel(const dbw_mkz_msgs::FuelLevelReport::ConstPtr& msg)
 {
   lpf_fuel_.filt(msg->fuel_level);
-}
-
-void TwistControllerNode::loadParams(ros::NodeHandle pn)
-{
-  double control_rate;
-  pn.param("control_rate", control_rate, 50.0);
-  control_period_ = 1.0 / control_rate;
 }
 
 void TwistControllerNode::recvSteeringReport(const dbw_mkz_msgs::SteeringReport::ConstPtr& msg)

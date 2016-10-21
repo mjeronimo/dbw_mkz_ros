@@ -35,32 +35,37 @@
 #ifndef YAWCONTROL_H
 #define YAWCONTROL_H
 
-#include "RadiusControl.h"
-#include "helper_functions.h"
 #include <math.h>
+#include "RadiusControl.h"
 
 namespace dbw_mkz_twist_controller {
 
 class YawControl {
 public:
-  YawControl() : max_lateral_accel_(INFINITY) {}
-  YawControl(double max_lateral_accel) : max_lateral_accel_(fabs(max_lateral_accel)) {}
-  void setMaxLateralAccel(double max_lateral_accel) { max_lateral_accel_ = fabs(max_lateral_accel); }
-  double getSteeringWheel(double cmd_vx, double cmd_wz, double speed) {
+  YawControl() : radius_control_(), speed_min_(1.8), lateral_accel_max_(INFINITY) {}
+  YawControl(double wheelbase, double steering_ratio, double speed_min = 1.8, double steering_wheel_angle_max = INFINITY, double lateral_accel_max = INFINITY) :
+    radius_control_(wheelbase, steering_ratio, steering_wheel_angle_max), speed_min_(fabs(speed_min)), lateral_accel_max_(fabs(lateral_accel_max)) {}
+  void setWheelBase(double val) { radius_control_.setWheelBase(val); }
+  void setSteeringRatio(double val) { radius_control_.setSteeringRatio(val); }
+  void setSteeringWheelAngleMax(double val) { radius_control_.setSteeringWheelAngleMax(val); }
+  void setSpeedMin(double val) { speed_min_ = fabs(val); }
+  void setLateralAccelMax(double val) { lateral_accel_max_ = fabs(val); }
+  double getSteeringWheelAngle(double cmd_vx, double cmd_wz, double speed) {
     cmd_wz = fabs(cmd_vx) > 0 ? cmd_wz * speed / cmd_vx : 0.0;
     if (fabs(speed) > 0.1) {
-      double max_yaw_rate = fabs(max_lateral_accel_ / speed);
+      double max_yaw_rate = fabs(lateral_accel_max_ / speed);
       if (cmd_wz > max_yaw_rate) {
         cmd_wz = max_yaw_rate;
       } else if (cmd_wz < -max_yaw_rate) {
         cmd_wz = -max_yaw_rate;
       }
     }
-    return radius_control_.getSteeringWheel(std::max(speed, mphToMps(4.0)) / cmd_wz);
+    return radius_control_.getSteeringWheelAngle(std::max(speed, speed_min_) / cmd_wz);
   }
 private:
   RadiusControl radius_control_;
-  double max_lateral_accel_;
+  double speed_min_;
+  double lateral_accel_max_;
 };
 
 }

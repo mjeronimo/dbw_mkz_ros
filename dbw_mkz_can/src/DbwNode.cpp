@@ -249,6 +249,14 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
     std::swap(boo_thresh_lo_, boo_thresh_hi_);
   }
 
+  // Ackermann steering parameters
+  acker_wheelbase_ = 2.8498;
+  acker_track_ = 1.6002;
+  steering_ratio_ = 16.0;
+  priv_nh.getParam("ackermann_wheelbase", acker_wheelbase_);
+  priv_nh.getParam("ackermann_track", acker_track_);
+  priv_nh.getParam("steering_ratio", steering_ratio_);
+
   // Initialize joint states
   joint_state_.position.resize(JOINT_COUNT);
   joint_state_.velocity.resize(JOINT_COUNT);
@@ -403,7 +411,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           geometry_msgs::TwistStamped twist;
           twist.header.stamp = out.header.stamp;
           twist.twist.linear.x = out.speed;
-          twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / 16.0) / (112.0 * 0.0254);
+          twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / steering_ratio_) / acker_wheelbase_;
           pub_twist_.publish(twist);
           publishJointStates(msg->header.stamp, NULL, &out);
           if (ptr->FLTCAL) {
@@ -1159,10 +1167,9 @@ void DbwNode::publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::Whe
     joint_state_.velocity[JOINT_RR] = wheels->rear_right;
   }
   if (steering) {
-    const double L = 112.0 * 0.0254;
-    const double W = 63.0 * 0.0254;
-    const double RATIO = 1 / 16.0;
-    double r = L / tan(steering->steering_wheel_angle * RATIO);
+    const double L = acker_wheelbase_;
+    const double W = acker_track_;
+    const double r = L / tan(steering->steering_wheel_angle / steering_ratio_);
     joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
     joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
   }

@@ -37,7 +37,8 @@
 #include <dynamic_reconfigure/server.h>
 #include <dbw_mkz_msgs/TwistCmd.h>
 #include <dbw_mkz_twist_controller/TwistTestConfig.h>
-#include "helper_functions.h"
+
+static double mphToMps(double mph) { return mph * 0.44704; }
 
 dbw_mkz_msgs::TwistCmd cmd;
 bool enable = false;
@@ -45,7 +46,7 @@ bool limits = false;
 
 void reconfig(dbw_mkz_twist_controller::TwistTestConfig& config, uint32_t level)
 {
-  cmd.twist.linear.x = dbw_mkz_twist_controller::mphToMps(config.speed);
+  cmd.twist.linear.x = mphToMps(config.speed);
   cmd.twist.angular.z = config.yaw_rate;
   cmd.accel_limit = config.accel_max;
   cmd.decel_limit = config.decel_max;

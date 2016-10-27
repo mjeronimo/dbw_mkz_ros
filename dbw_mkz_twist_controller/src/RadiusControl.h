@@ -48,7 +48,7 @@ public:
   void setSteeringRatio(double val) { steering_ratio_ = val; }
   void setSteeringWheelAngleMax(double val) { angle_max_ = fabs(val); }
   double getSteeringWheelAngle(double radius) {
-    double angle = isnan(radius) ? 0.0 : atan(wheelbase_ / radius) / steering_ratio_;
+    double angle = isnan(radius) ? 0.0 : atan(wheelbase_ / radius) * steering_ratio_;
     if (angle > angle_max_) {
       return angle_max_;
     } else if (angle < -angle_max_) {

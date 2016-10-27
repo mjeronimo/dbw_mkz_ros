@@ -5,7 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   dbw_mkz_msgs
   roscpp
-  roslib
   tf
 )
 
@@ -25,7 +24,6 @@ add_dependencies(twist_controller dbw_mkz_msgs_gencpp)
 add_dependencies(twist_controller ${PROJECT_NAME}_gencfg)
 target_link_libraries(twist_controller
   ${catkin_LIBRARIES}
-  yaml-cpp
 )
 
 add_executable(twist_tester src/twist_tester.cpp)
@@ -40,6 +38,6 @@ install(TARGETS twist_controller twist_tester
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-install(DIRECTORY launch yaml
+install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

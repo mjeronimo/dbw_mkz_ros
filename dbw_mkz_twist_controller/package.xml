@@ -21,12 +21,10 @@
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>dbw_mkz_msgs</build_depend>
-  <build_depend>roslib</build_depend>
 
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>dbw_mkz_msgs</run_depend>
-  <run_depend>roslib</run_depend>
 
 </package>

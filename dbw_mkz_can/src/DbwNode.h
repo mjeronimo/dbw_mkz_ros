@@ -137,6 +137,11 @@ private:
   double boo_thresh_lo_;
   double boo_thresh_hi_;
 
+  // Ackermann steering
+  double acker_wheelbase_;
+  double acker_track_;
+  double steering_ratio_;
+
   // Subscribed topics
   ros::Subscriber sub_enable_;
   ros::Subscriber sub_disable_;

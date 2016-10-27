@@ -37,7 +37,6 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
-#include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 #include <dbw_mkz_msgs/ThrottleCmd.h>
 #include <dbw_mkz_msgs/ThrottleReport.h>
@@ -58,16 +57,13 @@
 
 #include <std_msgs/Float64.h>
 
-namespace dbw_mkz_twist_controller{
-
-#define GAS_DENSITY             2.858  // kg/gal
+namespace dbw_mkz_twist_controller {
 
 class TwistControllerNode{
 public:
   TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn);
 private:
   void reconfig(ControllerConfig& config, uint32_t level);
-  void loadParams(ros::NodeHandle pn);
   void controlCallback(const ros::TimerEvent& event);
   void recvTwist(const geometry_msgs::Twist::ConstPtr& msg);
   void recvTwist2(const dbw_mkz_msgs::TwistCmd::ConstPtr& msg);
@@ -106,6 +102,12 @@ private:
 
   // Parameters
   double control_period_;
+  double acker_wheelbase_;
+  double acker_track_;
+  double steering_ratio_;
+
+  static const double GAS_DENSITY = 2.858; // kg/gal
+  static double mphToMps(double mph) { return mph * 0.44704; }
 };
 
 }

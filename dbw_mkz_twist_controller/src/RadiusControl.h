@@ -34,38 +34,32 @@
 
 #ifndef RADIUSCONTROL_H
 #define RADIUSCONTROL_H
+
 #include <math.h>
-#include <yaml-cpp/yaml.h>
-#include <ros/package.h>
-#include "helper_functions.h"
 
 namespace dbw_mkz_twist_controller {
 
 class RadiusControl {
 public:
-  RadiusControl() {
-    YAML::Node steering_params = YAML::LoadFile(
-        ros::package::getPath("dbw_mkz_twist_controller") + "/yaml/steering_params.yaml");
-    wheelbase_m_ = inchesToMeters(steering_params["wheelbase"].as<double>());
-    steering_ratio_ = inchesToMeters(steering_params["steering_ratio"].as<double>());
-    max_steering_wheel_angle_ = fabs(steering_params["max_steering_wheel_angle"].as<double>());
-  }
-  void setWheelBase(double val) { wheelbase_m_ = val; }
+  RadiusControl() : wheelbase_(1.0), steering_ratio_(1.0), angle_max_(INFINITY) {}
+  RadiusControl(double wheelbase, double steering_ratio, double steering_wheel_angle_max = INFINITY) :
+    wheelbase_(wheelbase), steering_ratio_(steering_ratio), angle_max_(fabs(steering_wheel_angle_max)) {}
+  void setWheelBase(double val) { wheelbase_ = val; }
   void setSteeringRatio(double val) { steering_ratio_ = val; }
-  void setMaxSteeringWheelAngle(double val) { max_steering_wheel_angle_ = fabs(val); }
-  double getSteeringWheel(double radius) {
-    double steering_wheel_angle = isnan(radius) ? 0.0 : atan(wheelbase_m_ / radius) / steering_ratio_;
-    if (steering_wheel_angle > max_steering_wheel_angle_) {
-      return max_steering_wheel_angle_;
-    } else if (steering_wheel_angle < -max_steering_wheel_angle_) {
-      return -max_steering_wheel_angle_;
+  void setSteeringWheelAngleMax(double val) { angle_max_ = fabs(val); }
+  double getSteeringWheelAngle(double radius) {
+    double angle = isnan(radius) ? 0.0 : atan(wheelbase_ / radius) * steering_ratio_;
+    if (angle > angle_max_) {
+      return angle_max_;
+    } else if (angle < -angle_max_) {
+      return -angle_max_;
     }
-    return steering_wheel_angle;
+    return angle;
   }
 private:
-  double wheelbase_m_;
+  double wheelbase_;
   double steering_ratio_;
-  double max_steering_wheel_angle_;
+  double angle_max_;
 };
 
 }

@@ -47,12 +47,12 @@ public:
     }
     PidControl(double kp, double ki, double kd, double min, double max) {
       last_error_ = 0.0; int_val_ = 0.0; last_int_val_ = 0.0;
-      kp_ = kp; ki_ = ki; kd_ = kd; min_ = min; max_ = max;
+      kp_ = kp; ki_ = ki; kd_ = kd; min_ = std::min(min,max); max_ = std::max(min,max);
     }
 
     void setGains(double kp, double ki, double kd) { kp_ = kp; ki_ = ki; kd_ = kd; }
-    void setRange(double min, double max) { min_ = min; max_ = max; }
-    void setParams(double kp, double ki, double kd, double min, double max) { kp_ = kp; ki_ = ki; kd_ = kd; min_ = min; max_ = max; }
+    void setRange(double min, double max) { min_ = std::min(min,max); max_ = std::max(min,max); }
+    void setParams(double kp, double ki, double kd, double min, double max) { setGains(kp,ki,kd); setRange(min,max); }
     void resetIntegrator() { int_val_ = 0.0; last_int_val_ = 0.0; }
     void revertIntegrator() { int_val_ = last_int_val_; }
 
@@ -78,7 +78,7 @@ private:
     double last_error_;
     double int_val_, last_int_val_;
     double kp_, ki_, kd_;
-    double max_, min_;
+    double min_, max_;
 };
 
 }

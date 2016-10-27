@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dbw_mkz_twist_controller)
 
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  dbw_mkz_msgs
   roscpp
-  tf
+  dbw_mkz_msgs
+  dynamic_reconfigure
 )
 
 generate_dynamic_reconfigure_options(

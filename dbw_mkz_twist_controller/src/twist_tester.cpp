@@ -32,26 +32,65 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
+// ROS and messages
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <dynamic_reconfigure/server.h>
 #include <dbw_mkz_msgs/TwistCmd.h>
+
+// Dynamic Reconfigure
+#include <dynamic_reconfigure/server.h>
 #include <dbw_mkz_twist_controller/TwistTestConfig.h>
 
+// Global variables
+dbw_mkz_twist_controller::TwistTestConfig cfg_;
+ros::Publisher pub_twist, pub_twist2;
+
+// Static functions
 static double mphToMps(double mph) { return mph * 0.44704; }
+static double kphToMps(double mph) { return mph * 0.277778; }
+static double yawRateFromRadius(double speed, double radius) {
+  return radius != 0.0 ? speed / radius : 0.0;
+}
 
-dbw_mkz_msgs::TwistCmd cmd;
-bool enable = false;
-bool limits = false;
-
+// Dynamic Reconfigure callback
 void reconfig(dbw_mkz_twist_controller::TwistTestConfig& config, uint32_t level)
 {
-  cmd.twist.linear.x = mphToMps(config.speed);
-  cmd.twist.angular.z = config.yaw_rate;
-  cmd.accel_limit = config.accel_max;
-  cmd.decel_limit = config.decel_max;
-  enable = config.go;
-  limits = config.use_limits;
+  cfg_ = config;
+}
+
+void timerCallback(const ros::TimerEvent& event)
+{
+  if (cfg_.publish) {
+    dbw_mkz_msgs::TwistCmd cmd;
+    switch (cfg_.speed_units) {
+      default:
+      case dbw_mkz_twist_controller::TwistTest_SPEED_MPS:
+        cmd.twist.linear.x = cfg_.speed;
+        break;
+      case dbw_mkz_twist_controller::TwistTest_SPEED_MPH:
+        cmd.twist.linear.x = mphToMps(cfg_.speed);
+        break;
+      case dbw_mkz_twist_controller::TwistTest_SPEED_KPH:
+        cmd.twist.linear.x = kphToMps(cfg_.speed);
+        break;
+    }
+    switch (cfg_.yaw_method) {
+      default:
+      case dbw_mkz_twist_controller::TwistTest_YAW_RATE:
+        cmd.twist.angular.z = cfg_.yaw_rate;
+        break;
+      case dbw_mkz_twist_controller::TwistTest_YAW_RADIUS:
+        cmd.twist.angular.z = yawRateFromRadius(cmd.twist.linear.x, cfg_.yaw_radius);
+        break;
+    }
+    if (cfg_.use_limits) {
+      cmd.accel_limit = cfg_.accel_max;
+      cmd.decel_limit = cfg_.decel_max;
+      pub_twist2.publish(cmd);
+    } else {
+      pub_twist.publish(cmd.twist);
+    }
+  }
 }
 
 int main(int argc, char** argv)
@@ -59,23 +98,19 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "twist_tester");
   ros::NodeHandle n;
 
-  ros::Publisher pub_twist = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-  ros::Publisher pub_twist2 = n.advertise<dbw_mkz_msgs::TwistCmd>("cmd_vel_with_limits", 1);
-
+  // Dynamic Reconfigure
   dynamic_reconfigure::Server<dbw_mkz_twist_controller::TwistTestConfig> srv;
   srv.setCallback(boost::bind(reconfig, _1, _2));
 
-  ros::Rate r(20);
-  while (ros::ok()){
-    if (enable){
-      if (limits) {
-        pub_twist2.publish(cmd);
-      } else {
-        pub_twist.publish(cmd.twist);
-      }
-    }
-    r.sleep();
-    ros::spinOnce();
-  }
+  // Publishers
+  pub_twist = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+  pub_twist2 = n.advertise<dbw_mkz_msgs::TwistCmd>("cmd_vel_with_limits", 1);
+
+  // Timer
+  ros::Timer timer = n.createTimer(ros::Duration(1/20.0), timerCallback);
+
+  // Handle callbacks
+  ros::spin();
+
   return 0;
 }

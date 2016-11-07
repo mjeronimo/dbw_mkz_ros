@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2016-11-07)
+------------------
 * Twist tester option for yaw rate or radius for steering
 * Cleanup of twist controller dynamic reconfigure
 * Removed tf dependency for dbw_mkz_twist_controller

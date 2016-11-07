@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.2 (2016-11-07)
+------------------
 * Configurable steering ratio
 * Contributors: Kevin Hallenbeck
 

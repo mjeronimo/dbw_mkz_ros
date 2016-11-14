@@ -232,6 +232,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   override_gear_ = false;
   fault_brakes_ = false;
   fault_throttle_ = false;
+  fault_steering_ = false;
   fault_steering_cal_ = false;
   fault_watchdog_ = false;
   fault_watchdog_using_brakes_ = false;
@@ -390,6 +391,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_STEERING_REPORT:
         if (msg->msg.dlc >= sizeof(MsgSteeringReport)) {
           const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->msg.data.elems;
+          faultSteering(ptr->FLTBUS1 && ptr->FLTBUS2);
           faultSteeringCal(ptr->FLTCAL);
           faultWatchdog(ptr->FLTWDC);
           overrideSteering(ptr->OVERRIDE);
@@ -414,7 +416,9 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / steering_ratio_) / acker_wheelbase_;
           pub_twist_.publish(twist);
           publishJointStates(msg->header.stamp, NULL, &out);
-          if (ptr->FLTCAL) {
+          if (ptr->FLTBUS1 || ptr->FLTBUS2) {
+            ROS_WARN_THROTTLE(5.0, "Steering fault. Check wiring.");
+          } else if (ptr->FLTCAL) {
             ROS_WARN_THROTTLE(5.0, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
           }
         }
@@ -1054,6 +1058,22 @@ void DbwNode::faultThrottle(bool fault)
   if (publishDbwEnabled()) {
     if (en) {
       ROS_ERROR("DBW system disabled. Throttle fault.");
+    } else {
+      ROS_INFO("DBW system enabled.");
+    }
+  }
+}
+
+void DbwNode::faultSteering(bool fault)
+{
+  bool en = enabled();
+  if (fault && en) {
+    enable_ = false;
+  }
+  fault_steering_ = fault;
+  if (publishDbwEnabled()) {
+    if (en) {
+      ROS_ERROR("DBW system disabled. Steering fault.");
     } else {
       ROS_INFO("DBW system enabled.");
     }

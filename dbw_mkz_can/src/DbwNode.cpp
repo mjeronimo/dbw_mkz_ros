@@ -601,6 +601,21 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         }
         break;
 
+      case ID_VERSION:
+        if (msg->msg.dlc >= sizeof(MsgVersion)) {
+          const MsgVersion *ptr = (const MsgVersion*)msg->msg.data.elems;
+          if (ptr->module == VERSION_BPEC) {
+            ROS_INFO_ONCE("Detected brake firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+          } else if (ptr->module == VERSION_TPEC) {
+            ROS_INFO_ONCE("Detected throttle firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+          } else if (ptr->module == VERSION_EPAS) {
+            ROS_INFO_ONCE("Detected steering firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+          } else {
+            ROS_WARN_THROTTLE(10.0, "Detected unknown firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+          }
+        }
+        break;
+
       case ID_BRAKE_CMD:
         ROS_WARN("DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Brake. Id: 0x%03X", ID_BRAKE_CMD);
         break;

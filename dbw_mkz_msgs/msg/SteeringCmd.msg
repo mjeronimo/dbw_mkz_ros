@@ -8,5 +8,8 @@ bool enable
 # Ignore driver overrides
 bool ignore
 
+# Disable the driver override audible warning
+bool quiet
+
 # Watchdog counter (optional)
 uint8 count

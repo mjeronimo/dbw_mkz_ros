@@ -103,7 +103,9 @@ typedef struct {
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
-  uint8_t :5;
+  uint8_t :1;
+  uint8_t QUIET :1;
+  uint8_t :3;
   uint8_t SVEL;
   uint8_t :8;
   uint8_t :8;

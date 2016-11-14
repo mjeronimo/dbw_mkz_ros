@@ -103,7 +103,9 @@ typedef struct {
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
-  uint8_t :5;
+  uint8_t :1;
+  uint8_t QUIET :1;
+  uint8_t :3;
   uint8_t SVEL;
   uint8_t :8;
   uint8_t :8;
@@ -303,6 +305,19 @@ typedef struct {
   uint16_t :8;
 } MsgReportThrottleInfo;
 
+enum {
+    VERSION_BPEC = 1,
+    VERSION_TPEC = 2,
+    VERSION_EPAS = 3,
+};
+typedef struct {
+  uint8_t module;
+  uint8_t :8;
+  uint16_t major;
+  uint16_t minor;
+  uint16_t build;
+} MsgVersion;
+
 #define BUILD_ASSERT(cond) do { (void) sizeof(char [1 - 2*!(cond)]); } while(0)
 static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgBrakeCmd));
@@ -327,6 +342,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
   BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
   BUILD_ASSERT(8 == sizeof(MsgReportThrottleInfo));
+  BUILD_ASSERT(8 == sizeof(MsgVersion));
 }
 #undef BUILD_ASSERT
 
@@ -353,6 +369,7 @@ enum {
   ID_REPORT_SURROUND      = 0x073,
   ID_REPORT_BRAKE_INFO    = 0x074,
   ID_REPORT_THROTTLE_INFO = 0x075,
+  ID_VERSION              = 0x07F,
 };
 
 #endif // _DISPATCH_H

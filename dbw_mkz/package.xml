@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>dbw_mkz</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <description>
     Drive-by-wire interface to the Dataspeed Inc. Lincoln MKZ DBW kit
   </description>

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2016-11-17)
+------------------
 * Added QUIET bit to disable driver override audible warning
 * Print brake/throttle/steering firmware versions
 * Handle and report steering faults (FLTBUS1 and FLTBUS2)

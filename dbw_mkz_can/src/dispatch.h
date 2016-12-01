@@ -178,10 +178,10 @@ typedef struct {
 } MsgMiscReport;
 
 typedef struct {
-  uint16_t front_left;
-  uint16_t front_right;
-  uint16_t rear_left;
-  uint16_t rear_right;
+  int16_t front_left;
+  int16_t front_right;
+  int16_t rear_left;
+  int16_t rear_right;
 } MsgReportWheelSpeed;
 
 typedef struct {

@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added brake and throttle thrashing scripts to try and induce faults
+* Changed wheel speeds to signed values
+* Contributors: Kevin Hallenbeck, Joshua Whitley
+
 1.0.3 (2016-11-17)
 ------------------
 * Added QUIET bit to disable driver override audible warning

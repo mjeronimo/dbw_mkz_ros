@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.4 (2016-12-06)
+------------------
 * Added brake and throttle thrashing scripts to try and induce faults
 * Changed wheel speeds to signed values
 * Contributors: Kevin Hallenbeck, Joshua Whitley

@@ -14,13 +14,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(joystick_demo src/joystick_demo.cpp src/JoystickDemo.cpp)
-add_dependencies(joystick_demo dbw_mkz_msgs_gencpp)
-target_link_libraries(joystick_demo
+add_executable(${PROJECT_NAME}_joystick_demo src/joystick_demo.cpp src/JoystickDemo.cpp)
+add_dependencies(${PROJECT_NAME}_joystick_demo dbw_mkz_msgs_gencpp)
+target_link_libraries(${PROJECT_NAME}_joystick_demo
   ${catkin_LIBRARIES}
 )
+set_target_properties(${PROJECT_NAME}_joystick_demo PROPERTIES OUTPUT_NAME joystick_demo PREFIX "")
 
-install(TARGETS joystick_demo
+install(TARGETS ${PROJECT_NAME}_joystick_demo
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

@@ -29,17 +29,17 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-add_executable(dbw_node
+add_executable(${PROJECT_NAME}_dbw_node
   src/node.cpp
-  src/DbwNode.cpp
 )
-add_dependencies(dbw_node dataspeed_can_msgs_gencpp)
-add_dependencies(dbw_node dbw_mkz_msgs_gencpp)
-target_link_libraries(dbw_node
-  ${catkin_LIBRARIES}
+add_dependencies(${PROJECT_NAME}_dbw_node dataspeed_can_msgs_gencpp)
+add_dependencies(${PROJECT_NAME}_dbw_node dbw_mkz_msgs_gencpp)
+target_link_libraries(${PROJECT_NAME}_dbw_node
+  ${PROJECT_NAME}
 )
+set_target_properties(${PROJECT_NAME}_dbw_node PROPERTIES OUTPUT_NAME dbw_node PREFIX "")
 
-install(TARGETS ${PROJECT_NAME} dbw_node
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_dbw_node
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )

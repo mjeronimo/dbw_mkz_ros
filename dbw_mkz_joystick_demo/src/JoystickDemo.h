@@ -37,25 +37,19 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-#include <std_msgs/Bool.h>
 #include <std_msgs/Empty.h>
 
 #include <dbw_mkz_msgs/ThrottleCmd.h>
 #include <dbw_mkz_msgs/BrakeCmd.h>
 #include <dbw_mkz_msgs/SteeringCmd.h>
 #include <dbw_mkz_msgs/GearCmd.h>
-#include <dbw_mkz_msgs/ThrottleReport.h>
-#include <dbw_mkz_msgs/BrakeReport.h>
-#include <dbw_mkz_msgs/SteeringReport.h>
-#include <dbw_mkz_msgs/GearReport.h>
-#include <dbw_mkz_msgs/Misc1Report.h>
 #include <dbw_mkz_msgs/TurnSignalCmd.h>
 
 namespace joystick_demo
 {
 
 typedef struct {
-  double brake_cmd;
+  double brake_joy;
   double throttle_joy;
   double steering_joy;
   bool steering_mult;
@@ -70,12 +64,10 @@ public:
   JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh);
 private:
   void recvJoy(const sensor_msgs::Joy::ConstPtr& msg);
-  void recvEnable(const std_msgs::Bool::ConstPtr& msg);
   void cmdCallback(const ros::TimerEvent& event);
 
   // Topics
   ros::Subscriber sub_joy_;
-  ros::Subscriber sub_enable_;
   ros::Publisher pub_throttle_;
   ros::Publisher pub_brake_;
   ros::Publisher pub_steering_;

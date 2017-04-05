@@ -50,9 +50,8 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : co
   priv_nh.getParam("count", count_);
 
   sub_joy_ = node.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
-  sub_enable_ = node.subscribe("dbw_enabled", 1, &JoystickDemo::recvEnable, this);
 
-  joy_data_.brake_cmd = 0.0;
+  joy_data_.brake_joy = 0.0;
   joy_data_.gear_cmd = dbw_mkz_msgs::Gear::NONE;
   joy_data_.steering_joy = 0.0;
   joy_data_.steering_mult = false;
@@ -96,7 +95,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   brake_msg.ignore = ignore_;
   brake_msg.count = counter_;
   brake_msg.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_PERCENT;
-  brake_msg.pedal_cmd = joy_data_.brake_cmd;
+  brake_msg.pedal_cmd = joy_data_.brake_joy;
   pub_brake_.publish(brake_msg);
 
   // Steering
@@ -105,8 +104,8 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   steering_msg.ignore = ignore_;
   steering_msg.count = counter_;
   steering_msg.steering_wheel_angle_cmd = joy_data_.steering_joy;
-  if (joy_data_.steering_mult) {
-    steering_msg.steering_wheel_angle_cmd *= 2.0;
+  if (!joy_data_.steering_mult) {
+    steering_msg.steering_wheel_angle_cmd *= 0.5;
   }
   pub_steering_.publish(steering_msg);
 
@@ -121,10 +120,6 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   dbw_mkz_msgs::TurnSignalCmd turn_signal_msg;
   turn_signal_msg.cmd.value = joy_data_.turn_signal_cmd;
   pub_turn_signal_.publish(turn_signal_msg);
-}
-
-void JoystickDemo::recvEnable(const std_msgs::Bool::ConstPtr& msg)
-{
 }
 
 void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
@@ -144,7 +139,7 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 
   // Brake
   if (joy_data_.joy_brake_valid) {
-    joy_data_.brake_cmd = 0.5 - 0.5 * msg->axes[AXIS_BRAKE];
+    joy_data_.brake_joy = 0.5 - 0.5 * msg->axes[AXIS_BRAKE];
   }
 
   // Gear
@@ -161,7 +156,7 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
   }
 
   // Steering
-  joy_data_.steering_joy = 235.0 * M_PI / 180.0 * ((fabs(msg->axes[AXIS_STEER_1]) > fabs(msg->axes[AXIS_STEER_2])) ? msg->axes[AXIS_STEER_1] : msg->axes[AXIS_STEER_2]);
+  joy_data_.steering_joy = 470.0 * M_PI / 180.0 * ((fabs(msg->axes[AXIS_STEER_1]) > fabs(msg->axes[AXIS_STEER_2])) ? msg->axes[AXIS_STEER_1] : msg->axes[AXIS_STEER_2]);
   joy_data_.steering_mult = msg->buttons[BTN_STEER_MULT_1] || msg->buttons[BTN_STEER_MULT_2];
 
   // Turn signal

@@ -10,7 +10,7 @@ set(${PROJECT_NAME}_CATKIN_DEPS
 
 find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 
-catkin_package(CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS})
+catkin_package()
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

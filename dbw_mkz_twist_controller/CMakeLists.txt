@@ -19,7 +19,7 @@ generate_dynamic_reconfigure_options(
   cfg/TwistTest.cfg
 )
 
-catkin_package(CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS})
+catkin_package()
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

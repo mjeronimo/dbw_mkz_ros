@@ -5,6 +5,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   roscpp
   nodelet
+  std_msgs
+  geometry_msgs
   sensor_msgs
   dataspeed_can_msgs
   dataspeed_can_msg_filters

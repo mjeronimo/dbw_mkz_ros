@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(dbw_mkz_twist_controller)
 
-set(${PROJECT_NAME}_CATKIN_DEPS
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  geometry_msgs
+  sensor_msgs
   dbw_mkz_msgs
   dynamic_reconfigure
-  geometry_msgs
-  roscpp
-  sensor_msgs
-  std_msgs
-)
-
-find_package(catkin REQUIRED COMPONENTS
-  ${${PROJECT_NAME}_CATKIN_DEPS}
 )
 
 generate_dynamic_reconfigure_options(

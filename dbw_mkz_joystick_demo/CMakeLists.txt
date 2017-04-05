@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(dbw_mkz_joystick_demo)
 
-set(${PROJECT_NAME}_CATKIN_DEPS
-  dbw_mkz_msgs
+find_package(catkin REQUIRED COMPONENTS
   roscpp
-  sensor_msgs
   std_msgs
+  sensor_msgs
+  dbw_mkz_msgs
 )
-
-find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 
 catkin_package()
 

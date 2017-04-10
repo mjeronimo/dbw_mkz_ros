@@ -27,7 +27,7 @@
     * ```wstool update -t src```
     * ```rosdep update && rosdep install --from-paths src --ignore-src```
 * Install udev rules
-    * ```sudo cp ~/dbw_ws/src/dataspeed_can/dataspeed_can_usb/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/```
+    * ```sudo cp ~/dbw_ws/src/dataspeed_can/dataspeed_can_usb/udev/90-DataspeedUsbCanToolRules.rules /etc/udev/rules.d/```
     * ```sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm trigger```
 * Build workspace
     * ```catkin_make -DCMAKE_BUILD_TYPE=Release```

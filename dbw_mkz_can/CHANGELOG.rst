@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.5 (2017-04-25)
+------------------
 * Updated package.xml format to version 2
 * Unique target names
 * Contributors: Kevin Hallenbeck

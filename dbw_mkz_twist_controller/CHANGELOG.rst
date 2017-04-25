@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated package.xml format to version 2
+* Add missing msg dependencies
+* Contributors: Kevin Hallenbeck, P. J. Reed
+
 1.0.4 (2016-12-06)
 ------------------
 

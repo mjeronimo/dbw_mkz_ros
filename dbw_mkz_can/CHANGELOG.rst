@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated package.xml format to version 2
+* Unique target names
+* Contributors: Kevin Hallenbeck
+
 1.0.4 (2016-12-06)
 ------------------
 * Added brake and throttle thrashing scripts to try and induce faults

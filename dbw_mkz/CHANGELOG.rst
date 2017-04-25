@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated package.xml format to version 2
+* Contributors: Kevin Hallenbeck
+
 1.0.4 (2016-12-06)
 ------------------
 

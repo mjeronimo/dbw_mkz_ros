@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated package.xml format to version 2
+* Add missing msg dependencies
+* Joystick demo cleanup
+* Unique target names
+* Contributors: Kevin Hallenbeck, P. J. Reed
+
 1.0.4 (2016-12-06)
 ------------------
 

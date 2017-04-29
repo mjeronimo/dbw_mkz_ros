@@ -47,7 +47,7 @@ ros::Publisher pub_twist, pub_twist2;
 
 // Static functions
 static double mphToMps(double mph) { return mph * 0.44704; }
-static double kphToMps(double mph) { return mph * 0.277778; }
+static double kphToMps(double kph) { return kph * 0.277778; }
 static double yawRateFromRadius(double speed, double radius) {
   return radius != 0.0 ? speed / radius : 0.0;
 }

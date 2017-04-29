@@ -36,10 +36,13 @@
 
 namespace dbw_mkz_twist_controller {
 
-TwistControllerNode::TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn)
+TwistControllerNode::TwistControllerNode(ros::NodeHandle &n, ros::NodeHandle &pn) : srv_(pn)
 {
   lpf_fuel_.setParams(60.0, 0.1);
   accel_pid_.setRange(0.0, 1.0);
+
+  // Dynamic reconfigure
+  srv_.setCallback(boost::bind(&TwistControllerNode::reconfig, this, _1, _2));
 
   // Control rate parameter
   double control_rate;
@@ -77,9 +80,6 @@ TwistControllerNode::TwistControllerNode(ros::NodeHandle n, ros::NodeHandle pn)
 
   // Timers
   control_timer_ = n.createTimer(ros::Duration(control_period_), &TwistControllerNode::controlCallback, this);
-
-  // Dynamic reconfigure
-  srv_.setCallback(boost::bind(&TwistControllerNode::reconfig, this, _1, _2));
 }
 
 void TwistControllerNode::controlCallback(const ros::TimerEvent& event)

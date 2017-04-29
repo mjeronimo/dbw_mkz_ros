@@ -21,5 +21,6 @@
   <depend>dbw_mkz_msgs</depend>
 
   <exec_depend>joy</exec_depend>
+  <exec_depend>dbw_mkz_can</exec_depend>
 
 </package>

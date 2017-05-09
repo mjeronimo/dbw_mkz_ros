@@ -63,5 +63,5 @@ private:
 
 // Register this plugin with pluginlib.  Names must match nodelets.xml.
 //
-// parameters: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(dbw_mkz_can, DbwNodelet, dbw_mkz_can::DbwNodelet, nodelet::Nodelet);
+// parameters: class type, base class type
+PLUGINLIB_EXPORT_CLASS(dbw_mkz_can::DbwNodelet, nodelet::Nodelet);

@@ -39,8 +39,8 @@ namespace joystick_demo
 
 JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : counter_(0)
 {
-  last_joy_.axes.resize(8, 0);
-  last_joy_.buttons.resize(11, 0);
+  last_joy_.axes.resize(AXIS_COUNT, 0);
+  last_joy_.buttons.resize(BTN_COUNT, 0);
 
   ignore_ = false;
   enable_ = false;
@@ -124,6 +124,16 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 
 void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 {
+  // Check for expected sizes
+  if (msg->axes.size() != (size_t)AXIS_COUNT) {
+    ROS_ERROR("Expected %zu joy axis count, received %zu", (size_t)AXIS_COUNT, msg->axes.size());
+    return;
+  }
+  if (msg->buttons.size() != (size_t)BTN_COUNT) {
+    ROS_ERROR("Expected %zu joy button count, received %zu", (size_t)BTN_COUNT, msg->buttons.size());
+    return;
+  }
+
   // Handle joystick startup
   if (msg->axes[AXIS_THROTTLE] != 0.0) {
     joy_data_.joy_throttle_valid = true;

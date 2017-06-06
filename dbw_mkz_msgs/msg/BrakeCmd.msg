@@ -9,6 +9,9 @@ bool boo_cmd
 # Enable
 bool enable
 
+# Clear driver overrides
+bool clear
+
 # Ignore driver overrides
 bool ignore
 

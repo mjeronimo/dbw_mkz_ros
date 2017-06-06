@@ -783,7 +783,7 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
       ptr->EN = 1;
     }
   }
-  if (clear()) {
+  if (clear() || msg->clear) {
     ptr->CLEAR = 1;
   }
   if (msg->ignore) {
@@ -819,7 +819,7 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
       ptr->EN = 1;
     }
   }
-  if (clear()) {
+  if (clear() || msg->clear) {
     ptr->CLEAR = 1;
   }
   if (msg->ignore) {
@@ -846,7 +846,7 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
       ptr->EN = 1;
     }
   }
-  if (clear()) {
+  if (clear() || msg->clear) {
     ptr->CLEAR = 1;
   }
   if (msg->ignore) {
@@ -869,6 +869,9 @@ void DbwNode::recvGearCmd(const dbw_mkz_msgs::GearCmd::ConstPtr& msg)
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
     ptr->GCMD = msg->cmd.gear;
+  }
+  if (clear() || msg->clear) {
+    ptr->CLEAR = 1;
   }
   pub_can_.publish(out);
 }

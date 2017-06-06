@@ -32,8 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#ifndef _DISPATCH_H
-#define _DISPATCH_H
+#ifndef _DBW_MKZ_CAN_DISPATCH_H
+#define _DBW_MKZ_CAN_DISPATCH_H
 #include <stdint.h>
 
 namespace dbw_mkz_can
@@ -377,4 +377,4 @@ enum {
 
 } //namespace dbw_mkz_can
 
-#endif // _DISPATCH_H
+#endif // _DBW_MKZ_CAN_DISPATCH_H

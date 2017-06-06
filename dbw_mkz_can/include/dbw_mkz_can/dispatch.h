@@ -36,6 +36,9 @@
 #define _DISPATCH_H
 #include <stdint.h>
 
+namespace dbw_mkz_can
+{
+
 typedef struct {
   uint16_t PCMD;
   uint8_t BCMD :1;
@@ -371,5 +374,7 @@ enum {
   ID_REPORT_THROTTLE_INFO = 0x075,
   ID_VERSION              = 0x07F,
 };
+
+} //namespace dbw_mkz_can
 
 #endif // _DISPATCH_H

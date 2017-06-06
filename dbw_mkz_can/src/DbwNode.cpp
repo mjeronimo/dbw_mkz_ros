@@ -33,7 +33,7 @@
  *********************************************************************/
 
 #include "DbwNode.h"
-#include "dispatch.h"
+#include <dbw_mkz_can/dispatch.h>
 
 namespace dbw_mkz_can
 {

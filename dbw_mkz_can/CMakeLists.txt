@@ -14,11 +14,13 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
+  INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
 )
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
 )
 
 add_library(${PROJECT_NAME}
@@ -44,6 +46,9 @@ set_target_properties(${PROJECT_NAME}_dbw_node PROPERTIES OUTPUT_NAME dbw_node P
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_dbw_node
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 install(DIRECTORY scripts
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

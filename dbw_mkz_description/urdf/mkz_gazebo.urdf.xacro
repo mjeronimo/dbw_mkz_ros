@@ -33,7 +33,7 @@
   
   <gazebo>
     <!-- Simulated vehicle interface -->
-    <plugin name="mkz_interface_plugin" filename="libmkz_interface_plugin.so" >
+    <plugin name="mkz_interface_plugin" filename="libmkz_dbw_mkz_gazebo_vehicle.so" >
       <start_gear>$(arg start_gear)</start_gear>
     </plugin>
 
@@ -47,7 +47,7 @@
     </plugin>
     
     <!-- Publish TF and twist measurements -->
-    <plugin name="pose_plugin" filename="libpose_plugin.so" >
+    <plugin name="pose_plugin" filename="libmkz_dbw_mkz_gazebo_pose.so" >
       <pub_tf>$(arg pub_tf)</pub_tf>
       <pub_odom>$(arg pub_odom)</pub_odom>
     </plugin>

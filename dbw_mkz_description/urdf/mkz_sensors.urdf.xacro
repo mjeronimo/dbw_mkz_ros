@@ -103,7 +103,7 @@
       <child link="${name}" />
     </joint>
     <gazebo>
-      <plugin name="gps_plugin" filename="libgps_plugin.so" >
+      <plugin name="gps_plugin" filename="libmkz_dbw_mkz_gazebo_gps.so" >
         <link_name>${name}</link_name>
         <update_rate>${rate}</update_rate>
         <ref_lat>${ref_lat}</ref_lat>

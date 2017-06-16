@@ -2,7 +2,7 @@
 
 <robot name="mkz_gazebo" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:property name="wheel_friction" value="0.8" />
+  <xacro:property name="wheel_friction" value="1.2" />
   <xacro:arg name="pub_odom" default="false"/>
   <xacro:arg name="pub_tf" default="false"/>
 
@@ -33,20 +33,13 @@
   
   <gazebo>
     <!-- Simulated vehicle interface -->
-    <plugin name="mkz_interface_plugin" filename="libdbw_mkz_gazebo_vehicle.so" >
+    <plugin name="dbw_interface_plugin" filename="libdbw_mkz_gazebo_vehicle.so" >
       <start_gear>$(arg start_gear)</start_gear>
+      <car_model>$(arg car_model)</car_model>
+      <car_year>$(arg car_year)</car_year>
     </plugin>
 
-    <!-- Publish joint states -->
-    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
-        <jointName>
-            left_steer, right_steer, wheel_fl, wheel_fr, wheel_rl, wheel_rr
-        </jointName>
-        <updateRate>100</updateRate>
-        <alwaysOn>true</alwaysOn>
-    </plugin>
-    
-    <!-- Publish TF and twist measurements -->
+    <!-- Publish TF and odom messages with true global frame pose and velocity -->
     <plugin name="pose_plugin" filename="libdbw_mkz_gazebo_pose.so" >
       <pub_tf>$(arg pub_tf)</pub_tf>
       <pub_odom>$(arg pub_odom)</pub_odom>

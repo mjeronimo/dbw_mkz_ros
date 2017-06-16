@@ -2,7 +2,7 @@
 
 <robot name="mkz_sensors" xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
-  <xacro:macro name="mkz_camera" params="name parent_link x y z roll pitch yaw" >
+  <xacro:macro name="dbw_mkz_camera" params="name parent_link x y z roll pitch yaw" >
 
     <link name="${name}" >
       <visual>
@@ -74,7 +74,7 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:macro name="mkz_gps" params="name parent_link x y z roll pitch yaw rate ref_lat ref_lon" >
+  <xacro:macro name="dbw_mkz_gps" params="name parent_link x y z rate ref_lat ref_lon" >
     <link name="${name}" >
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />

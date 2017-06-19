@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- created with Phobos 0.7 -->
   <robot name="dbw_mkz" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:arg name="dae_file" default="$(find dbw_mkz_description)/meshes/mondeo/body.dae"/>
+    <xacro:arg name="dae_file" default="$(find dbw_mkz_description)/meshes/mkz_13/body.dae"/>
     
     <link name="base_footprint">
     </link>
@@ -13,16 +13,16 @@
         <inertia ixx="1000.0" ixy="0" ixz="0" iyy="1000.0" iyz="0" izz="1000.0"/>
       </inertial>
       <visual name="chassis">
-        <origin xyz="-0.061355 0 -0.33647" rpy="0 0 1.570796"/>
+        <origin xyz="-0.045056 0 -0.373676" rpy="0 0 1.570796"/>
         <geometry>
-          <mesh filename="file://$(arg dae_file)" scale="1 1 1"/>
+          <mesh filename="file://$(arg dae_file)" scale="1 0.964 1"/>
         </geometry>
         <material name="black.001"/>
       </visual>
       <collision name="chassis_collision">
-        <origin xyz="0.039687 -0.03046 0.350609" rpy="1.570796 0 -3.141593"/>
+        <origin xyz="0.058756 -0.03046 0.325149" rpy="1.570796 0 -3.141593"/>
         <geometry>
-          <mesh filename="package://dbw_mkz_description/meshes/body_collision.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://dbw_mkz_description/meshes/body_collision.stl" scale="0.000965 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -50,9 +50,9 @@
         <inertia ixx="0.305583" ixy="0" ixz="0" iyy="0.305583" iyz="0" izz="0.5445"/>
       </inertial>
       <visual name="wheel_fl_visual">
-        <origin xyz="-0.0026 0 0.032213" rpy="-1.570796 1.570796 0"/>
+        <origin xyz="0 0 0.0385" rpy="-1.570796 -1.570796 0"/>
         <geometry>
-          <mesh filename="package://dbw_mkz_description/meshes/mondeo/wheel.dae" scale="0.01 0.01 0.01"/>
+          <mesh filename="package://dbw_mkz_description/meshes/fusion_13/wheel.dae" scale="0.01 0.01 0.01"/>
         </geometry>
         <material name="carpaint_002"/>
       </visual>
@@ -71,9 +71,9 @@
         <inertia ixx="0.305583" ixy="0" ixz="0" iyy="0.305583" iyz="0" izz="0.5445"/>
       </inertial>
       <visual name="wheel_fr_visual">
-        <origin xyz="-0.0026 0 -0.035355" rpy="-1.570796 -1.570796 0"/>
+        <origin xyz="0 0 -0.043777" rpy="-1.570796 1.570796 0"/>
         <geometry>
-          <mesh filename="package://dbw_mkz_description/meshes/mondeo/wheel.dae" scale="0.01 0.01 0.01"/>
+          <mesh filename="package://dbw_mkz_description/meshes/fusion_13/wheel.dae" scale="0.01 0.01 0.01"/>
         </geometry>
         <material name="carpaint_002.001"/>
       </visual>
@@ -92,9 +92,9 @@
         <inertia ixx="0.305583" ixy="0" ixz="0" iyy="0.305583" iyz="0" izz="0.5445"/>
       </inertial>
       <visual name="wheel_rl_visual">
-        <origin xyz="0.0026 0 0.010943" rpy="-1.570796 1.570796 0"/>
+        <origin xyz="0 0 0.017382" rpy="-1.570796 -1.570796 0"/>
         <geometry>
-          <mesh filename="package://dbw_mkz_description/meshes/mondeo/wheel.dae" scale="0.01 0.01 0.01"/>
+          <mesh filename="package://dbw_mkz_description/meshes/fusion_13/wheel.dae" scale="0.01 0.01 0.01"/>
         </geometry>
         <material name="carpaint_002.003"/>
       </visual>
@@ -113,9 +113,9 @@
         <inertia ixx="0.305583" ixy="0" ixz="0" iyy="0.305583" iyz="0" izz="0.5445"/>
       </inertial>
       <visual name="wheel_rr_visual">
-        <origin xyz="0.0026 0 -0.010783" rpy="-1.570796 -1.570796 0"/>
+        <origin xyz="0 0 -0.019214" rpy="-1.570796 1.570796 0"/>
         <geometry>
-          <mesh filename="package://dbw_mkz_description/meshes/mondeo/wheel.dae" scale="0.01 0.01 0.01"/>
+          <mesh filename="package://dbw_mkz_description/meshes/fusion_13/wheel.dae" scale="0.01 0.01 0.01"/>
         </geometry>
         <material name="carpaint_002.002"/>
       </visual>

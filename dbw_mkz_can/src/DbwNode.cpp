@@ -640,13 +640,12 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
     const MsgReportGyro *ptr_gyro = (const MsgReportGyro*)msgs[1]->msg.data.elems;
     sensor_msgs::Imu out;
     out.header.stamp = msgs[0]->header.stamp;
+    out.orientation_covariance[0] = -1; // Orientation not present
     out.linear_acceleration.x = (double)ptr_accel->accel_long * 0.01;
     out.linear_acceleration.y = (double)ptr_accel->accel_lat * 0.01;
     out.linear_acceleration.z = (double)ptr_accel->accel_vert * 0.01;
-    out.linear_acceleration_covariance[0] = -1;
     out.angular_velocity.x = (double)ptr_gyro->gyro_roll * 0.0002;
     out.angular_velocity.z = (double)ptr_gyro->gyro_yaw * 0.0002;
-    out.angular_velocity_covariance[0] = -1;
     pub_imu_.publish(out);
   }
 #if 0

@@ -238,6 +238,10 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   fault_watchdog_using_brakes_ = false;
   fault_watchdog_warned_ = false;
 
+  // Frame ID
+  frame_id_ = "base_footprint";
+  priv_nh.getParam("frame_id", frame_id_);
+
   // Setup brake lights (BOO)
   boo_status_ = false;
   boo_control_ = true;
@@ -411,6 +415,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           pub_steering_.publish(out);
           geometry_msgs::TwistStamped twist;
           twist.header.stamp = out.header.stamp;
+          twist.header.frame_id = frame_id_;
           twist.twist.linear.x = out.speed;
           twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / steering_ratio_) / acker_wheelbase_;
           pub_twist_.publish(twist);
@@ -640,6 +645,7 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
     const MsgReportGyro *ptr_gyro = (const MsgReportGyro*)msgs[1]->msg.data.elems;
     sensor_msgs::Imu out;
     out.header.stamp = msgs[0]->header.stamp;
+    out.header.frame_id = frame_id_;
     out.orientation_covariance[0] = -1; // Orientation not present
     out.linear_acceleration.x = (double)ptr_accel->accel_long * 0.01;
     out.linear_acceleration.y = (double)ptr_accel->accel_lat * 0.01;

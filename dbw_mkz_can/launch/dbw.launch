@@ -29,6 +29,7 @@
   </node>
 
   <!-- Vehicle Interface -->
+  <arg name="frame_id" default="base_footprint"/>
   <arg name="boo_control"   default="true"/>
   <arg name="boo_thresh_lo" default="0.20"/>
   <arg name="boo_thresh_hi" default="0.22"/>
@@ -43,6 +44,7 @@
     <node pkg="dbw_mkz_can" type="dbw_node" name="dbw_node" output="screen">
       <remap from="can_rx" to="$(arg can_ns)/can_rx"/>
       <remap from="can_tx" to="$(arg can_ns)/can_tx"/>
+      <param name="frame_id" value="$(arg frame_id)" />
       <param name="boo_control" value="$(arg boo_control)" />
       <param name="boo_thresh_lo" value="$(arg boo_thresh_lo)" />
       <param name="boo_thresh_hi" value="$(arg boo_thresh_hi)" />

@@ -132,6 +132,9 @@ private:
   sensor_msgs::JointState joint_state_;
   void publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
 
+  // Frame ID
+  std::string frame_id_;
+
   // Brake lights
   bool boo_status_;
   bool boo_control_;

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.6 (2017-06-21)
+------------------
 * Added frame_id parameter for IMU and Twist messages
 * Properly handle IMU unknown covariance and fields that are not present
 * Removed SuspensionReport (data was unintelligible)

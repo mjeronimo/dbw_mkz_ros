@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.6 (2017-06-21)
+------------------
 * Removed yaw rate control on speed, this also disables the lateral acceleration limit for now
 * Updated wheel radius with measured value
 * Contributors: Kevin Hallenbeck

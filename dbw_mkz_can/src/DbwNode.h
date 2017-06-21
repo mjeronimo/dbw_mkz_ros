@@ -52,7 +52,6 @@
 #include <dbw_mkz_msgs/Misc1Report.h>
 #include <dbw_mkz_msgs/WheelSpeedReport.h>
 #include <dbw_mkz_msgs/FuelLevelReport.h>
-#include <dbw_mkz_msgs/SuspensionReport.h>
 #include <dbw_mkz_msgs/TirePressureReport.h>
 #include <dbw_mkz_msgs/SurroundReport.h>
 #include <dbw_mkz_msgs/BrakeInfoReport.h>
@@ -162,7 +161,6 @@ private:
   ros::Publisher pub_gear_;
   ros::Publisher pub_misc_1_;
   ros::Publisher pub_wheel_speeds_;
-  ros::Publisher pub_suspension_;
   ros::Publisher pub_tire_pressure_;
   ros::Publisher pub_fuel_level_;
   ros::Publisher pub_surround_;

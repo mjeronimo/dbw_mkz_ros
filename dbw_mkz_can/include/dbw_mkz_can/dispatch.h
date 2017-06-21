@@ -237,13 +237,6 @@ typedef struct {
 } MsgReportGps3;
 
 typedef struct {
-  int16_t front_left;
-  int16_t front_right;
-  int16_t rear_left;
-  int16_t rear_right;
-} MsgReportSuspension;
-
-typedef struct {
   uint16_t front_left;
   uint16_t front_right;
   uint16_t rear_left;
@@ -339,7 +332,6 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportGps1));
   BUILD_ASSERT(8 == sizeof(MsgReportGps2));
   BUILD_ASSERT(8 == sizeof(MsgReportGps3));
-  BUILD_ASSERT(8 == sizeof(MsgReportSuspension));
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
   BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
@@ -366,7 +358,6 @@ enum {
   ID_REPORT_GPS1          = 0x06D,
   ID_REPORT_GPS2          = 0x06E,
   ID_REPORT_GPS3          = 0x06F,
-  ID_REPORT_SUSPENSION    = 0x070,
   ID_REPORT_TIRE_PRESSURE = 0x071,
   ID_REPORT_FUEL_LEVEL    = 0x072,
   ID_REPORT_SURROUND      = 0x073,

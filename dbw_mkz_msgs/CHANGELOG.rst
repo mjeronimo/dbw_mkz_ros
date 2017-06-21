@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed SuspensionReport (data was unintelligible)
+* Added clear bit to command messages
+* Contributors: Kevin Hallenbeck
+
 1.0.5 (2017-04-25)
 ------------------
 * Updated package.xml format to version 2

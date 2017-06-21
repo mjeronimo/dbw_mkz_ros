@@ -2,6 +2,13 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Solved xacro deprecation warnings
+* Added 2017 MKZ, 2013 Fusion, and 2015 Mondeo URDF models.
+* Added Gazebo simulation model to dbw_mkz_description, maintaining backward compatibility.
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.0.5 (2017-04-25)
 ------------------
 * Updated package.xml format to version 2

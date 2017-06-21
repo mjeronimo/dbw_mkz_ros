@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Check for expected joystick button and axis count
+* Additional dependencies
+* Contributors: Kevin Hallenbeck
+
 1.0.5 (2017-04-25)
 ------------------
 * Updated package.xml format to version 2

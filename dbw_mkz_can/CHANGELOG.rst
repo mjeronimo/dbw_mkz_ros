@@ -2,6 +2,19 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added frame_id parameter for IMU and Twist messages
+* Properly handle IMU unknown covariance and fields that are not present
+* Removed SuspensionReport (data was unintelligible)
+* Reorganized launch files.
+* Swapped lateral and longitudinal acceleration in IMU message.
+* Export dispatch.h for use by other packages
+* Added clear bit to command messages
+* Updated nodelet to the PLUGINLIB_EXPORT_CLASS macro
+* Additional dependencies
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.0.5 (2017-04-25)
 ------------------
 * Updated package.xml format to version 2

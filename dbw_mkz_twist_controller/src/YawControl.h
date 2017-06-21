@@ -51,6 +51,7 @@ public:
   void setSpeedMin(double val) { speed_min_ = fabs(val); }
   void setLateralAccelMax(double val) { lateral_accel_max_ = fabs(val); }
   double getSteeringWheelAngle(double cmd_vx, double cmd_wz, double speed) {
+#if 0
     cmd_wz = fabs(cmd_vx) > 0 ? cmd_wz * speed / cmd_vx : 0.0;
     if (fabs(speed) > 0.1) {
       double max_yaw_rate = fabs(lateral_accel_max_ / speed);
@@ -61,6 +62,12 @@ public:
       }
     }
     return radius_control_.getSteeringWheelAngle(std::max(speed, speed_min_) / cmd_wz);
+#else
+    if (fabsf(cmd_wz) > 1e-6) {
+      return radius_control_.getSteeringWheelAngle(cmd_vx / cmd_wz);
+    }
+    return 0.0;
+#endif
   }
 private:
   RadiusControl radius_control_;

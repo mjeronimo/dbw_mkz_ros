@@ -45,9 +45,11 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : co
   ignore_ = false;
   enable_ = false;
   count_ = false;
+  speed_ = 0.0;
   priv_nh.getParam("ignore", ignore_);
   priv_nh.getParam("enable", enable_);
   priv_nh.getParam("count", count_);
+  priv_nh.getParam("speed", speed_);
 
   sub_joy_ = node.subscribe("/joy", 1, &JoystickDemo::recvJoy, this);
 
@@ -104,6 +106,7 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
   steering_msg.ignore = ignore_;
   steering_msg.count = counter_;
   steering_msg.steering_wheel_angle_cmd = joy_data_.steering_joy;
+  steering_msg.steering_wheel_angle_velocity = speed_;
   if (!joy_data_.steering_mult) {
     steering_msg.steering_wheel_angle_cmd *= 0.5;
   }

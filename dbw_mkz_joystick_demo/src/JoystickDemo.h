@@ -80,6 +80,7 @@ private:
   bool ignore_; // Ignore driver overrides
   bool enable_; // Use enable and disable buttons
   bool count_; // Increment counter to enable watchdog
+  double speed_; // Steering command speed
 
   // Variables
   ros::Timer cmd_timer_;

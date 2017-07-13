@@ -648,8 +648,8 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
     out.header.frame_id = frame_id_;
     out.orientation_covariance[0] = -1; // Orientation not present
     out.linear_acceleration.x = (double)ptr_accel->accel_long * 0.01;
-    out.linear_acceleration.y = (double)ptr_accel->accel_lat * 0.01;
-    out.linear_acceleration.z = (double)ptr_accel->accel_vert * 0.01;
+    out.linear_acceleration.y = (double)ptr_accel->accel_lat * -0.01;
+    out.linear_acceleration.z = (double)ptr_accel->accel_vert * -0.01;
     out.angular_velocity.x = (double)ptr_gyro->gyro_roll * 0.0002;
     out.angular_velocity.z = (double)ptr_gyro->gyro_yaw * 0.0002;
     pub_imu_.publish(out);

@@ -242,6 +242,13 @@ typedef struct {
 } MsgReportGps3;
 
 typedef struct {
+  int16_t front_left;
+  int16_t front_right;
+  int16_t rear_left;
+  int16_t rear_right;
+} MsgReportWheelPosition;
+
+typedef struct {
   uint16_t front_left;
   uint16_t front_right;
   uint16_t rear_left;
@@ -337,6 +344,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportGps1));
   BUILD_ASSERT(8 == sizeof(MsgReportGps2));
   BUILD_ASSERT(8 == sizeof(MsgReportGps3));
+  BUILD_ASSERT(8 == sizeof(MsgReportWheelPosition));
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
   BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
@@ -347,28 +355,29 @@ static void dispatchAssertSizes() {
 #undef BUILD_ASSERT
 
 enum {
-  ID_BRAKE_CMD            = 0x060,
-  ID_BRAKE_REPORT         = 0x061,
-  ID_THROTTLE_CMD         = 0x062,
-  ID_THROTTLE_REPORT      = 0x063,
-  ID_STEERING_CMD         = 0x064,
-  ID_STEERING_REPORT      = 0x065,
-  ID_GEAR_CMD             = 0x066,
-  ID_GEAR_REPORT          = 0x067,
-  ID_MISC_CMD             = 0x068,
-  ID_MISC_REPORT          = 0x069,
-  ID_REPORT_WHEEL_SPEED   = 0x06A,
-  ID_REPORT_ACCEL         = 0x06B,
-  ID_REPORT_GYRO          = 0x06C,
-  ID_REPORT_GPS1          = 0x06D,
-  ID_REPORT_GPS2          = 0x06E,
-  ID_REPORT_GPS3          = 0x06F,
-  ID_REPORT_TIRE_PRESSURE = 0x071,
-  ID_REPORT_FUEL_LEVEL    = 0x072,
-  ID_REPORT_SURROUND      = 0x073,
-  ID_REPORT_BRAKE_INFO    = 0x074,
-  ID_REPORT_THROTTLE_INFO = 0x075,
-  ID_VERSION              = 0x07F,
+  ID_BRAKE_CMD              = 0x060,
+  ID_BRAKE_REPORT           = 0x061,
+  ID_THROTTLE_CMD           = 0x062,
+  ID_THROTTLE_REPORT        = 0x063,
+  ID_STEERING_CMD           = 0x064,
+  ID_STEERING_REPORT        = 0x065,
+  ID_GEAR_CMD               = 0x066,
+  ID_GEAR_REPORT            = 0x067,
+  ID_MISC_CMD               = 0x068,
+  ID_MISC_REPORT            = 0x069,
+  ID_REPORT_WHEEL_SPEED     = 0x06A,
+  ID_REPORT_ACCEL           = 0x06B,
+  ID_REPORT_GYRO            = 0x06C,
+  ID_REPORT_GPS1            = 0x06D,
+  ID_REPORT_GPS2            = 0x06E,
+  ID_REPORT_GPS3            = 0x06F,
+  ID_REPORT_WHEEL_POSITION  = 0x070,
+  ID_REPORT_TIRE_PRESSURE   = 0x071,
+  ID_REPORT_FUEL_LEVEL      = 0x072,
+  ID_REPORT_SURROUND        = 0x073,
+  ID_REPORT_BRAKE_INFO      = 0x074,
+  ID_REPORT_THROTTLE_INFO   = 0x075,
+  ID_VERSION                = 0x07F,
 };
 
 } //namespace dbw_mkz_can

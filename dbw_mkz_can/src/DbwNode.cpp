@@ -286,6 +286,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gear_ = node.advertise<dbw_mkz_msgs::GearReport>("gear_report", 2);
   pub_misc_1_ = node.advertise<dbw_mkz_msgs::Misc1Report>("misc_1_report", 2);
   pub_wheel_speeds_ = node.advertise<dbw_mkz_msgs::WheelSpeedReport>("wheel_speed_report", 2);
+  pub_wheel_positions_ = node.advertise<dbw_mkz_msgs::WheelPositionReport>("wheel_position_report", 2);
   pub_tire_pressure_ = node.advertise<dbw_mkz_msgs::TirePressureReport>("tire_pressure_report", 2);
   pub_fuel_level_ = node.advertise<dbw_mkz_msgs::FuelLevelReport>("fuel_level_report", 2);
   pub_surround_ = node.advertise<dbw_mkz_msgs::SurroundReport>("surround_report", 2);
@@ -506,6 +507,19 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.rear_right  = (float)ptr->rear_right  * 0.01;
           pub_wheel_speeds_.publish(out);
           publishJointStates(msg->header.stamp, &out, NULL);
+        }
+        break;
+
+      case ID_REPORT_WHEEL_POSITION:
+        if (msg->msg.dlc >= sizeof(MsgReportWheelPosition)) {
+          const MsgReportWheelPosition *ptr = (const MsgReportWheelPosition*)msg->msg.data.elems;
+          dbw_mkz_msgs::WheelPositionReport out;
+          out.header.stamp = msg->header.stamp;
+          out.front_left  = ptr->front_left;
+          out.front_right = ptr->front_right;
+          out.rear_left   = ptr->rear_left;
+          out.rear_right  = ptr->rear_right;
+          pub_wheel_positions_.publish(out);
         }
         break;
 

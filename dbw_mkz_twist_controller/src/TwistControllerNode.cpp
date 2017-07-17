@@ -50,9 +50,9 @@ TwistControllerNode::TwistControllerNode(ros::NodeHandle &n, ros::NodeHandle &pn
   control_period_ = 1.0 / control_rate;
 
   // Ackermann steering parameters
-  acker_wheelbase_ = 2.8498;
-  acker_track_ = 1.6002;
-  steering_ratio_ = 16.0;
+  acker_wheelbase_ = 2.8498; // 112.2 inches
+  acker_track_ = 1.5824; // 62.3 inches
+  steering_ratio_ = 14.8;
   pn.getParam("ackermann_wheelbase", acker_wheelbase_);
   pn.getParam("ackermann_track", acker_track_);
   pn.getParam("steering_ratio", steering_ratio_);

@@ -255,9 +255,9 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   }
 
   // Ackermann steering parameters
-  acker_wheelbase_ = 2.8498;
-  acker_track_ = 1.6002;
-  steering_ratio_ = 16.0;
+  acker_wheelbase_ = 2.8498; // 112.2 inches
+  acker_track_ = 1.5824; // 62.3 inches
+  steering_ratio_ = 14.8;
   priv_nh.getParam("ackermann_wheelbase", acker_wheelbase_);
   priv_nh.getParam("ackermann_track", acker_track_);
   priv_nh.getParam("steering_ratio", steering_ratio_);

@@ -177,7 +177,12 @@ typedef struct {
   uint8_t pasngr_airbag :1;
   uint8_t buckle_driver :1;
   uint8_t buckle_pasngr :1;
-  uint8_t :6;
+  uint8_t btn_ld_ok :1;
+  uint8_t btn_ld_up :1;
+  uint8_t btn_ld_down :1;
+  uint8_t btn_ld_left :1;
+  uint8_t btn_ld_right :1;
+  uint8_t :1;
 } MsgMiscReport;
 
 typedef struct {

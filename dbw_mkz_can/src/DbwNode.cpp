@@ -479,6 +479,11 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
             out.passenger_airbag = ptr->pasngr_airbag ? true : false;
             out.buckle_driver = ptr->buckle_driver ? true : false;
             out.buckle_passenger = ptr->buckle_pasngr ? true : false;
+            out.btn_ld_ok = ptr->btn_ld_ok ? true : false;
+            out.btn_ld_up = ptr->btn_ld_up ? true : false;
+            out.btn_ld_down = ptr->btn_ld_down ? true : false;
+            out.btn_ld_left = ptr->btn_ld_left ? true : false;
+            out.btn_ld_right = ptr->btn_ld_right ? true : false;
           }
           pub_misc_1_.publish(out);
         }

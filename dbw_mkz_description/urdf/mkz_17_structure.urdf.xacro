@@ -8,19 +8,19 @@
 
     <link name="base_link">
       <inertial>
-        <origin xyz="0 0 0.25" rpy="0 0 0"/>
+        <origin xyz="1.4225 0 0.25" rpy="0 0 0"/>
         <mass value="1500.0"/>
         <inertia ixx="1000.0" ixy="0" ixz="0" iyy="1000.0" iyz="0" izz="1000.0"/>
       </inertial>
       <visual name="chassis">
-        <origin xyz="-0.032498 0 -0.371498" rpy="0 0 1.570796"/>
+        <origin xyz="1.39 0 -0.371498" rpy="0 0 1.570796"/>
         <geometry>
-          <mesh filename="file://$(arg dae_file)" scale="1 0.964 1"/>
+          <mesh filename="file://$(arg dae_file)" scale="1 0.97 1"/>
         </geometry>
         <material name="black.001"/>
       </visual>
       <collision name="chassis_collision">
-        <origin xyz="0.054381 -0.019748 0.332734" rpy="1.570796 0 -3.141593"/>
+        <origin xyz="1.4768 -0.019748 0.332734" rpy="1.570796 0 -3.141593"/>
         <geometry>
           <mesh filename="package://dbw_mkz_description/meshes/body_collision.stl" scale="0.001 0.001 0.001"/>
         </geometry>
@@ -29,7 +29,7 @@
 
     <link name="steer_fl">
       <inertial>
-        <origin xyz="-0.013054 -0.0295 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1.0"/>
         <inertia ixx="0.037227" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.06"/>
       </inertial>
@@ -37,7 +37,7 @@
 
     <link name="steer_fr">
       <inertial>
-        <origin xyz="-0.01305 0.0275 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="1.0"/>
         <inertia ixx="0.037227" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.06"/>
       </inertial>
@@ -134,7 +134,7 @@
     </joint>
 
     <joint name="steer_fl" type="revolute">
-      <origin xyz="1.435054 0.817 0.33" rpy="0 0 0"/>
+      <origin xyz="2.85 0.79712 0" rpy="0 0 0"/>
       <parent link="base_link"/>
       <child link="steer_fl"/>
       <axis xyz="0 0 1.0"/>
@@ -142,7 +142,7 @@
     </joint>
 
     <joint name="steer_fr" type="revolute">
-      <origin xyz="1.43505 -0.815 0.33" rpy="0 0 0"/>
+      <origin xyz="2.85 -0.79712 0.0" rpy="0 0 0"/>
       <parent link="base_link"/>
       <child link="steer_fr"/>
       <axis xyz="0 0 1.0"/>
@@ -150,7 +150,7 @@
     </joint>
 
     <joint name="wheel_fl" type="continuous">
-      <origin xyz="-0.012654 -0.0295 -0.33" rpy="1.570796 0 -3.141593"/>
+      <origin xyz="0 0 0" rpy="1.570796 0 -3.141593"/>
       <parent link="steer_fl"/>
       <child link="wheel_fl"/>
       <axis xyz="0 0 1.0"/>
@@ -158,7 +158,7 @@
     </joint>
 
     <joint name="wheel_fr" type="continuous">
-      <origin xyz="-0.01265 0.0275 -0.33" rpy="1.570796 0 -3.141593"/>
+      <origin xyz="0 0 0" rpy="1.570796 0 -3.141593"/>
       <parent link="steer_fr"/>
       <child link="wheel_fr"/>
       <axis xyz="0 0 1.0"/>
@@ -166,7 +166,7 @@
     </joint>
 
     <joint name="wheel_rl" type="continuous">
-      <origin xyz="-1.4224 0.808618 0" rpy="1.570796 0 -3.141593"/>
+      <origin xyz="0 0.7874 0" rpy="1.570796 0 -3.141593"/>
       <parent link="base_link"/>
       <child link="wheel_rl"/>
       <axis xyz="0 0 1.0"/>
@@ -174,7 +174,7 @@
     </joint>
 
     <joint name="wheel_rr" type="continuous">
-      <origin xyz="-1.4224 -0.808 0" rpy="1.570796 0 -3.141593"/>
+      <origin xyz="0 -0.7874 0" rpy="1.570796 0 -3.141593"/>
       <parent link="base_link"/>
       <child link="wheel_rr"/>
       <axis xyz="0 0 1.0"/>

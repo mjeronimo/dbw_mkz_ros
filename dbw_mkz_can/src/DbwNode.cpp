@@ -447,7 +447,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
           if (ptr->btn_cc_gap_inc || ptr->btn_cc_cncl) {
             buttonCancel();
-          } else if ((ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) || (ptr->btn_cc_set_inc && ptr->btn_cc_off)) {
+          } else if ((ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) || (ptr->btn_cc_set_inc && ptr->btn_cc_off) || (ptr->btn_cc_set_dec && ptr->btn_cc_res)) {
             enableSystem();
           }
           dbw_mkz_msgs::Misc1Report out;

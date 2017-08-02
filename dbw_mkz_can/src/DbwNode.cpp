@@ -242,6 +242,10 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   frame_id_ = "base_footprint";
   priv_nh.getParam("frame_id", frame_id_);
 
+  // Buttons (enable/disable)
+  buttons_ = true;
+  priv_nh.getParam("buttons", buttons_);
+
   // Setup brake lights (BOO)
   boo_status_ = false;
   boo_control_ = true;
@@ -445,10 +449,12 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
       case ID_MISC_REPORT:
         if (msg->msg.dlc >= 3) {
           const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
-          if (ptr->btn_cc_gap_inc || ptr->btn_cc_cncl) {
-            buttonCancel();
-          } else if ((ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) || (ptr->btn_cc_set_inc && ptr->btn_cc_off) || (ptr->btn_cc_set_dec && ptr->btn_cc_res)) {
-            enableSystem();
+          if (buttons_) {
+            if (ptr->btn_cc_gap_inc || ptr->btn_cc_cncl) {
+              buttonCancel();
+            } else if ((ptr->btn_cc_set_dec && ptr->btn_cc_gap_dec) || (ptr->btn_cc_set_inc && ptr->btn_cc_off) || (ptr->btn_cc_set_dec && ptr->btn_cc_res)) {
+              enableSystem();
+            }
           }
           dbw_mkz_msgs::Misc1Report out;
           out.header.stamp = msg->header.stamp;

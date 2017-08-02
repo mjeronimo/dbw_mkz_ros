@@ -135,6 +135,9 @@ private:
   // Frame ID
   std::string frame_id_;
 
+  // Buttons (enable/disable)
+  bool buttons_;
+
   // Brake lights
   bool boo_status_;
   bool boo_control_;

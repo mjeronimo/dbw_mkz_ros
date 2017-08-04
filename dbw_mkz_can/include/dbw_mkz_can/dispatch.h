@@ -314,9 +314,9 @@ typedef struct {
 } MsgReportThrottleInfo;
 
 enum {
-    VERSION_BPEC = 1,
-    VERSION_TPEC = 2,
-    VERSION_EPAS = 3,
+  VERSION_BPEC = 1,
+  VERSION_TPEC = 2,
+  VERSION_EPAS = 3,
 };
 typedef struct {
   uint8_t module;

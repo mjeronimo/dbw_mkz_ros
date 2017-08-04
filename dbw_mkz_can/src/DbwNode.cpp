@@ -297,8 +297,9 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
   pub_gps_time_ = node.advertise<sensor_msgs::TimeReference>("gps/time", 10);
-  pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10, false);
+  pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10);
   pub_twist_ = node.advertise<geometry_msgs::TwistStamped>("twist", 10);
+  pub_vin_ = node.advertise<std_msgs::String>("vin", 1, true);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
 
@@ -617,6 +618,86 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         }
         break;
 
+      case ID_LICENSE:
+        if (msg->msg.dlc >= sizeof(MsgLicense)) {
+          const MsgLicense *ptr = (const MsgLicense*)msg->msg.data.elems;
+          if (ptr->ready) {
+            ROS_INFO_ONCE("DBW Licensing: Ready");
+            if (ptr->trial) {
+              ROS_WARN_ONCE("DBW Licensing: One or more licenses is a counted trial");
+            }
+            if (ptr->expired) {
+              ROS_WARN_ONCE("DBW Licensing: One or more licenses is expired due to the firmware build date");
+            }
+          } else {
+            ROS_INFO_THROTTLE(10.0, "DBW Licensing: Waiting to resolve VIN...");
+          }
+          if (ptr->mux == LIC_MUX_MAC) {
+            ROS_INFO_ONCE("Detected firmware MAC: %02X:%02X:%02X:%02X:%02X:%02X",
+                          ptr->mac.addr0, ptr->mac.addr1,
+                          ptr->mac.addr2, ptr->mac.addr3,
+                          ptr->mac.addr4, ptr->mac.addr5);
+          } else if (ptr->mux == LIC_MUX_DATE0) {
+            if (date_.size() == 0) {
+              date_.push_back(ptr->date0.date0);
+              date_.push_back(ptr->date0.date1);
+              date_.push_back(ptr->date0.date2);
+              date_.push_back(ptr->date0.date3);
+              date_.push_back(ptr->date0.date4);
+              date_.push_back(ptr->date0.date5);
+            }
+          } else if (ptr->mux == LIC_MUX_DATE1) {
+            if (date_.size() == 6) {
+              date_.push_back(ptr->date1.date6);
+              date_.push_back(ptr->date1.date7);
+              date_.push_back(ptr->date1.date8);
+              date_.push_back(ptr->date1.date9);
+              ROS_INFO("Detected firmware build date: %s", date_.c_str());
+            }
+          } else if (ptr->mux == LIC_MUX_VIN0) {
+            if (vin_.size() == 0) {
+              vin_.push_back(ptr->vin0.vin00);
+              vin_.push_back(ptr->vin0.vin01);
+              vin_.push_back(ptr->vin0.vin02);
+              vin_.push_back(ptr->vin0.vin03);
+              vin_.push_back(ptr->vin0.vin04);
+              vin_.push_back(ptr->vin0.vin05);
+            }
+          } else if (ptr->mux == LIC_MUX_VIN1) {
+            if (vin_.size() == 6) {
+              vin_.push_back(ptr->vin1.vin06);
+              vin_.push_back(ptr->vin1.vin07);
+              vin_.push_back(ptr->vin1.vin08);
+              vin_.push_back(ptr->vin1.vin09);
+              vin_.push_back(ptr->vin1.vin10);
+              vin_.push_back(ptr->vin1.vin11);
+            }
+          } else if (ptr->mux == LIC_MUX_VIN2) {
+            if (vin_.size() == 12) {
+              vin_.push_back(ptr->vin2.vin12);
+              vin_.push_back(ptr->vin2.vin13);
+              vin_.push_back(ptr->vin2.vin14);
+              vin_.push_back(ptr->vin2.vin15);
+              vin_.push_back(ptr->vin2.vin16);
+              std_msgs::String msg; msg.data = vin_;
+              pub_vin_.publish(msg);
+              ROS_INFO("Detected VIN: %s", vin_.c_str());
+            }
+          } else if (ptr->mux == LIC_MUX_F0) {
+            const char * const NAME = "MAIN";
+            if (ptr->license.enabled) {
+              ROS_INFO_ONCE("DBW Licensing: Feature '%s' enabled%s", NAME, ptr->license.trial ? " as a counted trial" : "");
+            } else if (ptr->ready) {
+              ROS_WARN_ONCE("DBW Licensing: Feature '%s' not licensed", NAME);
+            }
+            if (ptr->ready && (ptr->license.trial || !ptr->license.enabled)) {
+              ROS_INFO_ONCE("DBW Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,
+                            ptr->license.trials_used, ptr->license.trials_left);
+            }
+          }
+        }
+        break;
+
       case ID_VERSION:
         if (msg->msg.dlc >= sizeof(MsgVersion)) {
           const MsgVersion *ptr = (const MsgVersion*)msg->msg.data.elems;
@@ -627,7 +708,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           } else if (ptr->module == VERSION_EPAS) {
             ROS_INFO_ONCE("Detected steering firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
           } else {
-            ROS_WARN_THROTTLE(10.0, "Detected unknown firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+            ROS_WARN_THROTTLE(10.0, "Detected unknown firmware version %u.%u.%u for module %u", ptr->major, ptr->minor, ptr->build, ptr->module);
           }
         }
         break;

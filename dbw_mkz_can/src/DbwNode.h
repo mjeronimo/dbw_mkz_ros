@@ -65,6 +65,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 
 namespace dbw_mkz_can
 {
@@ -133,6 +134,10 @@ private:
   sensor_msgs::JointState joint_state_;
   void publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
 
+  // Licensing
+  std::string vin_;
+  std::string date_;
+
   // Frame ID
   std::string frame_id_;
 
@@ -181,6 +186,7 @@ private:
   ros::Publisher pub_gps_time_;
   ros::Publisher pub_joint_states_;
   ros::Publisher pub_twist_;
+  ros::Publisher pub_vin_;
   ros::Publisher pub_sys_enable_;
 
   // Time Synchronization

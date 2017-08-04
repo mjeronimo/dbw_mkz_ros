@@ -313,6 +313,81 @@ typedef struct {
   uint16_t :8;
 } MsgReportThrottleInfo;
 
+typedef enum {
+  LIC_MUX_F0 = 0x00, // Feature 0 (Main)
+  LIC_MUX_MAC   = 0x80,
+  LIC_MUX_DATE0 = 0x81,
+  LIC_MUX_DATE1 = 0x82,
+  LIC_MUX_VIN0  = 0x83,
+  LIC_MUX_VIN1  = 0x84,
+  LIC_MUX_VIN2  = 0x85,
+} LicenseMux;
+typedef struct {
+  uint8_t mux;
+  uint8_t ready :1;
+  uint8_t trial :1;
+  uint8_t expired :1;
+  uint8_t :5;
+  union {
+    struct {
+      uint8_t enabled :1;
+      uint8_t trial :1;
+      uint8_t :6;
+      uint8_t :8;
+      uint16_t trials_used;
+      uint16_t trials_left;
+    } license;
+    struct {
+      uint8_t addr0;
+      uint8_t addr1;
+      uint8_t addr2;
+      uint8_t addr3;
+      uint8_t addr4;
+      uint8_t addr5;
+    } mac;
+    struct {
+      uint8_t date0;
+      uint8_t date1;
+      uint8_t date2;
+      uint8_t date3;
+      uint8_t date4;
+      uint8_t date5;
+    } date0;
+    struct {
+      uint8_t date6;
+      uint8_t date7;
+      uint8_t date8;
+      uint8_t date9;
+      uint8_t :8;
+      uint8_t :8;
+    } date1;
+    struct {
+      uint8_t vin00;
+      uint8_t vin01;
+      uint8_t vin02;
+      uint8_t vin03;
+      uint8_t vin04;
+      uint8_t vin05;
+    } vin0;
+    struct {
+      uint8_t vin06;
+      uint8_t vin07;
+      uint8_t vin08;
+      uint8_t vin09;
+      uint8_t vin10;
+      uint8_t vin11;
+    } vin1;
+    struct {
+      uint8_t vin12;
+      uint8_t vin13;
+      uint8_t vin14;
+      uint8_t vin15;
+      uint8_t vin16;
+      uint8_t :8;
+    } vin2;
+  };
+} MsgLicense;
+
 enum {
   VERSION_BPEC = 1,
   VERSION_TPEC = 2,
@@ -350,6 +425,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
   BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
   BUILD_ASSERT(8 == sizeof(MsgReportThrottleInfo));
+  BUILD_ASSERT(8 == sizeof(MsgLicense));
   BUILD_ASSERT(8 == sizeof(MsgVersion));
 }
 #undef BUILD_ASSERT
@@ -377,6 +453,7 @@ enum {
   ID_REPORT_SURROUND        = 0x073,
   ID_REPORT_BRAKE_INFO      = 0x074,
   ID_REPORT_THROTTLE_INFO   = 0x075,
+  ID_LICENSE                = 0x07E,
   ID_VERSION                = 0x07F,
 };
 

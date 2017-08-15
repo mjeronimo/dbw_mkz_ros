@@ -237,6 +237,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   fault_watchdog_ = false;
   fault_watchdog_using_brakes_ = false;
   fault_watchdog_warned_ = false;
+  gear_warned_ = false;
 
   // Frame ID
   frame_id_ = "base_footprint";
@@ -435,7 +436,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_GEAR_REPORT:
-        if (msg->msg.dlc >= sizeof(MsgGearReport)) {
+        if (msg->msg.dlc >= 1) {
           const MsgGearReport *ptr = (const MsgGearReport*)msg->msg.data.elems;
           overrideGear(ptr->OVERRIDE);
           dbw_mkz_msgs::GearReport out;
@@ -444,6 +445,31 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.cmd.gear = ptr->CMD;
           out.override = ptr->OVERRIDE ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
+          if (msg->msg.dlc >= sizeof(MsgGearReport)) {
+            out.reject.value = ptr->REJECT;
+            if (out.reject.value == dbw_mkz_msgs::GearReject::NONE) {
+              gear_warned_ = false;
+            } else if (!gear_warned_) {
+              gear_warned_ = true;
+              switch (out.reject.value) {
+                case dbw_mkz_msgs::GearReject::SHIFT_IN_PROGRESS:
+                  ROS_WARN("Gear shift rejected: Shift in progress");
+                  break;
+                case dbw_mkz_msgs::GearReject::OVERRIDE:
+                  ROS_WARN("Gear shift rejected: Override on brake, throttle, or steering");
+                  break;
+                case dbw_mkz_msgs::GearReject::ROTARY_LOW:
+                  ROS_WARN("Gear shift rejected: Rotary shifter can't shift to Low");
+                  break;
+                case dbw_mkz_msgs::GearReject::ROTARY_PARK:
+                  ROS_WARN("Gear shift rejected: Rotary shifter can't shift out of Park");
+                  break;
+                case dbw_mkz_msgs::GearReject::VEHICLE:
+                  ROS_WARN("Gear shift rejected: Rejected by vehicle, try pressing the brakes");
+                  break;
+              }
+            }
+          }
           pub_gear_.publish(out);
         }
         break;

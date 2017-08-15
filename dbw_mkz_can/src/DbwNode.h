@@ -103,6 +103,7 @@ private:
   bool fault_watchdog_;
   bool fault_watchdog_using_brakes_;
   bool fault_watchdog_warned_;
+  bool gear_warned_;
   inline bool fault() { return fault_brakes_ || fault_throttle_ || fault_steering_ || fault_steering_cal_ || fault_watchdog_; }
   inline bool override() { return override_brake_ || override_throttle_ || override_steering_ || override_gear_; }
   inline bool clear() { return enable_ && override(); }

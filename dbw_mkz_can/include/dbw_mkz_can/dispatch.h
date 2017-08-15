@@ -142,6 +142,8 @@ typedef struct {
   uint8_t OVERRIDE :1;
   uint8_t CMD :3;
   uint8_t FLTBUS :1;
+  uint8_t REJECT :3;
+  uint8_t :5;
 } MsgGearReport;
 
 typedef struct {
@@ -410,7 +412,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgSteeringCmd));
   BUILD_ASSERT(8 == sizeof(MsgSteeringReport));
   BUILD_ASSERT(1 == sizeof(MsgGearCmd));
-  BUILD_ASSERT(1 == sizeof(MsgGearReport));
+  BUILD_ASSERT(2 == sizeof(MsgGearReport));
   BUILD_ASSERT(1 == sizeof(MsgTurnSignalCmd));
   BUILD_ASSERT(5 == sizeof(MsgMiscReport));
   BUILD_ASSERT(8 == sizeof(MsgReportWheelSpeed));

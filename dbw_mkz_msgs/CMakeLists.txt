@@ -15,6 +15,7 @@ add_message_files(DIRECTORY msg FILES
   FuelLevelReport.msg
   Gear.msg
   GearCmd.msg
+  GearReject.msg
   GearReport.msg
   HillStartAssist.msg
   Misc1Report.msg

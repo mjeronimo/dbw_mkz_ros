@@ -70,6 +70,31 @@
 namespace dbw_mkz_can
 {
 
+class ModuleVersion {
+public:
+  ModuleVersion() : full(0) {};
+  ModuleVersion(uint16_t major, uint16_t minor, uint16_t build) : major_(major), minor_(minor), build_(build), extra_(0) {};
+  bool operator<(const ModuleVersion& other) const { return this->full < other.full; }
+  bool operator>(const ModuleVersion& other) const { return this->full > other.full; }
+  bool operator<=(const ModuleVersion& other) const { return this->full <= other.full; }
+  bool operator>=(const ModuleVersion& other) const { return this->full >= other.full; }
+  bool operator==(const ModuleVersion& other) const { return this->full == other.full; }
+  bool operator!=(const ModuleVersion& other) const { return this->full != other.full; }
+private:
+  union {
+    uint64_t full;
+    struct {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+      uint16_t build_; uint16_t minor_; uint16_t major_; uint16_t extra_;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+      uint16_t extra_; uint16_t major_; uint16_t minor_; uint16_t build_;
+#else
+#error Failed to determine system endianness
+#endif
+    };
+  };
+};
+
 class DbwNode
 {
 public:
@@ -138,6 +163,11 @@ private:
   // Licensing
   std::string vin_;
   std::string date_;
+
+  // Firmware Versions
+  ModuleVersion version_brake_;
+  ModuleVersion version_throttle_;
+  ModuleVersion version_steering_;
 
   // Frame ID
   std::string frame_id_;

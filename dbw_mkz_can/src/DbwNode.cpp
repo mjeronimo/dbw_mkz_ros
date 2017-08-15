@@ -133,7 +133,6 @@ static inline float throttlePedalFromPercent(float percent) {
   return 0.0;
 }
 
-
 static const struct {float x; float y; float z; float a;} SONAR_TABLE[] = {
 //   x,      y,     z,     angle
  { 4.000,  0.900, 0.100, 0.500 * M_PI}, // Front left side
@@ -729,10 +728,13 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           const MsgVersion *ptr = (const MsgVersion*)msg->msg.data.elems;
           if (ptr->module == VERSION_BPEC) {
             ROS_INFO_ONCE("Detected brake firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+            version_brake_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
           } else if (ptr->module == VERSION_TPEC) {
             ROS_INFO_ONCE("Detected throttle firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+            version_throttle_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
           } else if (ptr->module == VERSION_EPAS) {
             ROS_INFO_ONCE("Detected steering firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+            version_steering_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
           } else {
             ROS_WARN_THROTTLE(10.0, "Detected unknown firmware version %u.%u.%u for module %u", ptr->major, ptr->minor, ptr->build, ptr->module);
           }

@@ -11,7 +11,6 @@ float32 speed                     # m/s
 # Status
 bool enabled  # Enabled
 bool override # Driver override
-bool driver   # Driver activity
 bool timeout  # Command timeout
 
 # Watchdog Counter

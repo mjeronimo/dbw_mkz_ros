@@ -123,7 +123,7 @@ typedef struct {
   int8_t TORQUE;
   uint8_t ENABLED :1;
   uint8_t OVERRIDE :1;
-  uint8_t DRIVER :1;
+  uint8_t :1;
   uint8_t FLTWDC :1;
   uint8_t FLTBUS1 :1;
   uint8_t FLTBUS2 :1;

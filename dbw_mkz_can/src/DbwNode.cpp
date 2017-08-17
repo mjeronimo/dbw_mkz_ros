@@ -369,7 +369,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_boo = ptr->FLTB ? true : false;
-          if (version_brake_ >= ModuleVersion(1,1,9)) {
+          if (version_brake_ >= ModuleVersion(2,0,0)) {
             timeoutBrake(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
@@ -398,7 +398,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
-          if (version_throttle_ >= ModuleVersion(1,1,9)) {
+          if (version_throttle_ >= ModuleVersion(2,0,0)) {
             timeoutThrottle(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
@@ -429,7 +429,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_calibration = ptr->FLTCAL ? true : false;
-          if (version_steering_ >= ModuleVersion(1,0,11)) {
+          if (version_steering_ >= ModuleVersion(2,0,0)) {
             timeoutSteering(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }

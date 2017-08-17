@@ -128,6 +128,12 @@ private:
   bool fault_watchdog_;
   bool fault_watchdog_using_brakes_;
   bool fault_watchdog_warned_;
+  bool timeout_brakes_;
+  bool timeout_throttle_;
+  bool timeout_steering_;
+  bool enabled_brakes_;
+  bool enabled_throttle_;
+  bool enabled_steering_;
   bool gear_warned_;
   inline bool fault() { return fault_brakes_ || fault_throttle_ || fault_steering_ || fault_steering_cal_ || fault_watchdog_; }
   inline bool override() { return override_brake_ || override_throttle_ || override_steering_ || override_gear_; }
@@ -141,6 +147,9 @@ private:
   void overrideThrottle(bool override);
   void overrideSteering(bool override);
   void overrideGear(bool override);
+  void timeoutBrake(bool timeout, bool enabled);
+  void timeoutThrottle(bool timeout, bool enabled);
+  void timeoutSteering(bool timeout, bool enabled);
   void faultBrakes(bool fault);
   void faultThrottle(bool fault);
   void faultSteering(bool fault);

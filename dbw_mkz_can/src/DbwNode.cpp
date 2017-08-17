@@ -236,6 +236,12 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   fault_watchdog_ = false;
   fault_watchdog_using_brakes_ = false;
   fault_watchdog_warned_ = false;
+  timeout_brakes_ = false;
+  timeout_throttle_ = false;
+  timeout_steering_ = false;
+  enabled_brakes_ = false;
+  enabled_throttle_ = false;
+  enabled_steering_ = false;
   gear_warned_ = false;
 
   // Frame ID
@@ -363,7 +369,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_boo = ptr->FLTB ? true : false;
-          out.fault_connector = ptr->FLTCON ? true : false;
+          if (version_brake_ >= ModuleVersion(1,1,9)) {
+            timeoutBrake(ptr->TMOUT, ptr->ENABLED);
+            out.timeout = ptr->TMOUT ? true : false;
+          }
           pub_brake_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
             ROS_WARN_THROTTLE(5.0, "Brake pedal fault. Check brake pedal wiring.");
@@ -389,7 +398,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
-          out.fault_connector = ptr->FLTCON ? true : false;
+          if (version_throttle_ >= ModuleVersion(1,1,9)) {
+            timeoutThrottle(ptr->TMOUT, ptr->ENABLED);
+            out.timeout = ptr->TMOUT ? true : false;
+          }
           pub_throttle_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
             ROS_WARN_THROTTLE(5.0, "Throttle pedal fault. Check throttle pedal wiring.");
@@ -417,7 +429,10 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_calibration = ptr->FLTCAL ? true : false;
-          out.fault_connector = ptr->FLTCON ? true : false;
+          if (version_steering_ >= ModuleVersion(1,0,11)) {
+            timeoutSteering(ptr->TMOUT, ptr->ENABLED);
+            out.timeout = ptr->TMOUT ? true : false;
+          }
           pub_steering_.publish(out);
           geometry_msgs::TwistStamped twist;
           twist.header.stamp = out.header.stamp;
@@ -1176,6 +1191,33 @@ void DbwNode::overrideGear(bool override)
       ROS_INFO("DBW system enabled.");
     }
   }
+}
+
+void DbwNode::timeoutBrake(bool timeout, bool enabled)
+{
+  if (!timeout_brakes_ && enabled_brakes_ && timeout && !enabled) {
+    ROS_WARN("Brake subsystem disabled after 100ms command timeout");
+  }
+  timeout_brakes_ = timeout;
+  enabled_brakes_ = enabled;
+}
+
+void DbwNode::timeoutThrottle(bool timeout, bool enabled)
+{
+  if (!timeout_throttle_ && enabled_throttle_ && timeout && !enabled) {
+    ROS_WARN("Throttle subsystem disabled after 100ms command timeout");
+  }
+  timeout_throttle_ = timeout;
+  enabled_throttle_ = enabled;
+}
+
+void DbwNode::timeoutSteering(bool timeout, bool enabled)
+{
+  if (!timeout_steering_ && enabled_steering_ && timeout && !enabled) {
+    ROS_WARN("Steering subsystem disabled after 100ms command timeout");
+  }
+  timeout_steering_ = timeout;
+  enabled_steering_ = enabled;
 }
 
 void DbwNode::faultBrakes(bool fault)

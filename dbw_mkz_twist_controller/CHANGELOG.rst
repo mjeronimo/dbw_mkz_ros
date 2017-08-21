@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated ackermann steering parameters (including steering ratio)
+* Contributors: Kevin Hallenbeck
+
 1.0.6 (2017-06-21)
 ------------------
 * Removed yaw rate control on speed, this also disables the lateral acceleration limit for now

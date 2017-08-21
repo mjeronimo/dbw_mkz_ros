@@ -2,6 +2,15 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed steering report driver activity bit
+* Replaced connector fault with timeout, and warn on timeout
+* Added gear rejection enumeration to gear report
+* Added wheel positions report (replaces suspension report)
+* Added steering wheel left D-Pad buttons
+* Contributors: Kevin Hallenbeck
+
 1.0.6 (2017-06-21)
 ------------------
 * Removed SuspensionReport (data was unintelligible)

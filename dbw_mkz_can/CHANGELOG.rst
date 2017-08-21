@@ -2,6 +2,22 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed steering report driver activity bit
+* Replaced connector fault with timeout, and warn on timeout
+* Keep track of module firmware versions
+* Added gear rejection enumeration to gear report
+* Added licensing and VIN
+* Added wheel positions report (replaces suspension report)
+* Added option to use buttons for enable/disable, or not
+* Added enable button combination for Mondeo without ACC (set_dec and cc_res)
+* Added steering wheel left D-Pad buttons
+* Updated ackermann steering parameters (including steering ratio)
+* Prioritize the local include folder (there were issues with catkin workspace overlays)
+* Fixed accel orientation to match the ROS standard
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.0.6 (2017-06-21)
 ------------------
 * Added frame_id parameter for IMU and Twist messages

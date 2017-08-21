@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Restructured joints in URDF models.
+* Contributors: Micho Radovnikovich
+
 1.0.6 (2017-06-21)
 ------------------
 * Solved xacro deprecation warnings

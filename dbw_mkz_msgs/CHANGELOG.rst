@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-08-21)
+------------------
 * Removed steering report driver activity bit
 * Replaced connector fault with timeout, and warn on timeout
 * Added gear rejection enumeration to gear report

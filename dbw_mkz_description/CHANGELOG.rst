@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-08-21)
+------------------
 * Restructured joints in URDF models.
 * Contributors: Micho Radovnikovich
 

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.7 (2017-08-21)
+------------------
 * Added steering wheel velocity (svel) parameter
 * Contributors: Kevin Hallenbeck
 

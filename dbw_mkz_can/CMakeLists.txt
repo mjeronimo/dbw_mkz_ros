@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   sensor_msgs
-  dataspeed_can_msgs
+  can_msgs
   dataspeed_can_msg_filters
   dbw_mkz_msgs
 )
@@ -27,7 +27,6 @@ add_library(${PROJECT_NAME}
   src/nodelet.cpp
   src/DbwNode.cpp
 )
-add_dependencies(${PROJECT_NAME} dataspeed_can_msgs_gencpp)
 add_dependencies(${PROJECT_NAME} dbw_mkz_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -36,7 +35,6 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(${PROJECT_NAME}_dbw_node
   src/node.cpp
 )
-add_dependencies(${PROJECT_NAME}_dbw_node dataspeed_can_msgs_gencpp)
 add_dependencies(${PROJECT_NAME}_dbw_node dbw_mkz_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}_dbw_node
   ${PROJECT_NAME}

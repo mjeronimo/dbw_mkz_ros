@@ -285,7 +285,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   joint_state_.name[JOINT_SR] = "steer_fr";
 
   // Set up Publishers
-  pub_can_ = node.advertise<dataspeed_can_msgs::CanMessage>("can_tx", 10);
+  pub_can_ = node.advertise<can_msgs::Frame>("can_tx", 10);
   pub_brake_ = node.advertise<dbw_mkz_msgs::BrakeReport>("brake_report", 2);
   pub_throttle_ = node.advertise<dbw_mkz_msgs::ThrottleReport>("throttle_report", 2);
   pub_steering_ = node.advertise<dbw_mkz_msgs::SteeringReport>("steering_report", 2);
@@ -337,15 +337,15 @@ void DbwNode::recvDisable(const std_msgs::Empty::ConstPtr& msg)
   disableSystem();
 }
 
-void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg)
+void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
 {
   sync_imu_.processMsg(msg);
   sync_gps_.processMsg(msg);
-  if (!msg->msg.extended) {
-    switch (msg->msg.id) {
+  if (!msg->is_rtr && !msg->is_error && !msg->is_extended) {
+    switch (msg->id) {
       case ID_BRAKE_REPORT:
-        if (msg->msg.dlc >= sizeof(MsgBrakeReport)) {
-          const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgBrakeReport)) {
+          const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->data.elems;
           faultBrakes(ptr->FLT1 && ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           overrideBrake(ptr->OVERRIDE);
@@ -381,8 +381,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_THROTTLE_REPORT:
-        if (msg->msg.dlc >= sizeof(MsgThrottleReport)) {
-          const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgThrottleReport)) {
+          const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->data.elems;
           faultThrottle(ptr->FLT1 && ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC);
           overrideThrottle(ptr->OVERRIDE);
@@ -410,8 +410,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_STEERING_REPORT:
-        if (msg->msg.dlc >= sizeof(MsgSteeringReport)) {
-          const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgSteeringReport)) {
+          const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->data.elems;
           faultSteering(ptr->FLTBUS1 && ptr->FLTBUS2);
           faultSteeringCal(ptr->FLTCAL);
           faultWatchdog(ptr->FLTWDC);
@@ -449,8 +449,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_GEAR_REPORT:
-        if (msg->msg.dlc >= 1) {
-          const MsgGearReport *ptr = (const MsgGearReport*)msg->msg.data.elems;
+        if (msg->dlc >= 1) {
+          const MsgGearReport *ptr = (const MsgGearReport*)msg->data.elems;
           overrideGear(ptr->OVERRIDE);
           dbw_mkz_msgs::GearReport out;
           out.header.stamp = msg->header.stamp;
@@ -458,7 +458,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.cmd.gear = ptr->CMD;
           out.override = ptr->OVERRIDE ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
-          if (msg->msg.dlc >= sizeof(MsgGearReport)) {
+          if (msg->dlc >= sizeof(MsgGearReport)) {
             out.reject.value = ptr->REJECT;
             if (out.reject.value == dbw_mkz_msgs::GearReject::NONE) {
               gear_warned_ = false;
@@ -488,8 +488,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_MISC_REPORT:
-        if (msg->msg.dlc >= 3) {
-          const MsgMiscReport *ptr = (const MsgMiscReport*)msg->msg.data.elems;
+        if (msg->dlc >= 3) {
+          const MsgMiscReport *ptr = (const MsgMiscReport*)msg->data.elems;
           if (buttons_) {
             if (ptr->btn_cc_gap_inc || ptr->btn_cc_cncl) {
               buttonCancel();
@@ -515,7 +515,7 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
           out.btn_cc_gap_dec = ptr->btn_cc_gap_dec ? true : false;
           out.btn_la_on_off = ptr->btn_la_on_off ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
-          if (msg->msg.dlc >= sizeof(MsgMiscReport)) {
+          if (msg->dlc >= sizeof(MsgMiscReport)) {
             out.door_driver = ptr->door_driver ? true : false;
             out.door_passenger = ptr->door_passenger ? true : false;
             out.door_rear_left = ptr->door_rear_left ? true : false;
@@ -537,8 +537,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_WHEEL_SPEED:
-        if (msg->msg.dlc >= sizeof(MsgReportWheelSpeed)) {
-          const MsgReportWheelSpeed *ptr = (const MsgReportWheelSpeed*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportWheelSpeed)) {
+          const MsgReportWheelSpeed *ptr = (const MsgReportWheelSpeed*)msg->data.elems;
           dbw_mkz_msgs::WheelSpeedReport out;
           out.header.stamp = msg->header.stamp;
           out.front_left  = (float)ptr->front_left  * 0.01;
@@ -551,8 +551,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_WHEEL_POSITION:
-        if (msg->msg.dlc >= sizeof(MsgReportWheelPosition)) {
-          const MsgReportWheelPosition *ptr = (const MsgReportWheelPosition*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportWheelPosition)) {
+          const MsgReportWheelPosition *ptr = (const MsgReportWheelPosition*)msg->data.elems;
           dbw_mkz_msgs::WheelPositionReport out;
           out.header.stamp = msg->header.stamp;
           out.front_left  = ptr->front_left;
@@ -564,8 +564,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_TIRE_PRESSURE:
-        if (msg->msg.dlc >= sizeof(MsgReportTirePressure)) {
-          const MsgReportTirePressure *ptr = (const MsgReportTirePressure*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportTirePressure)) {
+          const MsgReportTirePressure *ptr = (const MsgReportTirePressure*)msg->data.elems;
           dbw_mkz_msgs::TirePressureReport out;
           out.header.stamp = msg->header.stamp;
           out.front_left  = (float)ptr->front_left;
@@ -577,8 +577,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_FUEL_LEVEL:
-        if (msg->msg.dlc >= sizeof(MsgReportFuelLevel)) {
-          const MsgReportFuelLevel *ptr = (const MsgReportFuelLevel*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportFuelLevel)) {
+          const MsgReportFuelLevel *ptr = (const MsgReportFuelLevel*)msg->data.elems;
           dbw_mkz_msgs::FuelLevelReport out;
           out.header.stamp = msg->header.stamp;
           out.fuel_level  = (float)ptr->fuel_level * 0.108696;
@@ -587,8 +587,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_SURROUND:
-        if (msg->msg.dlc >= sizeof(MsgReportSurround)) {
-          const MsgReportSurround *ptr = (const MsgReportSurround*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportSurround)) {
+          const MsgReportSurround *ptr = (const MsgReportSurround*)msg->data.elems;
           dbw_mkz_msgs::SurroundReport out;
           out.header.stamp = msg->header.stamp;
           out.cta_left_alert = ptr->l_cta_alert ? true : false;
@@ -623,8 +623,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_BRAKE_INFO:
-        if (msg->msg.dlc >= sizeof(MsgReportBrakeInfo)) {
-          const MsgReportBrakeInfo *ptr = (const MsgReportBrakeInfo*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportBrakeInfo)) {
+          const MsgReportBrakeInfo *ptr = (const MsgReportBrakeInfo*)msg->data.elems;
           dbw_mkz_msgs::BrakeInfoReport out;
           out.header.stamp = msg->header.stamp;
           out.brake_torque_request = (float)ptr->brake_torque_request * 4.0;
@@ -646,8 +646,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_REPORT_THROTTLE_INFO:
-        if (msg->msg.dlc >= sizeof(MsgReportThrottleInfo)) {
-          const MsgReportThrottleInfo *ptr = (const MsgReportThrottleInfo*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgReportThrottleInfo)) {
+          const MsgReportThrottleInfo *ptr = (const MsgReportThrottleInfo*)msg->data.elems;
           dbw_mkz_msgs::ThrottleInfoReport out;
           out.header.stamp = msg->header.stamp;
           out.throttle_pc = (float)ptr->throttle_pc * 1e-3;
@@ -658,8 +658,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_LICENSE:
-        if (msg->msg.dlc >= sizeof(MsgLicense)) {
-          const MsgLicense *ptr = (const MsgLicense*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgLicense)) {
+          const MsgLicense *ptr = (const MsgLicense*)msg->data.elems;
           if (ptr->ready) {
             ROS_INFO_ONCE("DBW Licensing: Ready");
             if (ptr->trial) {
@@ -738,8 +738,8 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
         break;
 
       case ID_VERSION:
-        if (msg->msg.dlc >= sizeof(MsgVersion)) {
-          const MsgVersion *ptr = (const MsgVersion*)msg->msg.data.elems;
+        if (msg->dlc >= sizeof(MsgVersion)) {
+          const MsgVersion *ptr = (const MsgVersion*)msg->data.elems;
           if (ptr->module == VERSION_BPEC) {
             ROS_INFO_ONCE("Detected brake firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
             version_brake_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
@@ -784,13 +784,13 @@ void DbwNode::recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg
 #endif
 }
 
-void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs) {
+void DbwNode::recvCanImu(const std::vector<can_msgs::Frame::ConstPtr> &msgs) {
   ROS_ASSERT(msgs.size() == 2);
-  ROS_ASSERT(msgs[0]->msg.id == ID_REPORT_ACCEL);
-  ROS_ASSERT(msgs[1]->msg.id == ID_REPORT_GYRO);
-  if ((msgs[0]->msg.dlc >= sizeof(MsgReportAccel)) && (msgs[1]->msg.dlc >= sizeof(MsgReportGyro))) {
-    const MsgReportAccel *ptr_accel = (const MsgReportAccel*)msgs[0]->msg.data.elems;
-    const MsgReportGyro *ptr_gyro = (const MsgReportGyro*)msgs[1]->msg.data.elems;
+  ROS_ASSERT(msgs[0]->id == ID_REPORT_ACCEL);
+  ROS_ASSERT(msgs[1]->id == ID_REPORT_GYRO);
+  if ((msgs[0]->dlc >= sizeof(MsgReportAccel)) && (msgs[1]->dlc >= sizeof(MsgReportGyro))) {
+    const MsgReportAccel *ptr_accel = (const MsgReportAccel*)msgs[0]->data.elems;
+    const MsgReportGyro *ptr_gyro = (const MsgReportGyro*)msgs[1]->data.elems;
     sensor_msgs::Imu out;
     out.header.stamp = msgs[0]->header.stamp;
     out.header.frame_id = frame_id_;
@@ -810,15 +810,15 @@ void DbwNode::recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped
 #endif
 }
 
-void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs) {
+void DbwNode::recvCanGps(const std::vector<can_msgs::Frame::ConstPtr> &msgs) {
   ROS_ASSERT(msgs.size() == 3);
-  ROS_ASSERT(msgs[0]->msg.id == ID_REPORT_GPS1);
-  ROS_ASSERT(msgs[1]->msg.id == ID_REPORT_GPS2);
-  ROS_ASSERT(msgs[2]->msg.id == ID_REPORT_GPS3);
-  if ((msgs[0]->msg.dlc >= sizeof(MsgReportGps1)) && (msgs[1]->msg.dlc >= sizeof(MsgReportGps2)) && (msgs[2]->msg.dlc >= sizeof(MsgReportGps3))) {
-    const MsgReportGps1 *ptr1 = (const MsgReportGps1*)msgs[0]->msg.data.elems;
-    const MsgReportGps2 *ptr2 = (const MsgReportGps2*)msgs[1]->msg.data.elems;
-    const MsgReportGps3 *ptr3 = (const MsgReportGps3*)msgs[2]->msg.data.elems;
+  ROS_ASSERT(msgs[0]->id == ID_REPORT_GPS1);
+  ROS_ASSERT(msgs[1]->id == ID_REPORT_GPS2);
+  ROS_ASSERT(msgs[2]->id == ID_REPORT_GPS3);
+  if ((msgs[0]->dlc >= sizeof(MsgReportGps1)) && (msgs[1]->dlc >= sizeof(MsgReportGps2)) && (msgs[2]->dlc >= sizeof(MsgReportGps3))) {
+    const MsgReportGps1 *ptr1 = (const MsgReportGps1*)msgs[0]->data.elems;
+    const MsgReportGps2 *ptr2 = (const MsgReportGps2*)msgs[1]->data.elems;
+    const MsgReportGps3 *ptr3 = (const MsgReportGps3*)msgs[2]->data.elems;
 
     sensor_msgs::NavSatFix msg_fix;
     msg_fix.header.stamp =  msgs[0]->header.stamp;
@@ -880,9 +880,9 @@ void DbwNode::recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped
 
 void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
 {
-  dataspeed_can_msgs::CanMessage out;
+  can_msgs::Frame out;
   out.id = ID_BRAKE_CMD;
-  out.extended = false;
+  out.is_extended = false;
   out.dlc = sizeof(MsgBrakeCmd);
   MsgBrakeCmd *ptr = (MsgBrakeCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
@@ -934,9 +934,9 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
 
 void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
 {
-  dataspeed_can_msgs::CanMessage out;
+  can_msgs::Frame out;
   out.id = ID_THROTTLE_CMD;
-  out.extended = false;
+  out.is_extended = false;
   out.dlc = sizeof(MsgThrottleCmd);
   MsgThrottleCmd *ptr = (MsgThrottleCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
@@ -970,9 +970,9 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
 
 void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
 {
-  dataspeed_can_msgs::CanMessage out;
+  can_msgs::Frame out;
   out.id = ID_STEERING_CMD;
-  out.extended = false;
+  out.is_extended = false;
   out.dlc = sizeof(MsgSteeringCmd);
   MsgSteeringCmd *ptr = (MsgSteeringCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
@@ -1000,9 +1000,9 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
 
 void DbwNode::recvGearCmd(const dbw_mkz_msgs::GearCmd::ConstPtr& msg)
 {
-  dataspeed_can_msgs::CanMessage out;
+  can_msgs::Frame out;
   out.id = ID_GEAR_CMD;
-  out.extended = false;
+  out.is_extended = false;
   out.dlc = sizeof(MsgGearCmd);
   MsgGearCmd *ptr = (MsgGearCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
@@ -1017,9 +1017,9 @@ void DbwNode::recvGearCmd(const dbw_mkz_msgs::GearCmd::ConstPtr& msg)
 
 void DbwNode::recvTurnSignalCmd(const dbw_mkz_msgs::TurnSignalCmd::ConstPtr& msg)
 {
-  dataspeed_can_msgs::CanMessage out;
+  can_msgs::Frame out;
   out.id = ID_MISC_CMD;
-  out.extended = false;
+  out.is_extended = false;
   out.dlc = sizeof(MsgTurnSignalCmd);
   MsgTurnSignalCmd *ptr = (MsgTurnSignalCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
@@ -1046,8 +1046,8 @@ bool DbwNode::publishDbwEnabled()
 void DbwNode::timerCallback(const ros::TimerEvent& event)
 {
   if (clear()) {
-    dataspeed_can_msgs::CanMessage out;
-    out.extended = false;
+    can_msgs::Frame out;
+    out.is_extended = false;
 
     if (override_brake_) {
       out.id = ID_BRAKE_CMD;

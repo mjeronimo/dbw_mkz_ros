@@ -38,8 +38,8 @@
 #include <ros/ros.h>
 
 // ROS messages
+#include <can_msgs/Frame.h>
 #include <dataspeed_can_msg_filters/ApproximateTime.h>
-#include <dataspeed_can_msgs/CanMessageStamped.h>
 #include <dbw_mkz_msgs/BrakeCmd.h>
 #include <dbw_mkz_msgs/BrakeReport.h>
 #include <dbw_mkz_msgs/ThrottleCmd.h>
@@ -105,9 +105,9 @@ private:
   void timerCallback(const ros::TimerEvent& event);
   void recvEnable(const std_msgs::Empty::ConstPtr& msg);
   void recvDisable(const std_msgs::Empty::ConstPtr& msg);
-  void recvCAN(const dataspeed_can_msgs::CanMessageStamped::ConstPtr& msg);
-  void recvCanImu(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
-  void recvCanGps(const std::vector<dataspeed_can_msgs::CanMessageStamped::ConstPtr> &msgs);
+  void recvCAN(const can_msgs::Frame::ConstPtr& msg);
+  void recvCanImu(const std::vector<can_msgs::Frame::ConstPtr> &msgs);
+  void recvCanGps(const std::vector<can_msgs::Frame::ConstPtr> &msgs);
   void recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg);
   void recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg);
   void recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg);

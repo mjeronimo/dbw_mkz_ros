@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.8 (2017-09-07)
+------------------
 * Migrated from dataspeed_can_msgs to can_msgs
 * Contributors: Kevin Hallenbeck
 

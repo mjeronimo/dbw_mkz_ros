@@ -375,7 +375,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           }
           pub_brake_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(5.0, "Brake pedal fault. Check brake pedal wiring.");
+            ROS_WARN_THROTTLE(5.0, "Brake pedal fault. Check brake pedal wiring. FLT1: %s, FLT2: %s",
+                ptr->FLT1 ? "true" : "false",
+                ptr->FLT2 ? "true" : "false");
           }
         }
         break;
@@ -404,7 +406,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           }
           pub_throttle_.publish(out);
           if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(5.0, "Throttle pedal fault. Check throttle pedal wiring.");
+            ROS_WARN_THROTTLE(5.0, "Throttle pedal fault. Check throttle pedal wiring. FLT1: %s, FLT2: %s",
+                ptr->FLT1 ? "true" : "false",
+                ptr->FLT2 ? "true" : "false");
           }
         }
         break;
@@ -441,7 +445,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           pub_twist_.publish(twist);
           publishJointStates(msg->header.stamp, NULL, &out);
           if (ptr->FLTBUS1 || ptr->FLTBUS2) {
-            ROS_WARN_THROTTLE(5.0, "Steering fault. Check wiring.");
+            ROS_WARN_THROTTLE(5.0, "Steering fault. Check wiring. FLTBUS1: %s, FLTBUS2: %s",
+                ptr->FLTBUS1 ? "true" : "false",
+                ptr->FLTBUS2 ? "true" : "false");
           } else if (ptr->FLTCAL) {
             ROS_WARN_THROTTLE(5.0, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
           }

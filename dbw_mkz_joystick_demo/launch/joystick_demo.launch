@@ -15,7 +15,7 @@
 
   <!-- Joystick demo -->
   <arg name="ignore" default="false"/>
-  <arg name="enable" default="false"/>
+  <arg name="enable" default="true"/>
   <arg name="count" default="false"/>
   <arg name="svel" default="0.0"/>
   <node ns="vehicle" pkg="dbw_mkz_joystick_demo" type="joystick_demo" name="joystick_demo" output="screen" >

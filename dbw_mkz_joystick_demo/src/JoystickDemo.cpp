@@ -43,7 +43,7 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : co
   last_joy_.buttons.resize(BTN_COUNT, 0);
 
   ignore_ = false;
-  enable_ = false;
+  enable_ = true;
   count_ = false;
   svel_ = 0.0;
   priv_nh.getParam("ignore", ignore_);

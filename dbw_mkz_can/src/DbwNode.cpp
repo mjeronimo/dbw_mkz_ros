@@ -669,10 +669,10 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           if (ptr->ready) {
             ROS_INFO_ONCE("DBW Licensing: Ready");
             if (ptr->trial) {
-              ROS_WARN_ONCE("DBW Licensing: One or more licenses is a counted trial");
+              ROS_WARN_ONCE("DBW Licensing: One or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.");
             }
             if (ptr->expired) {
-              ROS_WARN_ONCE("DBW Licensing: One or more licenses is expired due to the firmware build date");
+              ROS_WARN_ONCE("DBW Licensing: One or more feature licenses expired due to the firmware build date");
             }
           } else {
             ROS_INFO_THROTTLE(10.0, "DBW Licensing: Waiting to resolve VIN...");
@@ -733,7 +733,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             if (ptr->license.enabled) {
               ROS_INFO_ONCE("DBW Licensing: Feature '%s' enabled%s", NAME, ptr->license.trial ? " as a counted trial" : "");
             } else if (ptr->ready) {
-              ROS_WARN_ONCE("DBW Licensing: Feature '%s' not licensed", NAME);
+              ROS_WARN_ONCE("DBW Licensing: Feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", NAME);
             }
             if (ptr->ready && (ptr->license.trial || !ptr->license.enabled)) {
               ROS_INFO_ONCE("DBW Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,

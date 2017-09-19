@@ -80,6 +80,9 @@ public:
   bool operator>=(const ModuleVersion& other) const { return this->full >= other.full; }
   bool operator==(const ModuleVersion& other) const { return this->full == other.full; }
   bool operator!=(const ModuleVersion& other) const { return this->full != other.full; }
+  uint16_t major() const { return major_; }
+  uint16_t minor() const { return minor_; }
+  uint16_t build() const { return build_; }
 private:
   union {
     uint64_t full;

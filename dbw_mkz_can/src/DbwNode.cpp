@@ -38,6 +38,11 @@
 namespace dbw_mkz_can
 {
 
+// Latest firmware versions
+static const ModuleVersion FIRMWARE_BRAKE(2,0,1);
+static const ModuleVersion FIRMWARE_THROTTLE(2,0,1);
+static const ModuleVersion FIRMWARE_STEERING(2,0,1);
+
 static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
 // Duty,   Nm
  {0.150,    0},
@@ -749,12 +754,27 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           if (ptr->module == VERSION_BPEC) {
             ROS_INFO_ONCE("Detected brake firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
             version_brake_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
+            if (version_brake_ < FIRMWARE_BRAKE) {
+              ROS_WARN_ONCE("Detected old brake firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
+                            version_brake_.major(), version_brake_.minor(), version_brake_.build(),
+                            FIRMWARE_BRAKE.major(), FIRMWARE_BRAKE.minor(), FIRMWARE_BRAKE.build());
+            }
           } else if (ptr->module == VERSION_TPEC) {
             ROS_INFO_ONCE("Detected throttle firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
             version_throttle_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
+            if (version_throttle_ < FIRMWARE_THROTTLE) {
+              ROS_WARN_ONCE("Detected old throttle firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
+                            version_throttle_.major(), version_throttle_.minor(), version_throttle_.build(),
+                            FIRMWARE_THROTTLE.major(), FIRMWARE_THROTTLE.minor(), FIRMWARE_THROTTLE.build());
+            }
           } else if (ptr->module == VERSION_EPAS) {
             ROS_INFO_ONCE("Detected steering firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
             version_steering_ = ModuleVersion(ptr->major, ptr->minor, ptr->build);
+            if (version_steering_ < FIRMWARE_STEERING) {
+              ROS_WARN_ONCE("Detected old steering firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
+                            version_steering_.major(), version_steering_.minor(), version_steering_.build(),
+                            FIRMWARE_STEERING.major(), FIRMWARE_STEERING.minor(), FIRMWARE_STEERING.build());
+            }
           } else {
             ROS_WARN_THROTTLE(10.0, "Detected unknown firmware version %u.%u.%u for module %u", ptr->major, ptr->minor, ptr->build, ptr->module);
           }

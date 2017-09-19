@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.9 (2017-09-19)
+------------------
 * Added warning to update old firmware
 * Added link to request a license
 * Added more detail to fault warnings

@@ -2,6 +2,13 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added warning to update old firmware
+* Added link to request a license
+* Added more detail to fault warnings
+* Contributors: Kevin Hallenbeck
+
 1.0.8 (2017-09-07)
 ------------------
 * Migrated from dataspeed_can_msgs to can_msgs

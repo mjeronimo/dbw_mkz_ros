@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Changed joystick demo enable buttons default to true
+* Contributors: Kevin Hallenbeck
+
 1.0.8 (2017-09-07)
 ------------------
 

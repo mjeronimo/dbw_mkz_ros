@@ -734,7 +734,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               ROS_INFO("Detected VIN: %s", vin_.c_str());
             }
           } else if (ptr->mux == LIC_MUX_F0) {
-            const char * const NAME = "MAIN";
+            const char * const NAME = "BASE"; // Base functionality
             if (ptr->license.enabled) {
               ROS_INFO_ONCE("DBW Licensing: Feature '%s' enabled%s", NAME, ptr->license.trial ? " as a counted trial" : "");
             } else if (ptr->ready) {

@@ -41,7 +41,7 @@ namespace dbw_mkz_can
 // Latest firmware versions
 static const ModuleVersion FIRMWARE_BRAKE(2,0,1);
 static const ModuleVersion FIRMWARE_THROTTLE(2,0,1);
-static const ModuleVersion FIRMWARE_STEERING(2,0,1);
+static const ModuleVersion FIRMWARE_STEERING(2,0,2);
 
 static const struct {float pedal; float torque;} BRAKE_TABLE[] = {
 // Duty,   Nm

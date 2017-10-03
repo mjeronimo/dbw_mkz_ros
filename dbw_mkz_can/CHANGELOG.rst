@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated steering firmware version
+* Renamed feature name
+* Contributors: Kevin Hallenbeck
+
 1.0.9 (2017-09-19)
 ------------------
 * Added warning to update old firmware

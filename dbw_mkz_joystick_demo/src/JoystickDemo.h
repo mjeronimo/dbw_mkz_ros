@@ -49,6 +49,7 @@ namespace joystick_demo
 {
 
 typedef struct {
+  ros::Time stamp;
   float brake_joy;
   float throttle_joy;
   float steering_joy;

@@ -77,6 +77,13 @@ JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : co
 
 void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 {
+  // Detect joy timeouts and reset
+  if (event.current_real - data_.stamp > ros::Duration(0.1)) {
+    data_.joy_throttle_valid = false;
+    data_.joy_brake_valid = false;
+    return;
+  }
+
   // Optional watchdog counter
   if (count_) {
     counter_++;
@@ -210,6 +217,7 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
     }
   }
 
+  data_.stamp = ros::Time::now();
   joy_ = *msg;
 }
 

@@ -49,9 +49,9 @@ namespace joystick_demo
 {
 
 typedef struct {
-  double brake_joy;
-  double throttle_joy;
-  double steering_joy;
+  float brake_joy;
+  float throttle_joy;
+  float steering_joy;
   bool steering_mult;
   int gear_cmd;
   int turn_signal_cmd;
@@ -83,9 +83,9 @@ private:
   double svel_; // Steering command speed
 
   // Variables
-  ros::Timer cmd_timer_;
-  JoystickDataStruct joy_data_;
-  sensor_msgs::Joy last_joy_;
+  ros::Timer timer_;
+  JoystickDataStruct data_;
+  sensor_msgs::Joy joy_;
   uint8_t counter_;
 
   enum {

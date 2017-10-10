@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");
 
-  // create DbwNode class
+  // Create JoystickDemo class
   joystick_demo::JoystickDemo n(node, priv_nh);
 
   ros::spin();

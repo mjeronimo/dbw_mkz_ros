@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.11 (2017-10-19)
+-------------------
 * Added missing dependencies
 * Handle joystick unplug and re-plugin events
 * Contributors: Kevin Hallenbeck

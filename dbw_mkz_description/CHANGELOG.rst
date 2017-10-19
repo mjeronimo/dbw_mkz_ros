@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added missing dependencies
+* Contributors: Kevin Hallenbeck
+
 1.0.10 (2017-10-03)
 -------------------
 

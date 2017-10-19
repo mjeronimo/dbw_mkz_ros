@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Added missing dependencies
+* Contributors: Kevin Hallenbeck
+
 1.0.10 (2017-10-03)
 -------------------
 * Updated steering firmware version

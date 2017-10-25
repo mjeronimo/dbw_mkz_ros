@@ -28,3 +28,7 @@ install(TARGETS ${PROJECT_NAME}_joystick_demo
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+if (CATKIN_ENABLE_TESTING)
+  add_subdirectory(tests)
+endif()

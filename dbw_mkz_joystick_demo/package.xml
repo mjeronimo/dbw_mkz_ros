@@ -24,4 +24,6 @@
   <exec_depend>joy</exec_depend>
   <exec_depend>dbw_mkz_can</exec_depend>
 
+  <test_depend>roslaunch</test_depend>
+
 </package>

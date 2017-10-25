@@ -31,6 +31,8 @@
   <exec_depend>dbw_mkz_description</exec_depend>
   <exec_depend>dbw_mkz_twist_controller</exec_depend>
 
+  <test_depend>roslaunch</test_depend>
+
   <export>
     <nodelet plugin="${prefix}/nodelets.xml" />
   </export>

@@ -1,0 +1,17 @@
+# Docker image from Docker Hub
+image: ros:kinetic
+
+pipelines:
+  default:
+    - step:
+        script:
+          - mkdir -p /tmp/src/repo && mv `pwd`/* /tmp/src/repo && mv /tmp/src `pwd`  # Move everything into the src directory
+          - source `find /opt/ros -name setup.bash | sort | head -1` && echo $ROS_DISTRO # Source ROS environment
+          - echo "yaml http://packages.dataspeedinc.com/ros/ros-public-$ROS_DISTRO.yaml $ROS_DISTRO" > /etc/ros/rosdep/sources.list.d/30-dataspeed-public-$ROS_DISTRO.list
+          - echo "deb [ arch=amd64 ] http://packages.dataspeedinc.com/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-dataspeed-public.list
+          - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F84AE1EB71A8AC108087DCAF677210FF6D3CDA
+          - apt update && rosdep update && rosdep install --from-paths src --ignore-src -y # Install dependencies missing from the docker image
+          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
+          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --make-args tests
+          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --make-args run_tests
+          - catkin_test_results build_isolated

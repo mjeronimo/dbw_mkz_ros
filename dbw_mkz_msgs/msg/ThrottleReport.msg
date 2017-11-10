@@ -1,7 +1,7 @@
 Header header
 
 # Throttle pedal
-# Unitless, range 0.15 to 0.50
+# Unitless, range 0.15 to 0.80
 float32 pedal_input
 float32 pedal_cmd
 float32 pedal_output

@@ -58,7 +58,6 @@ TwistControllerNode::TwistControllerNode(ros::NodeHandle &n, ros::NodeHandle &pn
   pn.getParam("steering_ratio", steering_ratio_);
   yaw_control_.setWheelBase(acker_wheelbase_);
   yaw_control_.setSteeringRatio(steering_ratio_);
-  yaw_control_.setSpeedMin(mphToMps(4.0));
 
   // Subscribers
   sub_twist_ = n.subscribe("cmd_vel", 1, &TwistControllerNode::recvTwist, this);
@@ -104,13 +103,9 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
   );
   double accel_cmd = speed_pid_.step(vel_error, control_period_);
 
-  const double MIN_SPEED = mphToMps(5.0);
   if (cmd_vel_.twist.linear.x <= (double)1e-2) {
     accel_cmd = std::min(accel_cmd, -530 / vehicle_mass / cfg_.wheel_radius);
-  } else if (cmd_vel_.twist.linear.x < MIN_SPEED) {
-    cmd_vel_.twist.angular.z *= MIN_SPEED / cmd_vel_.twist.linear.x;
-    cmd_vel_.twist.linear.x = MIN_SPEED;
-  }
+  } 
 
   std_msgs::Float64 accel_cmd_msg;
   accel_cmd_msg.data = accel_cmd;
@@ -132,7 +127,7 @@ void TwistControllerNode::controlCallback(const ros::TimerEvent& event)
 
     brake_cmd.enable = true;
     brake_cmd.pedal_cmd_type = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE;
-    if ((accel_cmd < -cfg_.brake_deadband) || (cmd_vel_.twist.linear.x < MIN_SPEED)) {
+    if ((accel_cmd < -cfg_.brake_deadband) ){
       brake_cmd.pedal_cmd = -accel_cmd * vehicle_mass * cfg_.wheel_radius;
     } else {
       brake_cmd.pedal_cmd = 0;

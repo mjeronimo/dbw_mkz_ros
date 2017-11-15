@@ -41,9 +41,9 @@ namespace dbw_mkz_twist_controller {
 
 class YawControl {
 public:
-  YawControl() : lateral_accel_max_(INFINITY), steering_wheel_angle_max_(8.2) {}
+  YawControl() : lateral_accel_max_(INFINITY), steering_wheel_angle_max_(8.2), steering_ratio_(1.0), wheelbase_(1.0) {}
   YawControl(double wheelbase, double steering_ratio, double steering_wheel_angle_max = INFINITY, double lateral_accel_max = INFINITY) :
-    lateral_accel_max_(fabs(lateral_accel_max)) {}
+    lateral_accel_max_(fabs(lateral_accel_max)), steering_wheel_angle_max_(steering_wheel_angle_max), steering_ratio_(steering_ratio), wheelbase_(wheelbase) {}
   void setWheelBase(double val) { wheelbase_ = val; }
   void setSteeringRatio(double val) { steering_ratio_ = val; }
   void setLateralAccelMax(double val) { lateral_accel_max_ = fabs(val); }

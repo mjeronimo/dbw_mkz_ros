@@ -21,4 +21,19 @@
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
 
+  <exec_depend>rosbag_migration_rule</exec_depend>
+
+  <export>
+    <rosbag_migration_rule rule_file="bmr/1.0.2-1.0.3/SteeringCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.5-1.0.6/BrakeCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.5-1.0.6/GearCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.5-1.0.6/SteeringCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.5-1.0.6/ThrottleCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.6-1.0.7/BrakeReport.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.6-1.0.7/GearReport.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.6-1.0.7/Misc1Report.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.6-1.0.7/SteeringReport.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.0.6-1.0.7/ThrottleReport.bmr"/>
+  </export>
+
 </package>

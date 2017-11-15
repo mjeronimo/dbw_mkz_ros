@@ -48,25 +48,13 @@ public:
   void setSteeringRatio(double val) { steering_ratio_ = val; }
   void setLateralAccelMax(double val) { lateral_accel_max_ = fabs(val); }
   double getSteeringWheelAngle(double cmd_vx, double cmd_wz, double speed) {
-#if 0
-    cmd_wz = fabs(cmd_vx) > 0 ? cmd_wz * speed / cmd_vx : 0.0;
-    if (fabs(speed) > 0.1) {
-      double max_yaw_rate = fabs(lateral_accel_max_ / speed);
-      if (cmd_wz > max_yaw_rate) {
-        cmd_wz = max_yaw_rate;
-      } else if (cmd_wz < -max_yaw_rate) {
-        cmd_wz = -max_yaw_rate;
-      }
-    }
-    return radius_control_.getSteeringWheelAngle(std::max(speed, speed_min_) / cmd_wz);
-#else
     double steering_wheel_angle;
-    if (fabsf(speed) > 0.5){ // When moving, use measured speed to compute steering angle to improve accuracy
+    if (fabsf(speed) > 0.5) { // When moving, use measured speed to compute steering angle to improve accuracy
       steering_wheel_angle = steering_ratio_ * atan(wheelbase_ * cmd_wz / speed);
-    }else{ // Use commanded speed to control radius at measured speeds below 0.5 m/s
-      if (fabsf(cmd_vx) > 0.1){
+    } else { // Use commanded speed to control radius at measured speeds below 0.5 m/s
+      if (fabsf(cmd_vx) > 0.1) {
         steering_wheel_angle = steering_ratio_ * atan(wheelbase_ * cmd_wz / cmd_vx);
-      }else{
+      } else {
         // Hits here if both measured speed and commanded speed are small;
         // set steering to zero to avoid large changes in steering command
         // due to dividing by small numbers.
@@ -74,14 +62,13 @@ public:
       }
     }
 
-    if (steering_wheel_angle > steering_wheel_angle_max_){
+    if (steering_wheel_angle > steering_wheel_angle_max_) {
       steering_wheel_angle = steering_wheel_angle_max_;
-    }else if (steering_wheel_angle < -steering_wheel_angle_max_){
+    } else if (steering_wheel_angle < -steering_wheel_angle_max_) {
       steering_wheel_angle = -steering_wheel_angle_max_;
     }
 
     return steering_wheel_angle;
-#endif
   }
 private:
   double lateral_accel_max_;

@@ -4,8 +4,8 @@ This tutorial assumes your workspace is already setup. If not, follow this [tuto
 # Download
 Download one or more bag file recordings
 
-* ~11MB [mkz_20151207](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/downloads/mkz_20151207.bag)
-* ~254MB [mkz_20151207_extra](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/downloads/mkz_20151207_extra.bag.tar.gz) (Includes Velodyne LIDAR and Oxford GPS)
+* ~5MB [mkz_20151207](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/downloads/mkz_20151207.new.bag)
+* ~316MB [mkz_20151207_extra](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/downloads/mkz_20151207_extra.new.bag) (Includes Velodyne LIDAR and Oxford GPS)
 
 # Playback
 In separate tabs, run the following:
@@ -17,3 +17,4 @@ In separate tabs, run the following:
 If using one of the recordings with 'extra' run the following to provide a tf reference for the Velodyne LIDAR:
 
 * ```rosrun tf static_transform_publisher 0.94 0 1.5 0.07 -0.02 0 base_footprint velodyne 50```
+

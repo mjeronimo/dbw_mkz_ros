@@ -1127,6 +1127,9 @@ void DbwNode::enableSystem()
       if (fault_throttle_) {
         ROS_WARN("DBW system not enabled. Throttle fault.");
       }
+      if (fault_steering_) {
+        ROS_WARN("DBW system not enabled. Steering fault.");
+      }
       if (fault_watchdog_) {
         ROS_WARN("DBW system not enabled. Watchdog fault.");
       }

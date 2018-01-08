@@ -373,16 +373,17 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
-          out.fault_boo = ptr->FLTB ? true : false;
+          out.fault_power = ptr->FLTPWR ? true : false;
           if (version_brake_ >= ModuleVersion(2,0,0)) {
             timeoutBrake(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
           pub_brake_.publish(out);
-          if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(5.0, "Brake pedal fault. Check brake pedal wiring. FLT1: %s, FLT2: %s",
-                ptr->FLT1 ? "true" : "false",
-                ptr->FLT2 ? "true" : "false");
+          if (ptr->FLT1 || ptr->FLT2 || ptr->FLTPWR) {
+            ROS_WARN_THROTTLE(5.0, "Brake fault.    FLT1: %s FLT2: %s FLTPWR: %s",
+                ptr->FLT1 ? "true, " : "false,",
+                ptr->FLT2 ? "true, " : "false,",
+                ptr->FLTPWR ? "true" : "false");
           }
         }
         break;
@@ -405,15 +406,17 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_wdc = ptr->FLTWDC ? true : false;
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
+          out.fault_power = ptr->FLTPWR ? true : false;
           if (version_throttle_ >= ModuleVersion(2,0,0)) {
             timeoutThrottle(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
           pub_throttle_.publish(out);
-          if (ptr->FLT1 || ptr->FLT2) {
-            ROS_WARN_THROTTLE(5.0, "Throttle pedal fault. Check throttle pedal wiring. FLT1: %s, FLT2: %s",
-                ptr->FLT1 ? "true" : "false",
-                ptr->FLT2 ? "true" : "false");
+          if (ptr->FLT1 || ptr->FLT2 || ptr->FLTPWR) {
+            ROS_WARN_THROTTLE(5.0, "Throttle fault. FLT1: %s FLT2: %s FLTPWR: %s",
+                ptr->FLT1 ? "true, " : "false,",
+                ptr->FLT2 ? "true, " : "false,",
+                ptr->FLTPWR ? "true" : "false");
           }
         }
         break;
@@ -437,6 +440,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_bus1 = ptr->FLTBUS1 ? true : false;
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_calibration = ptr->FLTCAL ? true : false;
+          out.fault_power = ptr->FLTPWR ? true : false;
           if (version_steering_ >= ModuleVersion(2,0,0)) {
             timeoutSteering(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
@@ -449,10 +453,11 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / steering_ratio_) / acker_wheelbase_;
           pub_twist_.publish(twist);
           publishJointStates(msg->header.stamp, NULL, &out);
-          if (ptr->FLTBUS1 || ptr->FLTBUS2) {
-            ROS_WARN_THROTTLE(5.0, "Steering fault. Check wiring. FLTBUS1: %s, FLTBUS2: %s",
-                ptr->FLTBUS1 ? "true" : "false",
-                ptr->FLTBUS2 ? "true" : "false");
+          if (ptr->FLTBUS1 || ptr->FLTBUS2 || ptr->FLTPWR) {
+            ROS_WARN_THROTTLE(5.0, "Steering fault. FLT1: %s FLT2: %s FLTPWR: %s",
+                ptr->FLTBUS1 ? "true, " : "false,",
+                ptr->FLTBUS2 ? "true, " : "false,",
+                ptr->FLTPWR  ? "true" : "false");
           } else if (ptr->FLTCAL) {
             ROS_WARN_THROTTLE(5.0, "Steering calibration fault. Drive at least 25 mph for at least 10 seconds in a straight line.");
           }

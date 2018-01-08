@@ -68,7 +68,7 @@ typedef struct {
   uint8_t FLTWDC :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
-  uint8_t FLTB :1;
+  uint8_t FLTPWR :1;
   uint8_t TMOUT :1;
 } MsgBrakeReport;
 
@@ -97,7 +97,7 @@ typedef struct {
   uint8_t FLTWDC :1;
   uint8_t FLT1 :1;
   uint8_t FLT2 :1;
-  uint8_t :1;
+  uint8_t FLTPWR :1;
   uint8_t TMOUT :1;
 } MsgThrottleReport;
 
@@ -123,7 +123,7 @@ typedef struct {
   int8_t TORQUE;
   uint8_t ENABLED :1;
   uint8_t OVERRIDE :1;
-  uint8_t :1;
+  uint8_t FLTPWR :1;
   uint8_t FLTWDC :1;
   uint8_t FLTBUS1 :1;
   uint8_t FLTBUS2 :1;

@@ -19,3 +19,4 @@ bool fault_wdc
 # Faults
 bool fault_ch1
 bool fault_ch2
+bool fault_power

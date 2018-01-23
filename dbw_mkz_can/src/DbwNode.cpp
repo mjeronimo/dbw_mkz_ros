@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2015-2017, Dataspeed Inc.
+ *  Copyright (c) 2015-2018, Dataspeed Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -1429,3 +1429,4 @@ void DbwNode::publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::Whe
 }
 
 } // namespace dbw_mkz_can
+

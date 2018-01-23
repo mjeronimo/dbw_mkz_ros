@@ -2,7 +2,7 @@
 
 # Software License Agreement (BSD License)
 #
-# Copyright (c) 2014-2016, Dataspeed Inc.
+# Copyright (c) 2014-2018, Dataspeed Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,

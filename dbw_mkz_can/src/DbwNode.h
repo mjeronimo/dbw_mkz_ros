@@ -67,36 +67,11 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 
+// Module Version class
+#include <dbw_mkz_can/ModuleVersion.h>
+
 namespace dbw_mkz_can
 {
-
-class ModuleVersion {
-public:
-  ModuleVersion() : full(0) {};
-  ModuleVersion(uint16_t major, uint16_t minor, uint16_t build) : major_(major), minor_(minor), build_(build), extra_(0) {};
-  bool operator<(const ModuleVersion& other) const { return this->full < other.full; }
-  bool operator>(const ModuleVersion& other) const { return this->full > other.full; }
-  bool operator<=(const ModuleVersion& other) const { return this->full <= other.full; }
-  bool operator>=(const ModuleVersion& other) const { return this->full >= other.full; }
-  bool operator==(const ModuleVersion& other) const { return this->full == other.full; }
-  bool operator!=(const ModuleVersion& other) const { return this->full != other.full; }
-  uint16_t major() const { return major_; }
-  uint16_t minor() const { return minor_; }
-  uint16_t build() const { return build_; }
-private:
-  union {
-    uint64_t full;
-    struct {
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-      uint16_t build_; uint16_t minor_; uint16_t major_; uint16_t extra_;
-#elif __BYTE_ORDER == __BIG_ENDIAN
-      uint16_t extra_; uint16_t major_; uint16_t minor_; uint16_t build_;
-#else
-#error Failed to determine system endianness
-#endif
-    };
-  };
-};
 
 class DbwNode
 {

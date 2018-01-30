@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Modifications to improve yaw rate tracking at low speeds
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.0.11 (2017-10-19)
 -------------------
 

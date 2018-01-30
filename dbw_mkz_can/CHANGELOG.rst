@@ -2,6 +2,17 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Moved ModuleVersion class and look-up-tables to exported header files (for use by other packages)
+* Added power fault bit to report when modules lose power
+* Added missing warning about steering fault preventing enable
+* Added roslaunch argument to set use_sim_time or not
+* Added roslaunch tests
+* Only warn once for each unknown module version
+* Contributors: Kevin Hallenbeck
+
 1.0.11 (2017-10-19)
 -------------------
 * Updated firmware versions

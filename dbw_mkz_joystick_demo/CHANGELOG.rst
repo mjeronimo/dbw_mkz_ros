@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.12 (2018-01-30)
+-------------------
 * Added argument for joystick device path
 * Added roslaunch tests
 * Contributors: Kevin Hallenbeck

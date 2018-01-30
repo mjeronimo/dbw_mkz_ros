@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.12 (2018-01-30)
+-------------------
 * Added power fault bit to report when modules lose power
 * Added bag migration rules for converting bag files with old message types
 * Contributors: Kevin Hallenbeck

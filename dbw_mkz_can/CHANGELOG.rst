@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.12 (2018-01-30)
+-------------------
 * Updated firmware versions
 * Moved ModuleVersion class and look-up-tables to exported header files (for use by other packages)
 * Added power fault bit to report when modules lose power

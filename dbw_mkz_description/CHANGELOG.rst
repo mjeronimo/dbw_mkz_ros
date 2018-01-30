@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.12 (2018-01-30)
+-------------------
 * Added roslaunch tests
 * Contributors: Kevin Hallenbeck
 

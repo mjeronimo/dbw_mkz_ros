@@ -11,7 +11,7 @@ pipelines:
           - echo "deb [ arch=amd64 ] http://packages.dataspeedinc.com/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-dataspeed-public.list
           - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F84AE1EB71A8AC108087DCAF677210FF6D3CDA
           - apt update && rosdep update && rosdep install --from-paths src --ignore-src -y # Install dependencies missing from the docker image
-          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
-          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --make-args tests
-          - catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --make-args run_tests -j1
+          - catkin_make_isolated -DCMAKE_BUILD_TYPE=Release --install
+          - catkin_make_isolated -DCMAKE_BUILD_TYPE=Release --make-args tests
+          - catkin_make_isolated -DCMAKE_BUILD_TYPE=Release --make-args run_tests -j1
           - catkin_test_results build_isolated

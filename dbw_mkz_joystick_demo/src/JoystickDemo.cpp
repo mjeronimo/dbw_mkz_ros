@@ -34,9 +34,6 @@
 
 #include "JoystickDemo.h"
 
-namespace joystick_demo
-{
-
 JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : counter_(0)
 {
   joy_.axes.resize(AXIS_COUNT, 0);
@@ -219,7 +216,5 @@ void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 
   data_.stamp = ros::Time::now();
   joy_ = *msg;
-}
-
 }
 

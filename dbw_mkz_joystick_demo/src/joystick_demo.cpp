@@ -42,8 +42,9 @@ int main(int argc, char** argv)
   ros::NodeHandle priv_nh("~");
 
   // Create JoystickDemo class
-  joystick_demo::JoystickDemo n(node, priv_nh);
+  JoystickDemo n(node, priv_nh);
 
+  // Handle callbacks until shutdown
   ros::spin();
 
   return 0;

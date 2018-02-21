@@ -45,9 +45,6 @@
 #include <dbw_mkz_msgs/GearCmd.h>
 #include <dbw_mkz_msgs/TurnSignalCmd.h>
 
-namespace joystick_demo
-{
-
 typedef struct {
   ros::Time stamp;
   float brake_joy;
@@ -107,8 +104,6 @@ private:
     AXIS_COUNT = 8,
   };
 };
-
-}
 
 #endif /* JOYSTICKDEMO_H_ */
 

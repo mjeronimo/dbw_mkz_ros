@@ -259,10 +259,10 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           overrideSteering(ptr->OVERRIDE);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
-          out.steering_wheel_angle     = (float)ptr->ANGLE * (0.1 * M_PI / 180);
-          out.steering_wheel_angle_cmd = (float)ptr->CMD   * (0.1 * M_PI / 180);
-          out.steering_wheel_torque = (float)ptr->TORQUE * 0.0625;
-          out.speed = (float)ptr->SPEED * (0.01 / 3.6);
+          out.steering_wheel_angle     = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
+          out.steering_wheel_angle_cmd = (float)ptr->CMD   * (float)(0.1 * M_PI / 180);
+          out.steering_wheel_torque = (float)ptr->TORQUE * (float)0.0625;
+          out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6);
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.fault_wdc = ptr->FLTWDC ? true : false;

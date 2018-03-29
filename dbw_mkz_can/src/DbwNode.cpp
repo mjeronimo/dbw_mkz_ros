@@ -44,6 +44,7 @@ namespace dbw_mkz_can
 static const ModuleVersion FIRMWARE_BRAKE(2,0,4);
 static const ModuleVersion FIRMWARE_THROTTLE(2,0,4);
 static const ModuleVersion FIRMWARE_STEERING(2,0,4);
+static const ModuleVersion FIRMWARE_SHIFTING(0,0,0);
 
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
@@ -609,6 +610,14 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               ROS_WARN_ONCE("Detected old steering firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
                             version_steering_.major(), version_steering_.minor(), version_steering_.build(),
                             FIRMWARE_STEERING.major(), FIRMWARE_STEERING.minor(), FIRMWARE_STEERING.build());
+            }
+          } else if (ptr->module == VERSION_SHIFT) {
+            ROS_INFO_ONCE("Detected shifting firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
+            version_shifting_ = version;
+            if (version_shifting_ < FIRMWARE_SHIFTING) {
+              ROS_WARN_ONCE("Detected old shifting firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
+                            version_shifting_.major(), version_shifting_.minor(), version_shifting_.build(),
+                            FIRMWARE_SHIFTING.major(), FIRMWARE_SHIFTING.minor(), FIRMWARE_SHIFTING.build());
             }
           } else {
             static std::map<uint8_t,ModuleVersion> list;

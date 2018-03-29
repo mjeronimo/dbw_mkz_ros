@@ -391,9 +391,10 @@ typedef struct {
 } MsgLicense;
 
 enum {
-  VERSION_BPEC = 1, // Brake
-  VERSION_TPEC = 2, // Throttle
-  VERSION_EPAS = 3, // Steering
+  VERSION_BPEC  = 1, // Brake
+  VERSION_TPEC  = 2, // Throttle
+  VERSION_EPAS  = 3, // Steering
+  VERSION_SHIFT = 4, // Shifting
 };
 typedef struct {
   uint8_t module;

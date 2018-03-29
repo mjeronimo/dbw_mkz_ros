@@ -155,6 +155,8 @@ private:
   ModuleVersion version_brake_;
   ModuleVersion version_throttle_;
   ModuleVersion version_steering_;
+  ModuleVersion version_shifting_;
+
 
   // Frame ID
   std::string frame_id_;

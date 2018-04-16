@@ -355,6 +355,8 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.btn_cc_res = ptr->btn_cc_res ? true : false;
           out.btn_cc_cncl = ptr->btn_cc_cncl ? true : false;
           out.btn_cc_res_cncl = ptr->btn_cc_res_cncl ? true : false;
+          out.btn_cc_res_inc = ptr->btn_cc_res_inc ? true : false;
+          out.btn_cc_res_dec = ptr->btn_cc_res_dec ? true : false;
           out.btn_cc_set_inc = ptr->btn_cc_set_inc ? true : false;
           out.btn_cc_set_dec = ptr->btn_cc_set_dec ? true : false;
           out.btn_cc_gap_inc = ptr->btn_cc_gap_inc ? true : false;

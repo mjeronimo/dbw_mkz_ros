@@ -158,11 +158,11 @@ typedef struct {
   uint8_t light_ambient :3;
   uint8_t btn_cc_on :1;
   uint8_t btn_cc_off :1;
-  uint8_t btn_cc_res:1;
-  uint8_t btn_cc_cncl:1;
+  uint8_t btn_cc_res :1;
+  uint8_t btn_cc_cncl :1;
   uint8_t :1;
   uint8_t btn_cc_on_off :1;
-  uint8_t btn_cc_res_cncl:1;
+  uint8_t btn_cc_res_cncl :1;
   uint8_t btn_cc_set_inc :1;
   uint8_t btn_cc_set_dec :1;
   uint8_t btn_cc_gap_inc :1;

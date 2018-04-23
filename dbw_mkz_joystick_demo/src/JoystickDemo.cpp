@@ -36,8 +36,8 @@
 
 JoystickDemo::JoystickDemo(ros::NodeHandle &node, ros::NodeHandle &priv_nh) : counter_(0)
 {
-  joy_.axes.resize(AXIS_COUNT, 0);
-  joy_.buttons.resize(BTN_COUNT, 0);
+  joy_.axes.resize(AXIS_COUNT_X, 0);
+  joy_.buttons.resize(BTN_COUNT_X, 0);
 
   ignore_ = false;
   enable_ = true;
@@ -132,12 +132,16 @@ void JoystickDemo::cmdCallback(const ros::TimerEvent& event)
 void JoystickDemo::recvJoy(const sensor_msgs::Joy::ConstPtr& msg)
 {
   // Check for expected sizes
-  if (msg->axes.size() != (size_t)AXIS_COUNT) {
-    ROS_ERROR("Expected %zu joy axis count, received %zu", (size_t)AXIS_COUNT, msg->axes.size());
-    return;
-  }
-  if (msg->buttons.size() != (size_t)BTN_COUNT) {
-    ROS_ERROR("Expected %zu joy button count, received %zu", (size_t)BTN_COUNT, msg->buttons.size());
+  if (msg->axes.size() != (size_t)AXIS_COUNT_X && msg->buttons.size() != (size_t)BTN_COUNT_X) {
+    if (msg->axes.size() == (size_t)AXIS_COUNT_D && msg->buttons.size() == (size_t)BTN_COUNT_D) {
+      ROS_ERROR_THROTTLE(2.0, "Detected Logitech Gamepad F310 in DirectInput (D) mode. Please select (X) with the switch on the back to select XInput mode.");
+    }
+    if (msg->axes.size() != (size_t)AXIS_COUNT_X) {
+      ROS_ERROR_THROTTLE(2.0, "Expected %zu joy axis count, received %zu", (size_t)AXIS_COUNT_X, msg->axes.size());
+    }
+    if (msg->buttons.size() != (size_t)BTN_COUNT_X) {
+      ROS_ERROR_THROTTLE(2.0, "Expected %zu joy button count, received %zu", (size_t)BTN_COUNT_X, msg->buttons.size());
+    }
     return;
   }
 

@@ -95,13 +95,15 @@ private:
     BTN_DISABLE = 4,
     BTN_STEER_MULT_1 = 6,
     BTN_STEER_MULT_2 = 7,
-    BTN_COUNT = 11,
+    BTN_COUNT_X = 11,
+    BTN_COUNT_D = 12,
     AXIS_THROTTLE = 5,
     AXIS_BRAKE = 2,
     AXIS_STEER_1 = 0,
     AXIS_STEER_2 = 3,
     AXIS_TURN_SIG = 6,
-    AXIS_COUNT = 8,
+    AXIS_COUNT_D = 6,
+    AXIS_COUNT_X = 8,
   };
 };
 

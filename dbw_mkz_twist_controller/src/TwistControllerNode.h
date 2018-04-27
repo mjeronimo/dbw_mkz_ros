@@ -63,6 +63,8 @@
 
 namespace dbw_mkz_twist_controller {
 
+static const double GAS_DENSITY = 2.858; // kg/gal
+
 class TwistControllerNode{
 public:
   TwistControllerNode(ros::NodeHandle &n, ros::NodeHandle &pn);
@@ -110,7 +112,6 @@ private:
   double acker_track_;
   double steering_ratio_;
 
-  static const double GAS_DENSITY = 2.858; // kg/gal
   static double mphToMps(double mph) { return mph * 0.44704; }
 };
 

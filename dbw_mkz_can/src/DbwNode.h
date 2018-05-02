@@ -157,9 +157,11 @@ private:
   ModuleVersion version_steering_;
   ModuleVersion version_shifting_;
 
-
   // Frame ID
   std::string frame_id_;
+
+  // Command warnings
+  bool warn_cmds_;
 
   // Buttons (enable/disable)
   bool buttons_;

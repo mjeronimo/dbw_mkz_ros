@@ -30,6 +30,7 @@
 
   <!-- Vehicle Interface -->
   <arg name="frame_id" default="base_footprint"/>
+  <arg name="warn_cmds" default="true"/>
   <arg name="buttons" default="true"/>
   <arg name="boo_control"   default="true"/>
   <arg name="boo_thresh_lo" default="0.20"/>
@@ -46,6 +47,7 @@
       <remap from="can_rx" to="$(arg can_ns)/can_rx"/>
       <remap from="can_tx" to="$(arg can_ns)/can_tx"/>
       <param name="frame_id" value="$(arg frame_id)" />
+      <param name="warn_cmds" value="$(arg warn_cmds)" />
       <param name="buttons" value="$(arg buttons)" />
       <param name="boo_control" value="$(arg boo_control)" />
       <param name="boo_thresh_lo" value="$(arg boo_thresh_lo)" />

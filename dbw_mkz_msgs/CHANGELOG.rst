@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.13 (2018-06-06)
+-------------------
 * Added support for the RES+ and RES- buttons
 * Contributors: Kevin Hallenbeck
 

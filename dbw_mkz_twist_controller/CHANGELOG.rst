@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.13 (2018-06-06)
+-------------------
 * Fixed compile error on ROS Melodic and Ubuntu Bionic
 * Contributors: Kevin Hallenbeck
 

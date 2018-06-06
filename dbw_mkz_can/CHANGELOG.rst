@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.13 (2018-06-06)
+-------------------
 * Updated firmware versions
 * Added option to enable/disable warnings on received command messages
 * Added support for the RES+ and RES- buttons

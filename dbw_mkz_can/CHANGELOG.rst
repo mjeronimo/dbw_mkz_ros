@@ -2,6 +2,15 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Added option to enable/disable warnings on received command messages
+* Added support for the RES+ and RES- buttons
+* Added explicit casts to float
+* Added firmware version of separate shifting module
+* Contributors: Kevin Hallenbeck
+
 1.0.12 (2018-01-30)
 -------------------
 * Updated firmware versions

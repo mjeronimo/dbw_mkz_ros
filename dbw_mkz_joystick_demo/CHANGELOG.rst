@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Warn and suggest fix for incorrect Logitech gamepad X/D switch configuration
+* Removed joystick_demo namespace
+* Contributors: Kevin Hallenbeck
+
 1.0.12 (2018-01-30)
 -------------------
 * Added argument for joystick device path

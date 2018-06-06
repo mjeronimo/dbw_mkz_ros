@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed compile error on ROS Melodic and Ubuntu Bionic
+* Contributors: Kevin Hallenbeck
+
 1.0.12 (2018-01-30)
 -------------------
 * Modifications to improve yaw rate tracking at low speeds

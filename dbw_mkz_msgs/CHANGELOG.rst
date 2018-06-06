@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added support for the RES+ and RES- buttons
+* Contributors: Kevin Hallenbeck
+
 1.0.12 (2018-01-30)
 -------------------
 * Added power fault bit to report when modules lose power

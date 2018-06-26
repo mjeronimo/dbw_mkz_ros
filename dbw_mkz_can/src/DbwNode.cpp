@@ -767,33 +767,52 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   MsgBrakeCmd *ptr = (MsgBrakeCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    float cmd = 0.0;
+    bool fwd = false;
     switch (msg->pedal_cmd_type) {
       default:
       case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_PEDAL:
-        cmd = msg->pedal_cmd;
+        ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
+        ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd * UINT16_MAX));
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_PERCENT:
-        cmd = brakePedalFromPercent(msg->pedal_cmd);
+        if (fwd) {
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PERCENT;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd * UINT16_MAX));
+        } else {
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromPercent(msg->pedal_cmd) * UINT16_MAX));
+        }
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE:
-        cmd = brakePedalFromTorque(msg->pedal_cmd);
+        if (fwd) {
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd));
+        } else {
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromTorque(msg->pedal_cmd) * UINT16_MAX));
+        }
+        break;
+      case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ:
+        ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ;
+        ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd));
         break;
     }
-    ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));
+    if (boo_control_ && fwd) {
+      ptr->ABOO = 1;
+    }
     if (msg->boo_cmd) {
       ptr->BCMD = 1;
       boo_status_ = true;
-    } else if (boo_control_) {
+    } else if (boo_control_ && (ptr->CMD_TYPE == dbw_mkz_msgs::BrakeCmd::CMD_PEDAL)) {
       if (boo_status_) {
         ptr->BCMD = 1;
       }
-      if (!boo_status_ && (cmd > boo_thresh_hi_)) {
+      if (!boo_status_ && (ptr->PCMD > (uint16_t)(boo_thresh_hi_ * UINT16_MAX))) {
         ptr->BCMD = 1;
         boo_status_ = true;
-      } else if (boo_status_ && (cmd < boo_thresh_lo_)) {
+      } else if (boo_status_ && (ptr->PCMD < (uint16_t)(boo_thresh_lo_ * UINT16_MAX))) {
         ptr->BCMD = 0;
         boo_status_ = false;
       }
@@ -821,16 +840,24 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
   MsgThrottleCmd *ptr = (MsgThrottleCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
+    bool fwd = false;
     float cmd = 0.0;
     switch (msg->pedal_cmd_type) {
       default:
       case dbw_mkz_msgs::ThrottleCmd::CMD_NONE:
         break;
       case dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL:
+        ptr->CMD_TYPE = dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL;
         cmd = msg->pedal_cmd;
         break;
       case dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT:
-        cmd = throttlePedalFromPercent(msg->pedal_cmd);
+        if (fwd) {
+          ptr->CMD_TYPE = dbw_mkz_msgs::ThrottleCmd::CMD_PERCENT;
+          cmd = msg->pedal_cmd;
+        } else {
+          ptr->CMD_TYPE = dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL;
+          cmd = throttlePedalFromPercent(msg->pedal_cmd);
+        }
         break;
     }
     ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));

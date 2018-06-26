@@ -117,7 +117,7 @@ static inline void sonarBuildPointCloud2(sensor_msgs::PointCloud2 &cloud, const 
   cloud.data.resize(cloud.row_step); // Shrink to actual size
 }
 
-} //namespace dbw_mkz_can
+} // namespace dbw_mkz_can
 
 #endif // _DBW_MKZ_CAN_SONAR_LUT_H
 

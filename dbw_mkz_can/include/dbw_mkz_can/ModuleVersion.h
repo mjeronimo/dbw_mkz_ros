@@ -76,7 +76,7 @@ private:
   };
 };
 
-} //namespace dbw_mkz_can
+} // namespace dbw_mkz_can
 
 #endif // _DBW_MKZ_CAN_MODULE_VERSION_H
 

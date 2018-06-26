@@ -460,7 +460,7 @@ enum {
   ID_VERSION                = 0x07F,
 };
 
-} //namespace dbw_mkz_can
+} // namespace dbw_mkz_can
 
 #endif // _DBW_MKZ_CAN_DISPATCH_H
 

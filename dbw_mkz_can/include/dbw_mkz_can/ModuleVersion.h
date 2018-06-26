@@ -58,6 +58,7 @@ public:
   bool operator>=(const ModuleVersion& other) const { return this->full >= other.full; }
   bool operator==(const ModuleVersion& other) const { return this->full == other.full; }
   bool operator!=(const ModuleVersion& other) const { return this->full != other.full; }
+  bool valid() const { return full != 0; }
   uint16_t major() const { return major_; }
   uint16_t minor() const { return minor_; }
   uint16_t build() const { return build_; }

@@ -35,6 +35,7 @@
 #ifndef _DBW_MKZ_CAN_SONAR_LUT_H
 #define _DBW_MKZ_CAN_SONAR_LUT_H
 #include <sensor_msgs/PointCloud2.h>
+#include <dbw_mkz_msgs/SurroundReport.h>
 
 namespace dbw_mkz_can
 {

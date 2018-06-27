@@ -21,6 +21,7 @@
   <exec_depend>robot_state_publisher</exec_depend>
 
   <test_depend>roslaunch</test_depend>
+  <test_depend>roslib</test_depend> <!-- Needed for ROS_DISTRO environment variable -->
   <test_depend>rviz</test_depend> <!-- Used to satisfy the roslaunch_add_file_check() test -->
 
 </package>

@@ -25,5 +25,6 @@
   <exec_depend>dbw_mkz_can</exec_depend>
 
   <test_depend>roslaunch</test_depend>
+  <test_depend>roslib</test_depend> <!-- Needed for ROS_DISTRO environment variable -->
 
 </package>

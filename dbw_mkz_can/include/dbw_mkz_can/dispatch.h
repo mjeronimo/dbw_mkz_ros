@@ -42,7 +42,9 @@ namespace dbw_mkz_can
 typedef struct {
   uint16_t PCMD;
   uint8_t BCMD :1;
-  uint8_t :7;
+  uint8_t ABOO :1;
+  uint8_t :2;
+  uint8_t CMD_TYPE :4;
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
@@ -74,7 +76,8 @@ typedef struct {
 
 typedef struct {
   uint16_t PCMD;
-  uint8_t :8;
+  uint8_t :4;
+  uint8_t CMD_TYPE :4;
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;

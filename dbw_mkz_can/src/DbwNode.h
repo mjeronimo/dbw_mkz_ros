@@ -166,6 +166,9 @@ private:
   // Buttons (enable/disable)
   bool buttons_;
 
+  // Pedal LUTs (local/embedded)
+  bool pedal_luts_;
+
   // Brake lights
   bool boo_status_;
   bool boo_control_;

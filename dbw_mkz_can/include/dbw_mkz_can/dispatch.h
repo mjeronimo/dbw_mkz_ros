@@ -50,7 +50,7 @@ typedef struct {
   uint8_t :8;
   uint8_t :8;
   uint8_t :8;
-  uint8_t count;
+  uint8_t COUNT;
 } MsgBrakeCmd;
 
 typedef struct {
@@ -82,7 +82,7 @@ typedef struct {
   uint8_t :8;
   uint8_t :8;
   uint8_t :8;
-  uint8_t count;
+  uint8_t COUNT;
 } MsgThrottleCmd;
 
 typedef struct {
@@ -113,7 +113,7 @@ typedef struct {
   uint8_t :8;
   uint8_t :8;
   uint8_t :8;
-  uint8_t count;
+  uint8_t COUNT;
 } MsgSteeringCmd;
 
 typedef struct {

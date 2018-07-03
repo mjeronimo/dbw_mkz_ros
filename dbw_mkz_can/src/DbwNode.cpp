@@ -91,6 +91,10 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   buttons_ = true;
   priv_nh.getParam("buttons", buttons_);
 
+  // Pedal LUTs (local/embedded)
+  pedal_luts_ = true;
+  priv_nh.getParam("pedal_luts", pedal_luts_);
+
   // Setup brake lights (BOO)
   boo_status_ = false;
   boo_control_ = true;
@@ -767,7 +771,7 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   MsgBrakeCmd *ptr = (MsgBrakeCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    bool fwd = false;
+    bool fwd = !pedal_luts_; // Forward command type, or apply pedal LUTs locally
     switch (msg->pedal_cmd_type) {
       default:
       case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
@@ -840,7 +844,7 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
   MsgThrottleCmd *ptr = (MsgThrottleCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    bool fwd = false;
+    bool fwd = !pedal_luts_; // Forward command type, or apply pedal LUTs locally
     float cmd = 0.0;
     switch (msg->pedal_cmd_type) {
       default:

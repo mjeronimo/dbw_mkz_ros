@@ -13,6 +13,11 @@ find_package(catkin REQUIRED COMPONENTS
   dbw_mkz_msgs
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS "Enabling coverage testing")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+endif()
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}

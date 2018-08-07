@@ -48,7 +48,8 @@ typedef struct {
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
-  uint8_t :5;
+  uint8_t :4;
+  uint8_t RES1 :1;
   uint8_t :8;
   uint8_t :8;
   uint8_t :8;
@@ -81,7 +82,8 @@ typedef struct {
   uint8_t EN :1;
   uint8_t CLEAR :1;
   uint8_t IGNORE :1;
-  uint8_t :5;
+  uint8_t :4;
+  uint8_t RES1 :1;
   uint8_t :8;
   uint8_t :8;
   uint8_t :8;

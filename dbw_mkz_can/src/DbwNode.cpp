@@ -640,10 +640,12 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
         break;
 
       case ID_BRAKE_CMD:
-        ROS_WARN_COND(warn_cmds_, "DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Brake. Id: 0x%03X", ID_BRAKE_CMD);
+        ROS_WARN_COND(warn_cmds_ && !((const MsgBrakeCmd*)msg->data.elems)->RES1,
+                                  "DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Brake. Id: 0x%03X", ID_BRAKE_CMD);
         break;
       case ID_THROTTLE_CMD:
-        ROS_WARN_COND(warn_cmds_, "DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Throttle. Id: 0x%03X", ID_THROTTLE_CMD);
+        ROS_WARN_COND(warn_cmds_ && !((const MsgThrottleCmd*)msg->data.elems)->RES1,
+                                  "DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Throttle. Id: 0x%03X", ID_THROTTLE_CMD);
         break;
       case ID_STEERING_CMD:
         ROS_WARN_COND(warn_cmds_, "DBW system: Another node on the CAN bus is commanding the vehicle!!! Subsystem: Steering. Id: 0x%03X", ID_STEERING_CMD);
@@ -888,7 +890,7 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
   MsgSteeringCmd *ptr = (MsgSteeringCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    ptr->SCMD = std::max((float)-4700, std::min((float)4700, (float)(msg->steering_wheel_angle_cmd * (180 / M_PI * 10))));
+    ptr->SCMD = std::max((float)-INT16_MAX, std::min((float)INT16_MAX, (float)(msg->steering_wheel_angle_cmd * (180 / M_PI * 10))));
     if (fabsf(msg->steering_wheel_angle_velocity) > 0) {
       ptr->SVEL = std::max((float)1, std::min((float)254, (float)roundf(fabsf(msg->steering_wheel_angle_velocity) * 180 / M_PI / 2)));
     }

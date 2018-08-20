@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.14 (2018-08-20)
+-------------------
 * Updated firmware versions
 * Enabled code coverage testing when built as debug
 * Increased the steering command range to +-INT16_MAX, the specific range limit is applied by the firmware

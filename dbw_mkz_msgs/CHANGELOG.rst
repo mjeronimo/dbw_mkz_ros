@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.14 (2018-08-20)
+-------------------
 * Added brake pedal CMD_TORQUE_RQ command type for closed loop brake torque request
 * Contributors: Kevin Hallenbeck
 

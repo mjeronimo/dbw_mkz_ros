@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.14 (2018-08-20)
+-------------------
 * Fixed roslaunch check failure due to rviz test dependency, but only supported in ROS distros newer than indigo
 * Contributors: Kevin Hallenbeck
 

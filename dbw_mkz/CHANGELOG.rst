@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added Ubuntu Bionic with ROS Melodic to installation script
+* Contributors: Kevin Hallenbeck
+
 1.0.13 (2018-06-06)
 -------------------
 

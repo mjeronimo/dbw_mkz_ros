@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added brake pedal CMD_TORQUE_RQ command type for closed loop brake torque request
+* Contributors: Kevin Hallenbeck
+
 1.0.13 (2018-06-06)
 -------------------
 * Added support for the RES+ and RES- buttons

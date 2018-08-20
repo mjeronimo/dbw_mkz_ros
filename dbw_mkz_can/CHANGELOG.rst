@@ -2,6 +2,21 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Enabled code coverage testing when built as debug
+* Increased the steering command range to +-INT16_MAX, the specific range limit is applied by the firmware
+* Skip warning about brake and throttle commands when the reserved bit is set
+* Match CAN messages 0x060 to 0x07F even though some are unused
+* Capitalized the COUNT field to match code style
+* Added parameter for local/embedded pedal LUTs
+* Added option to forward higher level pedal commands (percent/torque) to the embedded modules
+* Added unit tests for exported header files
+* Extracted sonar color to a separate function
+* Added missing include
+* Contributors: Kevin Hallenbeck
+
 1.0.13 (2018-06-06)
 -------------------
 * Updated firmware versions

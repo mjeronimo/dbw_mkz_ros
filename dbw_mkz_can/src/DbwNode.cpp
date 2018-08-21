@@ -41,10 +41,10 @@ namespace dbw_mkz_can
 {
 
 // Latest firmware versions
-static const ModuleVersion FIRMWARE_BRAKE(2,0,6);
-static const ModuleVersion FIRMWARE_THROTTLE(2,0,6);
-static const ModuleVersion FIRMWARE_STEERING(2,0,6);
-static const ModuleVersion FIRMWARE_SHIFTING(2,0,6);
+static const ModuleVersion FIRMWARE_BRAKE(2,0,7);
+static const ModuleVersion FIRMWARE_THROTTLE(2,0,7);
+static const ModuleVersion FIRMWARE_STEERING(2,0,7);
+static const ModuleVersion FIRMWARE_SHIFTING(2,0,7);
 
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)

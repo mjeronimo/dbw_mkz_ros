@@ -22,9 +22,9 @@ TEST(ModuleVersion, valid)
 {
   // Test zeros and ones
   EXPECT_FALSE(ModuleVersion(0,0,0).valid());
-  EXPECT_TRUE(ModuleVersion(1,0,0).valid());
-  EXPECT_TRUE(ModuleVersion(0,1,0).valid());
-  EXPECT_TRUE(ModuleVersion(0,0,1).valid());
+  EXPECT_TRUE (ModuleVersion(1,0,0).valid());
+  EXPECT_TRUE (ModuleVersion(0,1,0).valid());
+  EXPECT_TRUE (ModuleVersion(0,0,1).valid());
 
   // Test all valid values (non-zero)
   for (size_t i = 1; i <= UINT16_MAX; i++) {

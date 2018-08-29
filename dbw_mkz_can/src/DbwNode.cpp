@@ -41,10 +41,24 @@ namespace dbw_mkz_can
 {
 
 // Latest firmware versions
-static const ModuleVersion FIRMWARE_BRAKE(2,0,7);
-static const ModuleVersion FIRMWARE_THROTTLE(2,0,7);
-static const ModuleVersion FIRMWARE_STEERING(2,0,7);
-static const ModuleVersion FIRMWARE_SHIFTING(2,0,7);
+PlatformMap FIRMWARE_LATEST({
+  {PlatformVersion(P_FORD_CD4, M_BPEC,  ModuleVersion(2,0,7))},
+  {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,7))},
+  {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,0,7))},
+  {PlatformVersion(P_FORD_CD4, M_SHIFT, ModuleVersion(2,0,7))},
+  {PlatformVersion(P_FORD_P5,  M_TPEC,  ModuleVersion(0,2,0))},
+  {PlatformVersion(P_FORD_P5,  M_STEER, ModuleVersion(0,2,0))},
+  {PlatformVersion(P_FORD_P5,  M_SHIFT, ModuleVersion(0,2,0))},
+  {PlatformVersion(P_FORD_P5,  M_ABS,   ModuleVersion(0,2,0))},
+  {PlatformVersion(P_FORD_P5,  M_BOO,   ModuleVersion(0,2,0))},
+});
+
+// Minimum firmware versions required for the timeout bit
+PlatformMap FIRMWARE_TIMEOUT({
+  {PlatformVersion(P_FORD_CD4, M_BPEC,  ModuleVersion(2,0,0))},
+  {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,0))},
+  {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,0,0))},
+});
 
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
@@ -212,7 +226,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_power = ptr->FLTPWR ? true : false;
-          if (version_brake_ >= ModuleVersion(2,0,0)) {
+          if (firmware_.findPlatform(M_BPEC) >= FIRMWARE_TIMEOUT) {
             timeoutBrake(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
@@ -245,7 +259,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_ch1 = ptr->FLT1 ? true : false;
           out.fault_ch2 = ptr->FLT2 ? true : false;
           out.fault_power = ptr->FLTPWR ? true : false;
-          if (version_throttle_ >= ModuleVersion(2,0,0)) {
+          if (firmware_.findPlatform(M_TPEC) >= FIRMWARE_TIMEOUT) {
             timeoutThrottle(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
@@ -279,7 +293,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.fault_bus2 = ptr->FLTBUS2 ? true : false;
           out.fault_calibration = ptr->FLTCAL ? true : false;
           out.fault_power = ptr->FLTPWR ? true : false;
-          if (version_steering_ >= ModuleVersion(2,0,0)) {
+          if (firmware_.findPlatform(M_STEER) >= FIRMWARE_TIMEOUT) {
             timeoutSteering(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
@@ -596,44 +610,22 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
       case ID_VERSION:
         if (msg->dlc >= sizeof(MsgVersion)) {
           const MsgVersion *ptr = (const MsgVersion*)msg->data.elems;
-          const ModuleVersion version(ptr->major, ptr->minor, ptr->build);
-          if (ptr->module == VERSION_BPEC) {
-            ROS_INFO_ONCE("Detected  brake   firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
-            version_brake_ = version;
-            if (version_brake_ < FIRMWARE_BRAKE) {
-              ROS_WARN_ONCE("Detected old  brake   firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
-                            version_brake_.major(), version_brake_.minor(), version_brake_.build(),
-                            FIRMWARE_BRAKE.major(), FIRMWARE_BRAKE.minor(), FIRMWARE_BRAKE.build());
+          const PlatformVersion version((Platform)ptr->platform, (Module)ptr->module, ptr->major, ptr->minor, ptr->build);
+          const ModuleVersion latest = FIRMWARE_LATEST.findModule(version);
+          const char * str_p = platformToString(version.p);
+          const char * str_m = moduleToString(version.m);
+          if (!firmware_.findModule(version).valid()) {
+            firmware_.insert(version);
+            if (latest.valid()) {
+              ROS_INFO("Detected %s %s firmware version %u.%u.%u", str_p, str_m, ptr->major, ptr->minor, ptr->build);
+            } else {
+              ROS_WARN("Detected %s %s firmware version %u.%u.%u, which is unsupported. Platform: 0x%02X, Module: %u", str_p, str_m,
+                       ptr->major, ptr->minor, ptr->build, ptr->platform, ptr->module);
             }
-          } else if (ptr->module == VERSION_TPEC) {
-            ROS_INFO_ONCE("Detected throttle firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
-            version_throttle_ = version;
-            if (version_throttle_ < FIRMWARE_THROTTLE) {
-              ROS_WARN_ONCE("Detected old throttle firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
-                            version_throttle_.major(), version_throttle_.minor(), version_throttle_.build(),
-                            FIRMWARE_THROTTLE.major(), FIRMWARE_THROTTLE.minor(), FIRMWARE_THROTTLE.build());
-            }
-          } else if (ptr->module == VERSION_EPAS) {
-            ROS_INFO_ONCE("Detected steering firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
-            version_steering_ = version;
-            if (version_steering_ < FIRMWARE_STEERING) {
-              ROS_WARN_ONCE("Detected old steering firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
-                            version_steering_.major(), version_steering_.minor(), version_steering_.build(),
-                            FIRMWARE_STEERING.major(), FIRMWARE_STEERING.minor(), FIRMWARE_STEERING.build());
-            }
-          } else if (ptr->module == VERSION_SHIFT) {
-            ROS_INFO_ONCE("Detected shifting firmware version %u.%u.%u", ptr->major, ptr->minor, ptr->build);
-            version_shifting_ = version;
-            if (version_shifting_ < FIRMWARE_SHIFTING) {
-              ROS_WARN_ONCE("Detected old shifting firmware version %u.%u.%u, updating to %u.%u.%u is suggested.",
-                            version_shifting_.major(), version_shifting_.minor(), version_shifting_.build(),
-                            FIRMWARE_SHIFTING.major(), FIRMWARE_SHIFTING.minor(), FIRMWARE_SHIFTING.build());
-            }
-          } else {
-            static std::map<uint8_t,ModuleVersion> list;
-            if (list.find(ptr->module) == list.end()) {
-              list[ptr->module] = version;
-              ROS_WARN("Detected unknown firmware version %u.%u.%u for module %u", ptr->major, ptr->minor, ptr->build, ptr->module);
+            if (version < latest) {
+              ROS_WARN("Firmware %s %s has old  version %u.%u.%u, updating to %u.%u.%u is suggested.", str_p, str_m,
+                       version.v.major(), version.v.minor(), version.v.build(),
+                       latest.major(),  latest.minor(),  latest.build());
             }
           }
         }

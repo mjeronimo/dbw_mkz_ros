@@ -67,8 +67,8 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 
-// Module Version class
-#include <dbw_mkz_can/ModuleVersion.h>
+// Platform and module version map
+#include <dbw_mkz_can/PlatformMap.h>
 
 namespace dbw_mkz_can
 {
@@ -152,10 +152,7 @@ private:
   std::string date_;
 
   // Firmware Versions
-  ModuleVersion version_brake_;
-  ModuleVersion version_throttle_;
-  ModuleVersion version_steering_;
-  ModuleVersion version_shifting_;
+  PlatformMap firmware_;
 
   // Frame ID
   std::string frame_id_;

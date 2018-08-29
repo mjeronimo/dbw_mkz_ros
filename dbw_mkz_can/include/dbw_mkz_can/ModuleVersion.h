@@ -52,8 +52,8 @@ class ModuleVersion {
 public:
   ModuleVersion() : full(0) {};
   ModuleVersion(uint16_t major, uint16_t minor, uint16_t build) : major_(major), minor_(minor), build_(build), extra_(0) {};
-  bool operator<(const ModuleVersion& other) const { return this->full < other.full; }
-  bool operator>(const ModuleVersion& other) const { return this->full > other.full; }
+  bool operator< (const ModuleVersion& other) const { return this->full < other.full; }
+  bool operator> (const ModuleVersion& other) const { return this->full > other.full; }
   bool operator<=(const ModuleVersion& other) const { return this->full <= other.full; }
   bool operator>=(const ModuleVersion& other) const { return this->full >= other.full; }
   bool operator==(const ModuleVersion& other) const { return this->full == other.full; }

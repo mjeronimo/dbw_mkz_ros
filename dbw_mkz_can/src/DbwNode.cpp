@@ -60,6 +60,12 @@ PlatformMap FIRMWARE_TIMEOUT({
   {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,0,0))},
 });
 
+// Minimum firmware versions required for forwarding the command type
+PlatformMap FIRMWARE_CMDTYPE({
+  {PlatformVersion(P_FORD_CD4, M_BPEC,  ModuleVersion(2,0,7))},
+  {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,7))},
+});
+
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
 , sync_gps_(10, boost::bind(&DbwNode::recvCanGps, this, _1), ID_REPORT_GPS1, ID_REPORT_GPS2, ID_REPORT_GPS3)
@@ -766,6 +772,8 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
     bool fwd = !pedal_luts_; // Forward command type, or apply pedal LUTs locally
+    fwd |= firmware_.findModule(M_ABS).valid(); // The local pedal LUTs are for the BPEC module, not the ABS module
+    fwd &= firmware_.findPlatform(M_BPEC) >= FIRMWARE_CMDTYPE; // Minimum required firmware version
     switch (msg->pedal_cmd_type) {
       default:
       case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
@@ -839,6 +847,7 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
     bool fwd = !pedal_luts_; // Forward command type, or apply pedal LUTs locally
+    fwd &= firmware_.findPlatform(M_TPEC) >= FIRMWARE_CMDTYPE; // Minimum required firmware version
     float cmd = 0.0;
     switch (msg->pedal_cmd_type) {
       default:

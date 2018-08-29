@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.16 (2018-08-29)
+-------------------
 * Force compiler to use C++11
 * Handle version message with a map/database of several platform/module combinations
 * Implemented firmware version requirements for forwarding pedal command type

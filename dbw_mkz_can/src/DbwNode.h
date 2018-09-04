@@ -147,6 +147,17 @@ private:
   sensor_msgs::JointState joint_state_;
   void publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::WheelSpeedReport *wheels, const dbw_mkz_msgs::SteeringReport *steering);
 
+  // The signum function: https://stackoverflow.com/questions/1903954/
+  template <typename T> static int sgn(T val) {
+      return ((T)0 < val) - (val < (T)0);
+  }
+
+  // Sign of the wheel velocities, to be multiplied with vehicle speed
+  float speedSign() const {
+    return sgn(joint_state_.velocity[JOINT_FL]) + sgn(joint_state_.velocity[JOINT_FR]) +
+           sgn(joint_state_.velocity[JOINT_RL]) + sgn(joint_state_.velocity[JOINT_RR]) < 0 ? -1.0 : 1.0;
+  }
+
   // Licensing
   std::string vin_;
   std::string date_;

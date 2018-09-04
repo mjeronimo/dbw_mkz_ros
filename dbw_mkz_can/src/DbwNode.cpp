@@ -291,7 +291,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.steering_wheel_angle     = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
           out.steering_wheel_angle_cmd = (float)ptr->CMD   * (float)(0.1 * M_PI / 180);
           out.steering_wheel_torque = (float)ptr->TORQUE * (float)0.0625;
-          out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6);
+          out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6) * (float)speedSign();
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.fault_wdc = ptr->FLTWDC ? true : false;

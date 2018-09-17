@@ -211,7 +211,6 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->data.elems;
           faultBrakes(ptr->FLT1 && ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
-          overrideBrake(ptr->OVERRIDE);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
@@ -236,6 +235,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             timeoutBrake(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
+          overrideBrake(ptr->OVERRIDE, out.timeout);
           pub_brake_.publish(out);
           if (ptr->FLT1 || ptr->FLT2 || ptr->FLTPWR) {
             ROS_WARN_THROTTLE(5.0, "Brake fault.    FLT1: %s FLT2: %s FLTPWR: %s",
@@ -251,7 +251,6 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->data.elems;
           faultThrottle(ptr->FLT1 && ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC);
-          overrideThrottle(ptr->OVERRIDE);
           dbw_mkz_msgs::ThrottleReport out;
           out.header.stamp = msg->header.stamp;
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
@@ -269,6 +268,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             timeoutThrottle(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
+          overrideThrottle(ptr->OVERRIDE, out.timeout);
           pub_throttle_.publish(out);
           if (ptr->FLT1 || ptr->FLT2 || ptr->FLTPWR) {
             ROS_WARN_THROTTLE(5.0, "Throttle fault. FLT1: %s FLT2: %s FLTPWR: %s",
@@ -285,7 +285,6 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           faultSteering(ptr->FLTBUS1 && ptr->FLTBUS2);
           faultSteeringCal(ptr->FLTCAL);
           faultWatchdog(ptr->FLTWDC);
-          overrideSteering(ptr->OVERRIDE);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
           out.steering_wheel_angle     = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
@@ -303,6 +302,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             timeoutSteering(ptr->TMOUT, ptr->ENABLED);
             out.timeout = ptr->TMOUT ? true : false;
           }
+          overrideSteering(ptr->OVERRIDE, out.timeout);
           pub_steering_.publish(out);
           geometry_msgs::TwistStamped twist;
           twist.header.stamp = out.header.stamp;
@@ -1045,10 +1045,13 @@ void DbwNode::buttonCancel()
   }
 }
 
-void DbwNode::overrideBrake(bool override)
+void DbwNode::overrideBrake(bool override, bool timeout)
 {
   bool en = enabled();
-  if (override && en) {
+  if (en && timeout) {
+    override = false;
+  }
+  if (en && override) {
     enable_ = false;
   }
   override_brake_ = override;
@@ -1061,10 +1064,13 @@ void DbwNode::overrideBrake(bool override)
   }
 }
 
-void DbwNode::overrideThrottle(bool override)
+void DbwNode::overrideThrottle(bool override, bool timeout)
 {
   bool en = enabled();
-  if (override && en) {
+  if (en && timeout) {
+    override = false;
+  }
+  if (en && override) {
     enable_ = false;
   }
   override_throttle_ = override;
@@ -1077,10 +1083,13 @@ void DbwNode::overrideThrottle(bool override)
   }
 }
 
-void DbwNode::overrideSteering(bool override)
+void DbwNode::overrideSteering(bool override, bool timeout)
 {
   bool en = enabled();
-  if (override && en) {
+  if (en && timeout) {
+    override = false;
+  }
+  if (en && override) {
     enable_ = false;
   }
   override_steering_ = override;
@@ -1096,7 +1105,7 @@ void DbwNode::overrideSteering(bool override)
 void DbwNode::overrideGear(bool override)
 {
   bool en = enabled();
-  if (override && en) {
+  if (en && override) {
     enable_ = false;
   }
   override_gear_ = override;

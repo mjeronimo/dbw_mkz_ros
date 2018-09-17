@@ -121,9 +121,9 @@ private:
   void enableSystem();
   void disableSystem();
   void buttonCancel();
-  void overrideBrake(bool override);
-  void overrideThrottle(bool override);
-  void overrideSteering(bool override);
+  void overrideBrake(bool override, bool timeout);
+  void overrideThrottle(bool override, bool timeout);
+  void overrideSteering(bool override, bool timeout);
   void overrideGear(bool override);
   void timeoutBrake(bool timeout, bool enabled);
   void timeoutThrottle(bool timeout, bool enabled);

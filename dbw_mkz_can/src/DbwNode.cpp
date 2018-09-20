@@ -112,7 +112,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   priv_nh.getParam("buttons", buttons_);
 
   // Pedal LUTs (local/embedded)
-  pedal_luts_ = true;
+  pedal_luts_ = false;
   priv_nh.getParam("pedal_luts", pedal_luts_);
 
   // Setup brake lights (BOO)

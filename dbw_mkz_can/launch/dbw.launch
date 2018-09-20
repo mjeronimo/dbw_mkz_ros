@@ -26,7 +26,7 @@
   <arg name="frame_id" default="base_footprint"/>
   <arg name="warn_cmds" default="true"/>
   <arg name="buttons" default="true"/>
-  <arg name="pedal_luts"    default="true"/>
+  <arg name="pedal_luts"    default="false"/>
   <arg name="boo_control"   default="true"/>
   <arg name="boo_thresh_lo" default="0.20"/>
   <arg name="boo_thresh_hi" default="0.22"/>

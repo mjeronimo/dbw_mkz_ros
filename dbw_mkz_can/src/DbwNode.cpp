@@ -771,9 +771,11 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
   MsgBrakeCmd *ptr = (MsgBrakeCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
+    bool fwd_abs = firmware_.findModule(M_ABS).valid(); // Does the ABS braking module exist?
+    bool fwd_bpe = firmware_.findPlatform(M_BPEC) >= FIRMWARE_CMDTYPE; // Minimum required BPEC firmware version
     bool fwd = !pedal_luts_; // Forward command type, or apply pedal LUTs locally
-    fwd |= firmware_.findModule(M_ABS).valid(); // The local pedal LUTs are for the BPEC module, not the ABS module
-    fwd &= firmware_.findPlatform(M_BPEC) >= FIRMWARE_CMDTYPE; // Minimum required firmware version
+    fwd |= fwd_abs; // The local pedal LUTs are for the BPEC module, the ABS module requires forwarding
+    fwd &= fwd_bpe; // Only modern BPEC firmware supports forwarding the command type
     switch (msg->pedal_cmd_type) {
       default:
       case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
@@ -801,8 +803,20 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
         }
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ:
-        ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ;
-        ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd));
+        if (fwd_abs || fwd_bpe) {
+          // CMD_TORQUE_RQ must be forwarded, there is no local implementation
+          fwd = true;
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd));
+        } else if (fwd) {
+          // Fallback to forwarded CMD_TORQUE
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_TORQUE;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd));
+        } else {
+          // Fallback to local CMD_TORQUE
+          ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
+          ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromTorque(msg->pedal_cmd) * UINT16_MAX));
+        }
         break;
     }
     if (boo_control_ && fwd) {

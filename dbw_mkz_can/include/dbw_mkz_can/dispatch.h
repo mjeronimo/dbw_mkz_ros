@@ -190,6 +190,9 @@ typedef struct {
   uint8_t btn_ld_left :1;
   uint8_t btn_ld_right :1;
   uint8_t btn_cc_res_dec :1;
+  uint8_t :8;
+  uint8_t :8;
+  uint8_t outside_air_temp :8;
 } MsgMiscReport;
 
 typedef struct {
@@ -414,7 +417,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(1 == sizeof(MsgGearCmd));
   BUILD_ASSERT(2 == sizeof(MsgGearReport));
   BUILD_ASSERT(1 == sizeof(MsgTurnSignalCmd));
-  BUILD_ASSERT(5 == sizeof(MsgMiscReport));
+  BUILD_ASSERT(8 == sizeof(MsgMiscReport));
   BUILD_ASSERT(8 == sizeof(MsgReportWheelSpeed));
   BUILD_ASSERT(6 == sizeof(MsgReportAccel));
   BUILD_ASSERT(4 == sizeof(MsgReportGyro));

@@ -391,7 +391,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.btn_cc_gap_dec = ptr->btn_cc_gap_dec ? true : false;
           out.btn_la_on_off = ptr->btn_la_on_off ? true : false;
           out.fault_bus = ptr->FLTBUS ? true : false;
-          if (msg->dlc >= sizeof(MsgMiscReport)) {
+          if (msg->dlc >= 5) {
             out.door_driver = ptr->door_driver ? true : false;
             out.door_passenger = ptr->door_passenger ? true : false;
             out.door_rear_left = ptr->door_rear_left ? true : false;
@@ -407,6 +407,11 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.btn_ld_down = ptr->btn_ld_down ? true : false;
             out.btn_ld_left = ptr->btn_ld_left ? true : false;
             out.btn_ld_right = ptr->btn_ld_right ? true : false;
+          }
+          if ((msg->dlc >= 8) && (ptr->outside_air_temp < 0xFE)) {
+            out.outside_temperature = ((float)ptr->outside_air_temp * (float)0.5) - (float)40;
+          } else {
+            out.outside_temperature = NAN;
           }
           pub_misc_1_.publish(out);
         }

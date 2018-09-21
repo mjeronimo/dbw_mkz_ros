@@ -620,7 +620,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const ModuleVersion latest = FIRMWARE_LATEST.findModule(version);
           const char * str_p = platformToString(version.p);
           const char * str_m = moduleToString(version.m);
-          if (!firmware_.findModule(version).valid()) {
+          if (firmware_.findModule(version) != version.v) {
             firmware_.insert(version);
             if (latest.valid()) {
               ROS_INFO("Detected %s %s firmware version %u.%u.%u", str_p, str_m, ptr->major, ptr->minor, ptr->build);

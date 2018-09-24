@@ -43,10 +43,10 @@ namespace dbw_mkz_can
 
 // Vehicle platform enumeration
 typedef enum {
-  P_FORD_CD4 = 0x00, // MKZ/Fusion/Mondeo
-  P_FORD_P5  = 0x01, // F150
-  P_FCA_RU   = 0x10, // Pacifica
-  P_FCA_KL   = 0x11, // Cherokee
+  P_FORD_CD4 = 0x00, // Lincoln MKZ, Ford Fusion/Mondeo
+  P_FORD_P5  = 0x01, // Ford F150
+  P_FCA_RU   = 0x10, // Chrysler Pacifica
+  P_FCA_WK2  = 0x11, // Jeep Grand Cherokee
 } Platform;
 
 // Module type enumeration
@@ -64,7 +64,7 @@ static const char* platformToString(Platform x) {
     case P_FORD_CD4: return "FORD_CD4";
     case P_FORD_P5:  return "FORD_P5";
     case P_FCA_RU:   return "FCA_RU";
-    case P_FCA_KL:   return "FCA_KL";
+    case P_FCA_WK2:  return "FCA_WK2";
     default:         return "UNKNOWN";
   }
 }

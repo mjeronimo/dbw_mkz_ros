@@ -209,7 +209,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
       case ID_BRAKE_REPORT:
         if (msg->dlc >= sizeof(MsgBrakeReport)) {
           const MsgBrakeReport *ptr = (const MsgBrakeReport*)msg->data.elems;
-          faultBrakes(ptr->FLT1 && ptr->FLT2);
+          faultBrakes(ptr->FLT1 || ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
@@ -249,7 +249,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
       case ID_THROTTLE_REPORT:
         if (msg->dlc >= sizeof(MsgThrottleReport)) {
           const MsgThrottleReport *ptr = (const MsgThrottleReport*)msg->data.elems;
-          faultThrottle(ptr->FLT1 && ptr->FLT2);
+          faultThrottle(ptr->FLT1 || ptr->FLT2);
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC);
           dbw_mkz_msgs::ThrottleReport out;
           out.header.stamp = msg->header.stamp;
@@ -282,7 +282,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
       case ID_STEERING_REPORT:
         if (msg->dlc >= sizeof(MsgSteeringReport)) {
           const MsgSteeringReport *ptr = (const MsgSteeringReport*)msg->data.elems;
-          faultSteering(ptr->FLTBUS1 && ptr->FLTBUS2);
+          faultSteering(ptr->FLTBUS1 || ptr->FLTBUS2);
           faultSteeringCal(ptr->FLTCAL);
           faultWatchdog(ptr->FLTWDC);
           dbw_mkz_msgs::SteeringReport out;

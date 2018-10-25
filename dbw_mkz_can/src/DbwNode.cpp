@@ -42,15 +42,15 @@ namespace dbw_mkz_can
 
 // Latest firmware versions
 PlatformMap FIRMWARE_LATEST({
-  {PlatformVersion(P_FORD_CD4, M_BPEC,  ModuleVersion(2,0,7))},
-  {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,7))},
-  {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,0,7))},
-  {PlatformVersion(P_FORD_CD4, M_SHIFT, ModuleVersion(2,0,7))},
-  {PlatformVersion(P_FORD_P5,  M_TPEC,  ModuleVersion(0,2,0))},
-  {PlatformVersion(P_FORD_P5,  M_STEER, ModuleVersion(0,2,0))},
-  {PlatformVersion(P_FORD_P5,  M_SHIFT, ModuleVersion(0,2,0))},
-  {PlatformVersion(P_FORD_P5,  M_ABS,   ModuleVersion(0,2,0))},
-  {PlatformVersion(P_FORD_P5,  M_BOO,   ModuleVersion(0,2,0))},
+  {PlatformVersion(P_FORD_CD4, M_BPEC,  ModuleVersion(2,0,8))},
+  {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,8))},
+  {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,0,8))},
+  {PlatformVersion(P_FORD_CD4, M_SHIFT, ModuleVersion(2,0,8))},
+  {PlatformVersion(P_FORD_P5,  M_TPEC,  ModuleVersion(0,2,1))},
+  {PlatformVersion(P_FORD_P5,  M_STEER, ModuleVersion(0,2,1))},
+  {PlatformVersion(P_FORD_P5,  M_SHIFT, ModuleVersion(0,2,1))},
+  {PlatformVersion(P_FORD_P5,  M_ABS,   ModuleVersion(0,2,1))},
+  {PlatformVersion(P_FORD_P5,  M_BOO,   ModuleVersion(0,2,1))},
 });
 
 // Minimum firmware versions required for the timeout bit

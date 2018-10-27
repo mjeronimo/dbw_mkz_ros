@@ -2,6 +2,22 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Updated list of platforms
+* Disengage on any fault for brake/throttle/steering (change AND to OR)
+* Added outside air temperature to Misc1Report
+* Latch firmware version on any change (previously only latched once)
+* Changed pedal_luts default from true to false (forward command type by default now)
+* Fixed handling of all the firmware/module requrements for brake command type CMD_TORQUE_RQ
+* Disregard overrides on unused subsystems using the TIMEOUT bit
+* Fixed typo in nodelets.xml of dbw_mkz_can
+* Finished unit tests of PlatformMap
+* Use sign of wheel speeds to set sign of vehicle speed, fixes issue #24
+* Set CXX_STANDARD to C++11 only when necessary
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.0.16 (2018-08-29)
 -------------------
 * Force compiler to use C++11

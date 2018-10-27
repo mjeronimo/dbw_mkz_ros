@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.16 (2018-08-29)
 -------------------
 

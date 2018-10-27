@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.17 (2018-10-27)
+-------------------
 * Added outside air temperature to Misc1Report
 * Fixed copy-paste mistake in old bag migration rule
 * Contributors: Kevin Hallenbeck

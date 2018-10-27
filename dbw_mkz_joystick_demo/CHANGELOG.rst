@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.17 (2018-10-27)
+-------------------
 * Added option to enable/disable each command topic
 * Contributors: Kevin Hallenbeck
 

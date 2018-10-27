@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.17 (2018-10-27)
+-------------------
 * Updated firmware versions
 * Updated list of platforms
 * Disengage on any fault for brake/throttle/steering (change AND to OR)

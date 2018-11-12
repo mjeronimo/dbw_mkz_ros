@@ -162,6 +162,7 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_sonar_cloud_ = node.advertise<sensor_msgs::PointCloud2>("sonar_cloud", 2);
   pub_brake_info_ = node.advertise<dbw_mkz_msgs::BrakeInfoReport>("brake_info_report", 2);
   pub_throttle_info_ = node.advertise<dbw_mkz_msgs::ThrottleInfoReport>("throttle_info_report", 2);
+  pub_driver_assist_ = node.advertise<dbw_mkz_msgs::DriverAssistReport>("driver_assist_report", 2);
   pub_imu_ = node.advertise<sensor_msgs::Imu>("imu/data_raw", 10);
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
@@ -535,6 +536,30 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.throttle_rate = (float)ptr->throttle_rate * 4e-4;
           out.engine_rpm = (float)ptr->engine_rpm * 0.25;
           pub_throttle_info_.publish(out);
+        }
+        break;
+
+      case ID_REPORT_DRIVER_ASSIST:
+        if (msg->dlc >= sizeof(MsgReportDriverAssist)) {
+          const MsgReportDriverAssist *ptr = (const MsgReportDriverAssist*)msg->data.elems;
+          dbw_mkz_msgs::DriverAssistReport out;
+          out.header.stamp = msg->header.stamp;
+          out.decel = (float)ptr->decel * (float)0.0625;
+          out.decel_src = ptr->decel_src;
+          out.fcw_available = ptr->fcw_available;
+          out.fcw_active    = ptr->fcw_active;
+          out.aeb_available = ptr->aeb_available;
+          out.aeb_precharge = ptr->aeb_precharge;
+          out.aeb_braking   = ptr->aeb_braking;
+          out.acc_enabled   = ptr->acc_enabled;
+          out.acc_braking   = ptr->acc_braking;
+          pub_driver_assist_.publish(out);
+          if (out.fcw_active) {
+            ROS_WARN_THROTTLE(5.0, "Forward collision warning activated!");
+          }
+          if (out.aeb_braking) {
+            ROS_WARN_THROTTLE(5.0, "Automatic emergency braking activated!");
+          }
         }
         break;
 

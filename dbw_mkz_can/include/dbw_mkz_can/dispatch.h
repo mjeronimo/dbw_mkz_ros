@@ -474,7 +474,7 @@ enum {
   ID_REPORT_SURROUND        = 0x073,
   ID_REPORT_BRAKE_INFO      = 0x074,
   ID_REPORT_THROTTLE_INFO   = 0x075,
-  ID_REPORT_DRIVER_ASSIST   = 0x076,
+  ID_REPORT_DRIVER_ASSIST   = 0x079,
   ID_LICENSE                = 0x07E,
   ID_VERSION                = 0x07F,
 };

@@ -29,7 +29,7 @@
   <exec_depend>roslaunch</exec_depend>
   <exec_depend>dataspeed_can_usb</exec_depend>
   <exec_depend>dbw_mkz_description</exec_depend>
-  <exec_depend>dbw_mkz_twist_controller</exec_depend>
+  <exec_depend>dataspeed_ulc_can</exec_depend>
 
   <test_depend>roslaunch</test_depend>
 

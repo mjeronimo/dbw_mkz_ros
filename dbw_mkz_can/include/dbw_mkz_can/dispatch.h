@@ -327,9 +327,9 @@ typedef struct {
   uint8_t decel :8;
   uint8_t decel_src :2;
   uint8_t :1;
-  uint8_t fcw_available :1;
+  uint8_t fcw_enabled :1;
   uint8_t fcw_active :1;
-  uint8_t aeb_available :1;
+  uint8_t aeb_enabled :1;
   uint8_t aeb_precharge :1;
   uint8_t aeb_braking :1;
   uint8_t :1;

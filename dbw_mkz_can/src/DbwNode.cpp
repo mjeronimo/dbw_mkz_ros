@@ -545,10 +545,10 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           dbw_mkz_msgs::DriverAssistReport out;
           out.header.stamp = msg->header.stamp;
           out.decel = (float)ptr->decel * (float)0.0625;
-          out.decel_src = ptr->decel_src;
-          out.fcw_available = ptr->fcw_available;
+          out.decel_src     = ptr->decel_src;
+          out.fcw_enabled   = ptr->fcw_enabled;
           out.fcw_active    = ptr->fcw_active;
-          out.aeb_available = ptr->aeb_available;
+          out.aeb_enabled   = ptr->aeb_enabled;
           out.aeb_precharge = ptr->aeb_precharge;
           out.aeb_braking   = ptr->aeb_braking;
           out.acc_enabled   = ptr->acc_enabled;

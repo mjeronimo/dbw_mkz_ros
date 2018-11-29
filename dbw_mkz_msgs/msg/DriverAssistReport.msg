@@ -10,11 +10,11 @@ uint8 DECEL_AEB=1
 uint8 DECEL_ACC=2
 
 # FCW Status
-bool fcw_available
+bool fcw_enabled
 bool fcw_active
 
 # AEB Status
-bool aeb_available
+bool aeb_enabled
 bool aeb_precharge
 bool aeb_braking
 

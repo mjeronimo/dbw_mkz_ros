@@ -115,18 +115,6 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pedal_luts_ = false;
   priv_nh.getParam("pedal_luts", pedal_luts_);
 
-  // Setup brake lights (BOO)
-  boo_status_ = false;
-  boo_control_ = true;
-  boo_thresh_lo_ = 0.20;
-  boo_thresh_hi_ = 0.22;
-  priv_nh.getParam("boo_control", boo_control_);
-  priv_nh.getParam("boo_thresh_lo", boo_thresh_lo_);
-  priv_nh.getParam("boo_thresh_hi", boo_thresh_hi_);
-  if (boo_thresh_lo_ > boo_thresh_hi_) {
-    std::swap(boo_thresh_lo_, boo_thresh_hi_);
-  }
-
   // Ackermann steering parameters
   acker_wheelbase_ = 2.8498; // 112.2 inches
   acker_track_ = 1.5824; // 62.3 inches
@@ -855,24 +843,25 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
         ptr->PCMD = std::max((float)0.0, std::min((float)10e3, msg->pedal_cmd * 1e-3f));
         break;
     }
-    if (boo_control_ && fwd) {
-      ptr->ABOO = 1;
-    }
-    if (msg->boo_cmd) {
-      ptr->BCMD = 1;
-      boo_status_ = true;
-    } else if (boo_control_ && (ptr->CMD_TYPE == dbw_mkz_msgs::BrakeCmd::CMD_PEDAL)) {
+#if 1 // Manually implement auto BOO control (brake lights) for legacy firmware
+    ptr->ABOO = 1;
+    const PlatformVersion firmware_bpec = firmware_.findPlatform(M_BPEC);
+    if (firmware_bpec.v.valid() && (firmware_bpec < FIRMWARE_CMDTYPE)) {
+      const uint16_t BOO_THRESH_LO = 0.20 * UINT16_MAX;
+      const uint16_t BOO_THRESH_HI = 0.22 * UINT16_MAX;
+      static bool boo_status_ = false;
       if (boo_status_) {
         ptr->BCMD = 1;
       }
-      if (!boo_status_ && (ptr->PCMD > (uint16_t)(boo_thresh_hi_ * UINT16_MAX))) {
+      if (!boo_status_ && (ptr->PCMD > BOO_THRESH_HI)) {
         ptr->BCMD = 1;
         boo_status_ = true;
-      } else if (boo_status_ && (ptr->PCMD < (uint16_t)(boo_thresh_lo_ * UINT16_MAX))) {
+      } else if (boo_status_ && (ptr->PCMD < BOO_THRESH_LO)) {
         ptr->BCMD = 0;
         boo_status_ = false;
       }
     }
+#endif
     if (msg->enable) {
       ptr->EN = 1;
     }

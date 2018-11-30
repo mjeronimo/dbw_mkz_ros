@@ -178,12 +178,6 @@ private:
   // Pedal LUTs (local/embedded)
   bool pedal_luts_;
 
-  // Brake lights
-  bool boo_status_;
-  bool boo_control_;
-  double boo_thresh_lo_;
-  double boo_thresh_hi_;
-
   // Ackermann steering
   double acker_wheelbase_;
   double acker_track_;

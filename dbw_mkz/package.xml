@@ -19,7 +19,6 @@
   <exec_depend>dbw_mkz_description</exec_depend>
   <exec_depend>dbw_mkz_joystick_demo</exec_depend>
   <exec_depend>dbw_mkz_msgs</exec_depend>
-  <exec_depend>dbw_mkz_twist_controller</exec_depend>
 
   <export>
     <metapackage/>

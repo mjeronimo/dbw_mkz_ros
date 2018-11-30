@@ -214,6 +214,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
+          ///@TODO: Multiplex PI/PC/PO types
           out.pedal_input  = (float)ptr->PI / UINT16_MAX;
           out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
           out.pedal_output = (float)ptr->PO / UINT16_MAX;
@@ -222,7 +223,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.torque_output = brakeTorqueFromPedal(out.pedal_output);
           out.boo_input  = ptr->BI ? true : false;
           out.boo_cmd    = ptr->BC ? true : false;
-          out.boo_output = ptr->BO ? true : false;
+          out.boo_output = ptr->BI || ptr->BC;
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;

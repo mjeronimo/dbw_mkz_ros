@@ -60,7 +60,7 @@ typedef struct {
   uint16_t PI;
   uint16_t PC;
   uint16_t PO;
-  uint8_t BO :1;
+  uint8_t BTYPE :1;
   uint8_t BC :1;
   uint8_t BI :1;
   uint8_t WDCBRK :1;

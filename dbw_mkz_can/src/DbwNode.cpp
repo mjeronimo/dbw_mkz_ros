@@ -848,6 +848,11 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
           ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromTorque(msg->pedal_cmd) * UINT16_MAX));
         }
         break;
+      case dbw_mkz_msgs::BrakeCmd::CMD_DECEL:
+        // CMD_DECEL must be forwarded, there is no local implementation
+        ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_DECEL;
+        ptr->PCMD = std::max((float)0.0, std::min((float)10e3, msg->pedal_cmd * 1e-3f));
+        break;
     }
     if (boo_control_ && fwd) {
       ptr->ABOO = 1;

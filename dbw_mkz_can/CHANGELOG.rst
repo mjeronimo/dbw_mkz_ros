@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2018-11-30)
+------------------
 * Updated firmware versions
 * Removed all BOO control options and manually implemented auto BOO control for legacy firmware (brake lights)
 * Added BTYPE (brake type) bit

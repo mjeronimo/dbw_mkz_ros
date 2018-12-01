@@ -840,7 +840,7 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
       case dbw_mkz_msgs::BrakeCmd::CMD_DECEL:
         // CMD_DECEL must be forwarded, there is no local implementation
         ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_DECEL;
-        ptr->PCMD = std::max((float)0.0, std::min((float)10e3, msg->pedal_cmd * 1e-3f));
+        ptr->PCMD = std::max((float)0.0, std::min((float)10e3, msg->pedal_cmd * 1e3f));
         break;
     }
 #if 1 // Manually implement auto BOO control (brake lights) for legacy firmware

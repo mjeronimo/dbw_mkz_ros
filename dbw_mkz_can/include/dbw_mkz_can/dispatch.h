@@ -41,8 +41,8 @@ namespace dbw_mkz_can
 
 typedef struct {
   uint16_t PCMD;
-  uint8_t BCMD :1;
-  uint8_t ABOO :1;
+  uint8_t BCMD :1; // Only for legacy firmware
+  uint8_t ABOO :1; // Only for legacy firmware
   uint8_t :2;
   uint8_t CMD_TYPE :4;
   uint8_t EN :1;
@@ -60,7 +60,7 @@ typedef struct {
   uint16_t PI;
   uint16_t PC;
   uint16_t PO;
-  uint8_t BO :1;
+  uint8_t BTYPE :1;
   uint8_t BC :1;
   uint8_t BI :1;
   uint8_t WDCBRK :1;

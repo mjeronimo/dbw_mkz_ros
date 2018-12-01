@@ -2,6 +2,13 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use the ${catkin_EXPORTED_TARGETS} macro for target dependencies
+* Removed joystick deadzone
+* Added parameters for brake and throttle gains (sanitized from 0 to 1)
+* Contributors: Kevin Hallenbeck
+
 1.0.17 (2018-10-27)
 -------------------
 * Added option to enable/disable each command topic

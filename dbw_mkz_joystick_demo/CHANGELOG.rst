@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.0 (2018-11-30)
 ------------------
 * Use the ${catkin_EXPORTED_TARGETS} macro for target dependencies

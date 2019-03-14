@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated Dataspeed logos in meshes
+* Contributors: Micho Radovnikovich
+
 1.1.1 (2019-03-01)
 ------------------
 

@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.1 (2019-03-01)
 ------------------
 * Updated firmware versions

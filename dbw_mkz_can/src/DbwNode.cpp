@@ -400,7 +400,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.btn_ld_right = ptr->btn_ld_right ? true : false;
           }
           if ((msg->dlc >= 8) && (ptr->outside_air_temp < 0xFE)) {
-            out.outside_temperature = ((float)ptr->outside_air_temp * (float)0.5) - (float)40;
+            out.outside_temperature = ((float)ptr->outside_air_temp * 0.5f) - 40.0f;
           } else {
             out.outside_temperature = NAN;
           }
@@ -413,10 +413,10 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportWheelSpeed *ptr = (const MsgReportWheelSpeed*)msg->data.elems;
           dbw_mkz_msgs::WheelSpeedReport out;
           out.header.stamp = msg->header.stamp;
-          out.front_left  = (float)ptr->front_left  * 0.01;
-          out.front_right = (float)ptr->front_right * 0.01;
-          out.rear_left   = (float)ptr->rear_left   * 0.01;
-          out.rear_right  = (float)ptr->rear_right  * 0.01;
+          out.front_left  = (float)ptr->front_left  * 0.01f;
+          out.front_right = (float)ptr->front_right * 0.01f;
+          out.rear_left   = (float)ptr->rear_left   * 0.01f;
+          out.rear_right  = (float)ptr->rear_right  * 0.01f;
           pub_wheel_speeds_.publish(out);
           publishJointStates(msg->header.stamp, &out, NULL);
         }
@@ -453,7 +453,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportFuelLevel *ptr = (const MsgReportFuelLevel*)msg->data.elems;
           dbw_mkz_msgs::FuelLevelReport out;
           out.header.stamp = msg->header.stamp;
-          out.fuel_level  = (float)ptr->fuel_level * 0.108696;
+          out.fuel_level  = (float)ptr->fuel_level * 0.108696f;
           pub_fuel_level_.publish(out);
         }
         break;
@@ -499,10 +499,10 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportBrakeInfo *ptr = (const MsgReportBrakeInfo*)msg->data.elems;
           dbw_mkz_msgs::BrakeInfoReport out;
           out.header.stamp = msg->header.stamp;
-          out.brake_torque_request = (float)ptr->brake_torque_request * 4.0;
-          out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0;
-          out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0;
-          out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035;
+          out.brake_torque_request = (float)ptr->brake_torque_request * 4.0f;
+          out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0f;
+          out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0f;
+          out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035f;
           out.hsa.status = ptr->hsa_stat;
           out.hsa.mode = ptr->hsa_mode;
           out.abs_active = ptr->abs_active ? true : false;
@@ -522,9 +522,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportThrottleInfo *ptr = (const MsgReportThrottleInfo*)msg->data.elems;
           dbw_mkz_msgs::ThrottleInfoReport out;
           out.header.stamp = msg->header.stamp;
-          out.throttle_pc = (float)ptr->throttle_pc * 1e-3;
-          out.throttle_rate = (float)ptr->throttle_rate * 4e-4;
-          out.engine_rpm = (float)ptr->engine_rpm * 0.25;
+          out.throttle_pc = (float)ptr->throttle_pc * 1e-3f;
+          out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
+          out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
           pub_throttle_info_.publish(out);
         }
         break;
@@ -534,7 +534,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportDriverAssist *ptr = (const MsgReportDriverAssist*)msg->data.elems;
           dbw_mkz_msgs::DriverAssistReport out;
           out.header.stamp = msg->header.stamp;
-          out.decel = (float)ptr->decel * (float)0.0625;
+          out.decel = (float)ptr->decel * 0.0625f;
           out.decel_src     = ptr->decel_src;
           out.fcw_enabled   = ptr->fcw_enabled;
           out.fcw_active    = ptr->fcw_active;

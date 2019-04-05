@@ -39,6 +39,8 @@
 namespace dbw_mkz_can
 {
 
+#pragma pack(push, 1) // Pack structures to a single byte
+
 typedef struct {
   uint16_t PCMD;
   uint8_t BCMD :1; // Only for legacy firmware
@@ -266,7 +268,12 @@ typedef struct {
 } MsgReportTirePressure;
 
 typedef struct {
-  int16_t fuel_level;
+  int16_t  fuel_level :11;    // 0.18696 %
+  uint8_t :3;
+  uint16_t battery_hev :10;   // 0.5 V
+  uint8_t  battery_12v :8;    // 0.0625 V
+  uint32_t odometer :24;      // 0.1 km
+  uint8_t :8;
 } MsgReportFuelLevel;
 
 typedef struct {
@@ -441,7 +448,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportGps3));
   BUILD_ASSERT(8 == sizeof(MsgReportWheelPosition));
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
-  BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
+  BUILD_ASSERT(8 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
   BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
   BUILD_ASSERT(8 == sizeof(MsgReportThrottleInfo));
@@ -478,6 +485,8 @@ enum {
   ID_LICENSE                = 0x07E,
   ID_VERSION                = 0x07F,
 };
+
+#pragma pack(pop) // Undo packing
 
 } // namespace dbw_mkz_can
 

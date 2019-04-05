@@ -449,11 +449,16 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
         break;
 
       case ID_REPORT_FUEL_LEVEL:
-        if (msg->dlc >= sizeof(MsgReportFuelLevel)) {
+        if (msg->dlc >= 2) {
           const MsgReportFuelLevel *ptr = (const MsgReportFuelLevel*)msg->data.elems;
           dbw_mkz_msgs::FuelLevelReport out;
           out.header.stamp = msg->header.stamp;
           out.fuel_level  = (float)ptr->fuel_level * 0.108696f;
+          if (msg->dlc >= sizeof(MsgReportFuelLevel)) {
+            out.battery_12v = (float)ptr->battery_12v * 0.0625f;
+            out.battery_hev = (float)ptr->battery_hev * 0.5f;
+            out.odometer = (float)ptr->odometer * 0.1f;
+          }
           pub_fuel_level_.publish(out);
         }
         break;

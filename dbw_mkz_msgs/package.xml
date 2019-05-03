@@ -40,7 +40,9 @@
     <rosbag_migration_rule rule_file="bmr/1.0.12-1.0.13/Misc1Report.bmr"/>
     <rosbag_migration_rule rule_file="bmr/1.0.16-1.0.17/Misc1Report.bmr"/>
     <rosbag_migration_rule rule_file="bmr/1.0.17-1.1.0/BrakeCmd.bmr"/>
-    <rosbag_migration_rule rule_file="bmr/1.1.2-1.1.3/FuelLevelReport.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.1.2-1.2.0/FuelLevelReport.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.1.2-1.2.0/SteeringCmd.bmr"/>
+    <rosbag_migration_rule rule_file="bmr/1.1.2-1.2.0/SteeringReport.bmr"/>
   </export>
 
 </package>

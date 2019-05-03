@@ -89,6 +89,7 @@ private:
   bool ignore_; // Ignore driver overrides
   bool enable_; // Use enable and disable buttons
   bool count_; // Increment counter to enable watchdog
+  bool strq_; // Steering torque command (otherwise angle)
   float svel_; // Steering command speed
 
   // Variables
@@ -96,6 +97,7 @@ private:
   JoystickDataStruct data_;
   sensor_msgs::Joy joy_;
   uint8_t counter_;
+  float last_steering_filt_output_;
 
   enum {
     BTN_PARK = 3,

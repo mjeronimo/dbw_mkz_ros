@@ -115,7 +115,8 @@ typedef struct {
   uint8_t IGNORE :1;
   uint8_t :1;
   uint8_t QUIET :1;
-  uint8_t :3;
+  uint8_t :2;
+  uint8_t CMD_TYPE :1;
   uint8_t SVEL;
   uint8_t :8;
   uint8_t :8;
@@ -125,7 +126,8 @@ typedef struct {
 
 typedef struct {
   int16_t ANGLE;
-  int16_t CMD;
+  int16_t CMD :15;
+  uint8_t TMODE :1; // Torque mode
   uint16_t SPEED;
   int8_t TORQUE;
   uint8_t ENABLED :1;

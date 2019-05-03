@@ -72,6 +72,12 @@ PlatformMap FIRMWARE_CMDTYPE({
   {PlatformVersion(P_FORD_CD4, M_TPEC,  ModuleVersion(2,0,7))},
 });
 
+// Minimum firmware versions required for using the new SVEL resolution of 4 deg/s
+PlatformMap FIRMWARE_HIGH_RATE_LIMIT({
+  {PlatformVersion(P_FORD_CD4, M_STEER, ModuleVersion(2,2,0))},
+  {PlatformVersion(P_FORD_P5,  M_STEER, ModuleVersion(1,1,0))},
+});
+
 DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 : sync_imu_(10, boost::bind(&DbwNode::recvCanImu, this, _1), ID_REPORT_ACCEL, ID_REPORT_GYRO)
 , sync_gps_(10, boost::bind(&DbwNode::recvCanGps, this, _1), ID_REPORT_GPS1, ID_REPORT_GPS2, ID_REPORT_GPS3)
@@ -285,7 +291,12 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
           out.steering_wheel_angle     = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
-          out.steering_wheel_angle_cmd = (float)ptr->CMD   * (float)(0.1 * M_PI / 180);
+          out.steering_wheel_cmd_type = ptr->TMODE ? dbw_mkz_msgs::SteeringReport::CMD_TORQUE : dbw_mkz_msgs::SteeringReport::CMD_ANGLE;
+          if (out.steering_wheel_cmd_type == dbw_mkz_msgs::SteeringReport::CMD_ANGLE) {
+            out.steering_wheel_cmd = (float)ptr->CMD * (float)(0.1 * M_PI / 180);
+          } else {
+            out.steering_wheel_cmd = (float)ptr->CMD / 128.0f;
+          }
           out.steering_wheel_torque = (float)ptr->TORQUE * (float)0.0625;
           out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6) * (float)speedSign();
           out.enabled = ptr->ENABLED ? true : false;
@@ -808,12 +819,14 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
     fwd |= fwd_abs; // The local pedal LUTs are for the BPEC module, the ABS module requires forwarding
     fwd &= fwd_bpe; // Only modern BPEC firmware supports forwarding the command type
     switch (msg->pedal_cmd_type) {
-      default:
       case dbw_mkz_msgs::BrakeCmd::CMD_NONE:
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_PEDAL:
         ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
         ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, msg->pedal_cmd * UINT16_MAX));
+        if (!firmware_.findModule(M_BPEC).valid() && firmware_.findModule(M_ABS).valid()) {
+          ROS_WARN_THROTTLE(1.0, "Module ABS does not support brake command type PEDAL");
+        }
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_PERCENT:
         if (fwd) {
@@ -832,6 +845,9 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
           ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
           ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromTorque(msg->pedal_cmd) * UINT16_MAX));
         }
+        if (!firmware_.findModule(M_BPEC).valid() && firmware_.findModule(M_ABS).valid()) {
+          ROS_WARN_THROTTLE(1.0, "Module ABS does not support brake command type TORQUE");
+        }
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_TORQUE_RQ:
         if (fwd_abs || fwd_bpe) {
@@ -848,11 +864,20 @@ void DbwNode::recvBrakeCmd(const dbw_mkz_msgs::BrakeCmd::ConstPtr& msg)
           ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_PEDAL;
           ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, brakePedalFromTorque(msg->pedal_cmd) * UINT16_MAX));
         }
+        if (!firmware_.findModule(M_BPEC).valid() && firmware_.findModule(M_ABS).valid()) {
+          ROS_WARN_THROTTLE(1.0, "Module ABS does not support brake command type TORQUE_RQ");
+        }
         break;
       case dbw_mkz_msgs::BrakeCmd::CMD_DECEL:
         // CMD_DECEL must be forwarded, there is no local implementation
         ptr->CMD_TYPE = dbw_mkz_msgs::BrakeCmd::CMD_DECEL;
         ptr->PCMD = std::max((float)0.0, std::min((float)10e3, msg->pedal_cmd * 1e3f));
+        if (!firmware_.findModule(M_ABS).valid() && firmware_.findModule(M_BPEC).valid()) {
+          ROS_WARN_THROTTLE(1.0, "Module BPEC does not support brake command type DECEL");
+        }
+        break;
+      default:
+        ROS_WARN("Unknown brake command type: %u", msg->pedal_cmd_type);
         break;
     }
 #if 1 // Manually implement auto BOO control (brake lights) for legacy firmware
@@ -901,7 +926,6 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
     fwd &= firmware_.findPlatform(M_TPEC) >= FIRMWARE_CMDTYPE; // Minimum required firmware version
     float cmd = 0.0;
     switch (msg->pedal_cmd_type) {
-      default:
       case dbw_mkz_msgs::ThrottleCmd::CMD_NONE:
         break;
       case dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL:
@@ -916,6 +940,9 @@ void DbwNode::recvThrottleCmd(const dbw_mkz_msgs::ThrottleCmd::ConstPtr& msg)
           ptr->CMD_TYPE = dbw_mkz_msgs::ThrottleCmd::CMD_PEDAL;
           cmd = throttlePedalFromPercent(msg->pedal_cmd);
         }
+        break;
+      default:
+        ROS_WARN("Unknown throttle command type: %u", msg->pedal_cmd_type);
         break;
     }
     ptr->PCMD = std::max((float)0.0, std::min((float)UINT16_MAX, cmd * UINT16_MAX));
@@ -942,9 +969,28 @@ void DbwNode::recvSteeringCmd(const dbw_mkz_msgs::SteeringCmd::ConstPtr& msg)
   MsgSteeringCmd *ptr = (MsgSteeringCmd*)out.data.elems;
   memset(ptr, 0x00, sizeof(*ptr));
   if (enabled()) {
-    ptr->SCMD = std::max((float)-INT16_MAX, std::min((float)INT16_MAX, (float)(msg->steering_wheel_angle_cmd * (180 / M_PI * 10))));
-    if (fabsf(msg->steering_wheel_angle_velocity) > 0) {
-      ptr->SVEL = std::max((float)1, std::min((float)254, (float)roundf(fabsf(msg->steering_wheel_angle_velocity) * 180 / M_PI / 2)));
+    switch (msg->cmd_type) {
+      case dbw_mkz_msgs::SteeringCmd::CMD_ANGLE:
+        ptr->SCMD = std::max((float)-INT16_MAX, std::min((float)INT16_MAX, (float)(msg->steering_wheel_angle_cmd * (180 / M_PI * 10))));
+        if (fabsf(msg->steering_wheel_angle_velocity) > 0) {
+          if (firmware_.findModule(M_EPS).valid() || (firmware_.findPlatform(M_STEER) >= FIRMWARE_HIGH_RATE_LIMIT)) {
+            ptr->SVEL = std::max((float)1, std::min((float)254, (float)roundf(fabsf(msg->steering_wheel_angle_velocity) * 180 / M_PI / 4)));
+          } else {
+            ptr->SVEL = std::max((float)1, std::min((float)254, (float)roundf(fabsf(msg->steering_wheel_angle_velocity) * 180 / M_PI / 2)));
+          }
+        }
+        ptr->CMD_TYPE = dbw_mkz_msgs::SteeringCmd::CMD_ANGLE;
+        break;
+      case dbw_mkz_msgs::SteeringCmd::CMD_TORQUE:
+        ptr->SCMD = std::max((float)-INT16_MAX, std::min((float)INT16_MAX, (float)(msg->steering_wheel_torque_cmd * 128)));
+        ptr->CMD_TYPE = dbw_mkz_msgs::SteeringCmd::CMD_TORQUE;
+        if (!firmware_.findModule(M_EPS).valid() && firmware_.findModule(M_STEER).valid()) {
+          ROS_WARN_THROTTLE(1.0, "Module STEER does not support steering command type TORQUE");
+        }
+        break;
+      default:
+        ROS_WARN("Unknown steering command type: %u", msg->cmd_type);
+        break;
     }
     if (msg->enable) {
       ptr->EN = 1;

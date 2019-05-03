@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2015-2018, Dataspeed Inc.
+ *  Copyright (c) 2015-2019, Dataspeed Inc.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,8 @@
 
 namespace dbw_mkz_can
 {
+
+#pragma pack(push, 1) // Pack structures to a single byte
 
 typedef struct {
   uint16_t PCMD;
@@ -113,7 +115,8 @@ typedef struct {
   uint8_t IGNORE :1;
   uint8_t :1;
   uint8_t QUIET :1;
-  uint8_t :3;
+  uint8_t :2;
+  uint8_t CMD_TYPE :1;
   uint8_t SVEL;
   uint8_t :8;
   uint8_t :8;
@@ -123,7 +126,8 @@ typedef struct {
 
 typedef struct {
   int16_t ANGLE;
-  int16_t CMD;
+  int16_t CMD :15;
+  uint8_t TMODE :1; // Torque mode
   uint16_t SPEED;
   int8_t TORQUE;
   uint8_t ENABLED :1;
@@ -266,7 +270,12 @@ typedef struct {
 } MsgReportTirePressure;
 
 typedef struct {
-  int16_t fuel_level;
+  int16_t  fuel_level :11;    // 0.18696 %
+  uint8_t :3;
+  uint16_t battery_hev :10;   // 0.5 V
+  uint8_t  battery_12v :8;    // 0.0625 V
+  uint32_t odometer :24;      // 0.1 km
+  uint8_t :8;
 } MsgReportFuelLevel;
 
 typedef struct {
@@ -441,7 +450,7 @@ static void dispatchAssertSizes() {
   BUILD_ASSERT(8 == sizeof(MsgReportGps3));
   BUILD_ASSERT(8 == sizeof(MsgReportWheelPosition));
   BUILD_ASSERT(8 == sizeof(MsgReportTirePressure));
-  BUILD_ASSERT(2 == sizeof(MsgReportFuelLevel));
+  BUILD_ASSERT(8 == sizeof(MsgReportFuelLevel));
   BUILD_ASSERT(8 == sizeof(MsgReportSurround));
   BUILD_ASSERT(8 == sizeof(MsgReportBrakeInfo));
   BUILD_ASSERT(8 == sizeof(MsgReportThrottleInfo));
@@ -478,6 +487,8 @@ enum {
   ID_LICENSE                = 0x07E,
   ID_VERSION                = 0x07F,
 };
+
+#pragma pack(pop) // Undo packing
 
 } // namespace dbw_mkz_can
 

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2019-05-03)
+------------------
 * Added angle/torque steering command modes (not supported on all platforms)
 * Added warnings for unknown and unsupported command types
 * Added support for firmware change that uses SVEL resolution of 4 deg/s

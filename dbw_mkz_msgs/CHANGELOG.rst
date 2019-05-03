@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2019-05-03)
+------------------
 * Added angle/torque steering command modes (not supported on all platforms)
 * Added odometer and battery voltage to fuel level report
 * Contributors: Kevin Hallenbeck

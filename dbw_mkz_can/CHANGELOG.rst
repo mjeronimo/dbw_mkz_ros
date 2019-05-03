@@ -2,6 +2,17 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added angle/torque steering command modes (not supported on all platforms)
+* Added warnings for unknown and unsupported command types
+* Added support for firmware change that uses SVEL resolution of 4 deg/s
+* Added FORD_C1 platform
+* Added script to estimate the number of wheel counts per killometer
+* Added odometer and battery voltage to fuel level report
+* Added casts to force single precision floating point math
+* Contributors: Kevin Hallenbeck
+
 1.1.2 (2019-03-14)
 ------------------
 

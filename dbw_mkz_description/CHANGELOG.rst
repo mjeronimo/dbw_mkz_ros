@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.2 (2019-03-14)
 ------------------
 * Updated Dataspeed logos in meshes

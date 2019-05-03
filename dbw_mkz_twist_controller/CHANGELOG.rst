@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_twist_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.1.2 (2019-03-14)
 ------------------
 

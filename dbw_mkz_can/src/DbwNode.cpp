@@ -525,6 +525,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0f;
           out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0f;
           out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035f;
+          out.brake_pedal_qf.value = ptr->bped_qf;
           out.hsa.status = ptr->hsa_stat;
           out.hsa.mode = ptr->hsa_mode;
           out.abs_active = ptr->abs_active ? true : false;
@@ -536,6 +537,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.parking_brake.status = ptr->parking_brake;
           out.stationary = ptr->stationary;
           pub_brake_info_.publish(out);
+          if (ptr->bped_qf != dbw_mkz_msgs::QualityFactor::OK) {
+            ROS_WARN_THROTTLE(5.0, "Brake pedal limp-home: %u", ptr->bped_qf);
+          }
         }
         break;
 
@@ -546,8 +550,12 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.header.stamp = msg->header.stamp;
           out.throttle_pc = (float)ptr->throttle_pc * 1e-3f;
           out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
+          out.throttle_pedal_qf.value = ptr->aped_qf;
           out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
           pub_throttle_info_.publish(out);
+          if (ptr->aped_qf != dbw_mkz_msgs::QualityFactor::OK) {
+            ROS_WARN_THROTTLE(5.0, "Throttle pedal limp-home: %u", ptr->aped_qf);
+          }
         }
         break;
 

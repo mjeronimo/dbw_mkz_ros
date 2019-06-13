@@ -6,3 +6,6 @@ float32 throttle_rate # Throttle pedal change per second (1/s)
 
 # Engine
 float32 engine_rpm    # Engine Speed (rpm)
+
+# Gear Num
+uint8 gear_num        # Gear Number

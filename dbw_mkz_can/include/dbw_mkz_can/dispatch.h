@@ -327,8 +327,8 @@ typedef struct {
   uint16_t throttle_pc :10;
   uint16_t :6;
   int16_t throttle_rate :8;
-  uint8_t gear_num :4;
-  uint8_t  :4;
+  uint8_t gear_num :5;
+  uint8_t  :3;
   uint16_t :8;
   uint16_t :8;
 } MsgReportThrottleInfo;

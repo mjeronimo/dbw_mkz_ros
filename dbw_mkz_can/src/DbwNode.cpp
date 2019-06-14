@@ -547,8 +547,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.throttle_pc = (float)ptr->throttle_pc * 1e-3f;
           out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
           out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
-          out.gear_num = ptr->gear_num;
-          ROS_WARN_ONCE("gear_num %d",ptr->gear_num);          
+          out.gear_num = ptr->gear_num;      
           pub_throttle_info_.publish(out);
         }
         break;

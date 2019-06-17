@@ -1,4 +1,4 @@
-uint8 gear_num
+uint8 num
 
 uint8 NONE=0
 uint8 DRIVE_D01=1

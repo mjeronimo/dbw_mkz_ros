@@ -306,31 +306,32 @@ typedef struct {
 
 typedef struct {
   uint16_t brake_torque_request :12;
-  uint16_t hsa_stat :3;
-  uint16_t stationary :1;
+  uint8_t hsa_stat :3;
+  uint8_t stationary :1;
   uint16_t brake_torque_actual :12;
-  uint16_t hsa_mode :2;
-  uint16_t parking_brake :2;
+  uint8_t hsa_mode :2;
+  uint8_t parking_brake :2;
   int16_t wheel_torque :14;
-  uint16_t :2;
+  uint8_t bped_qf :2;
   int16_t accel_over_ground_est :10;
-  uint16_t abs_active :1;
-  uint16_t abs_enabled :1;
-  uint16_t stab_active :1;
-  uint16_t stab_enabled :1;
-  uint16_t trac_active :1;
-  uint16_t trac_enabled :1;
+  uint8_t abs_active :1;
+  uint8_t abs_enabled :1;
+  uint8_t stab_active :1;
+  uint8_t stab_enabled :1;
+  uint8_t trac_active :1;
+  uint8_t trac_enabled :1;
 } MsgReportBrakeInfo;
 
 typedef struct {
   uint16_t engine_rpm :16;
   uint16_t throttle_pc :10;
-  uint16_t :6;
-  int16_t throttle_rate :8;
+  uint8_t :4;
+  uint8_t aped_qf :2;
+  int8_t throttle_rate :8;
   uint8_t gear_num :5;
   uint8_t  :3;
-  uint16_t :8;
-  uint16_t :8;
+  uint8_t :8;
+  uint8_t :8;
 } MsgReportThrottleInfo;
 
 typedef struct {

@@ -22,6 +22,7 @@ add_message_files(DIRECTORY msg FILES
   HillStartAssist.msg
   Misc1Report.msg
   ParkingBrake.msg
+  QualityFactor.msg
   SteeringCmd.msg
   SteeringReport.msg
   SurroundReport.msg

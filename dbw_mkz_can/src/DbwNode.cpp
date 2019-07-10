@@ -552,6 +552,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
           out.throttle_pedal_qf.value = ptr->aped_qf;
           out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
+          out.gear_num.num = ptr->gear_num;      
           pub_throttle_info_.publish(out);
           if (ptr->aped_qf != dbw_mkz_msgs::QualityFactor::OK) {
             ROS_WARN_THROTTLE(5.0, "Throttle pedal limp-home: %u", ptr->aped_qf);

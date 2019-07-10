@@ -7,3 +7,6 @@ QualityFactor throttle_pedal_qf # Non-zero is limp-home
 
 # Engine
 float32 engine_rpm    # Engine Speed (rpm)
+
+# Gear Num
+GearNum gear_num      # Gear Number

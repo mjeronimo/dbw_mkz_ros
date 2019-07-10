@@ -215,13 +215,27 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
-          ///@TODO: Multiplex PI/PC/PO types
-          out.pedal_input  = (float)ptr->PI / UINT16_MAX;
-          out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
-          out.pedal_output = (float)ptr->PO / UINT16_MAX;
-          out.torque_input = brakeTorqueFromPedal(out.pedal_input);
-          out.torque_cmd = brakeTorqueFromPedal(out.pedal_cmd);
-          out.torque_output = brakeTorqueFromPedal(out.pedal_output);
+          if (ptr->BTYPE == 0) {
+            // Brake pedal emulator for hybrid electric vehicles
+            out.pedal_input  = (float)ptr->PI / UINT16_MAX;
+            out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
+            out.pedal_output = (float)ptr->PO / UINT16_MAX;
+            out.torque_input  = brakeTorqueFromPedal(out.pedal_input);
+            out.torque_cmd    = brakeTorqueFromPedal(out.pedal_cmd);
+            out.torque_output = brakeTorqueFromPedal(out.pedal_output);
+            out.decel_cmd = 0;
+            out.decel_output = 0;
+          } else {
+            // ACC/AEB braking for non-hybrid vehicles
+            out.pedal_input = 0;
+            out.pedal_cmd = 0;
+            out.pedal_output = 0;
+            out.torque_input = ptr->PI;
+            out.torque_cmd = 0;
+            out.torque_output = 0;
+            out.decel_cmd    = ptr->PC * 1e-3f;
+            out.decel_output = ptr->PO * 1e-3f;
+          }
           out.boo_input  = ptr->BI ? true : false;
           out.boo_cmd    = ptr->BC ? true : false;
           out.boo_output = ptr->BI || ptr->BC;

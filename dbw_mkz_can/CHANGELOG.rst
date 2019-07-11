@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Added support for non-hybrid brake report values
+* Added gear number to throttle info message
+* Added throttle and brake limp-home statuses
+* Contributors: Kevin Hallenbeck, Sun Hwang
+
 1.2.0 (2019-05-03)
 ------------------
 * Added angle/torque steering command modes (not supported on all platforms)

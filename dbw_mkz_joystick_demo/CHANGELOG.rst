@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.0 (2019-05-03)
 ------------------
 * Added angle/torque steering command modes (not supported on all platforms)

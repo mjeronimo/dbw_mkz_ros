@@ -51,12 +51,12 @@ PlatformMap FIRMWARE_LATEST({
   {PlatformVersion(P_FORD_P5,  M_SHIFT, ModuleVersion(1,0,2))},
   {PlatformVersion(P_FORD_P5,  M_ABS,   ModuleVersion(1,0,2))},
   {PlatformVersion(P_FORD_P5,  M_BOO,   ModuleVersion(1,0,2))},
-  {PlatformVersion(P_FORD_C1,  M_TPEC,  ModuleVersion(0,0,1))},
-  {PlatformVersion(P_FORD_C1,  M_STEER, ModuleVersion(0,0,1))},
-  {PlatformVersion(P_FORD_C1,  M_SHIFT, ModuleVersion(0,0,1))},
-  {PlatformVersion(P_FORD_C1,  M_ABS,   ModuleVersion(0,0,1))},
-  {PlatformVersion(P_FORD_C1,  M_BOO,   ModuleVersion(0,0,1))},
-  {PlatformVersion(P_FORD_C1,  M_EPS,   ModuleVersion(0,0,1))},
+  {PlatformVersion(P_FORD_C1,  M_TPEC,  ModuleVersion(0,0,3))},
+  {PlatformVersion(P_FORD_C1,  M_STEER, ModuleVersion(0,0,3))},
+  {PlatformVersion(P_FORD_C1,  M_SHIFT, ModuleVersion(0,0,3))},
+  {PlatformVersion(P_FORD_C1,  M_ABS,   ModuleVersion(0,0,4))},
+  {PlatformVersion(P_FORD_C1,  M_BOO,   ModuleVersion(0,0,3))},
+  {PlatformVersion(P_FORD_C1,  M_EPS,   ModuleVersion(0,0,4))},
 });
 
 // Minimum firmware versions required for the timeout bit

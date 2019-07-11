@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.1 (2019-07-11)
+------------------
 * Updated firmware versions
 * Added support for non-hybrid brake report values
 * Added gear number to throttle info message

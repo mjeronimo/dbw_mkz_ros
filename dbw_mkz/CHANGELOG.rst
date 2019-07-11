@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.1 (2019-07-11)
+------------------
 * Updated ROS apt key
 * Contributors: Eric Myllyoja
 

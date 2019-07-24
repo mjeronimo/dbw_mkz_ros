@@ -620,17 +620,18 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
       case ID_LICENSE:
         if (msg->dlc >= sizeof(MsgLicense)) {
           const MsgLicense *ptr = (const MsgLicense*)msg->data.elems;
-          const char * str_m = moduleToString((Module)ptr->module);
+          const Module module = ptr->module ? (Module)ptr->module : M_STEER; // Legacy steering firmware reports zero for module
+          const char * str_m = moduleToString(module);
           ROS_DEBUG("LICENSE(%x,%02X,%s)", ptr->module, ptr->mux, str_m);
           if (ptr->ready) {
-            ROS_INFO_ONCE_ID(ptr->module, "Licensing: %s ready", str_m);
+            ROS_INFO_ONCE_ID(module, "Licensing: %s ready", str_m);
             if (ptr->trial) {
-              ROS_WARN_ONCE_ID(ptr->module, "Licensing: %s one or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.", str_m);
+              ROS_WARN_ONCE_ID(module, "Licensing: %s one or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.", str_m);
             }
             if (ptr->expired) {
-              ROS_WARN_ONCE_ID(ptr->module, "Licensing: %s one or more feature licenses expired due to the firmware build date", str_m);
+              ROS_WARN_ONCE_ID(module, "Licensing: %s one or more feature licenses expired due to the firmware build date", str_m);
             }
-          } else if (ptr->module == M_STEER){
+          } else if (module == M_STEER) {
             ROS_INFO_THROTTLE(10.0, "Licensing: Waiting for VIN...");
           } else {
             ROS_INFO_THROTTLE(10.0, "Licensing: Waiting for required info...");
@@ -658,7 +659,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
                           ptr->mac.addr2, ptr->mac.addr3,
                           ptr->mac.addr4, ptr->mac.addr5);
           } else if (ptr->mux == LIC_MUX_BDATE0) {
-            std::string &bdate = bdate_[ptr->module];
+            std::string &bdate = bdate_[module];
             if (bdate.size() == 0) {
               bdate.push_back(ptr->bdate0.date0);
               bdate.push_back(ptr->bdate0.date1);
@@ -668,7 +669,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               bdate.push_back(ptr->bdate0.date5);
             }
           } else if (ptr->mux == LIC_MUX_BDATE1) {
-            std::string &bdate = bdate_[ptr->module];
+            std::string &bdate = bdate_[module];
             if (bdate.size() == 6) {
               bdate.push_back(ptr->bdate1.date6);
               bdate.push_back(ptr->bdate1.date7);
@@ -708,11 +709,11 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           } else if (ptr->mux == LIC_MUX_F0) {
             const char * const NAME = "BASE"; // Base functionality
             if (ptr->license.enabled) {
-              ROS_INFO_ONCE_ID(ptr->module, "Licensing: %s feature '%s' enabled%s", str_m, NAME, ptr->license.trial ? " as a counted trial" : "");
+              ROS_INFO_ONCE_ID(module, "Licensing: %s feature '%s' enabled%s", str_m, NAME, ptr->license.trial ? " as a counted trial" : "");
             } else if (ptr->ready) {
-              ROS_WARN_ONCE_ID(ptr->module, "Licensing: %s feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", str_m, NAME);
+              ROS_WARN_ONCE_ID(module, "Licensing: %s feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", str_m, NAME);
             }
-            if (ptr->ready && (ptr->module == M_STEER) && (ptr->license.trial || !ptr->license.enabled)) {
+            if (ptr->ready && (module == M_STEER) && (ptr->license.trial || !ptr->license.enabled)) {
               ROS_INFO_ONCE("Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,
                             ptr->license.trials_used, ptr->license.trials_left);
             }

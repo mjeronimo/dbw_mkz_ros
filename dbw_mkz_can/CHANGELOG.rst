@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.2 (2019-07-24)
+------------------
 * Extend licensing to each module
 * Contributors: Kevin Hallenbeck, Sun Hwang
 

@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.1 (2019-07-11)
 ------------------
 * Added support for non-hybrid brake report values

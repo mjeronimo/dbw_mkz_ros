@@ -626,7 +626,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           if (ptr->ready) {
             ROS_INFO_ONCE_ID(module, "Licensing: %s ready", str_m);
             if (ptr->trial) {
-              ROS_WARN_ONCE_ID(module, "Licensing: %s one or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.", str_m);
+              ROS_WARN_ONCE_ID(module, "Licensing: %s one or more features licensed as a counted trial. Visit https://www.dataspeedinc.com/products/maintenance-subscription/ to request a full license.", str_m);
             }
             if (ptr->expired) {
               ROS_WARN_ONCE_ID(module, "Licensing: %s one or more feature licenses expired due to the firmware build date", str_m);
@@ -711,7 +711,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             if (ptr->license.enabled) {
               ROS_INFO_ONCE_ID(module, "Licensing: %s feature '%s' enabled%s", str_m, NAME, ptr->license.trial ? " as a counted trial" : "");
             } else if (ptr->ready) {
-              ROS_WARN_ONCE_ID(module, "Licensing: %s feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", str_m, NAME);
+              ROS_WARN_ONCE_ID(module, "Licensing: %s feature '%s' not licensed. Visit https://www.dataspeedinc.com/products/maintenance-subscription/ to request a license.", str_m, NAME);
             }
             if (ptr->ready && (module == M_STEER) && (ptr->license.trial || !ptr->license.enabled)) {
               ROS_INFO_ONCE("Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,

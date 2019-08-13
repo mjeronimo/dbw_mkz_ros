@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.3 (2019-08-13)
+------------------
 * Updated firmware versions
 * Updated website maintenance link
 * Contributors: Kevin Hallenbeck

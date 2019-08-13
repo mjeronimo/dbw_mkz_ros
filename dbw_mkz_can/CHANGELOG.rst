@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated firmware versions
+* Updated website maintenance link
+* Contributors: Kevin Hallenbeck
+
 1.2.2 (2019-07-24)
 ------------------
 * Extend licensing to each module

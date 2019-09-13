@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added argument to enable/disable CAN message filtering on DBW message range
+* Contributors: Kevin Hallenbeck
+
 1.2.3 (2019-08-13)
 ------------------
 * Updated firmware versions

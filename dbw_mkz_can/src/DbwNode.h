@@ -161,10 +161,8 @@ private:
 
   // Licensing
   std::string vin_;
-  ///@TODO: Need maps for dates because multiple of each
-  std::string bdate_; // build date
   std::string ldate_; // license date
-  std::map<uint8_t, std::string> mapbdate_;
+  std::map<uint8_t, std::string> bdate_;
 
   // Firmware Versions
   PlatformMap firmware_;

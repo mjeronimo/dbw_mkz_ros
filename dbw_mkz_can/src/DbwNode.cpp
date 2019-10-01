@@ -599,84 +599,117 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
         break;
 
       case ID_LICENSE:
-        if (msg->dlc >= sizeof(MsgLicense)) {
-          const MsgLicense *ptr = (const MsgLicense*)msg->data.elems;
-          if (ptr->ready) {
-            ROS_INFO_ONCE("DBW Licensing: Ready");
-            if (ptr->trial) {
-              ROS_WARN_ONCE("DBW Licensing: One or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.");
-            }
-            if (ptr->expired) {
-              ROS_WARN_ONCE("DBW Licensing: One or more feature licenses expired due to the firmware build date");
-            }
-          } else {
-            ROS_INFO_THROTTLE(10.0, "DBW Licensing: Waiting to resolve VIN...");
+      if (msg->dlc >= sizeof(MsgLicense)) {
+        const MsgLicense *ptr = (const MsgLicense*)msg->data.elems;
+        const char * str_m = moduleToString((Module)ptr->module);
+#if 0
+        ROS_FATAL("LICENSE(%s,%x,%02X)", str_m, ptr->module, ptr->mux);
+#endif
+        if (ptr->ready) {
+          ROS_INFO("Detected(%d) Licensing: Ready",ptr->module);
+          if (ptr->trial) {
+            ROS_WARN("Detected(%d) Licensing: One or more features licensed as a counted trial. Visit http://dataspeedinc.com/maintenance/ to request a full license.",ptr->module);
           }
-          if (ptr->mux == LIC_MUX_MAC) {
-            ROS_INFO_ONCE("Detected firmware MAC: %02X:%02X:%02X:%02X:%02X:%02X",
-                          ptr->mac.addr0, ptr->mac.addr1,
-                          ptr->mac.addr2, ptr->mac.addr3,
-                          ptr->mac.addr4, ptr->mac.addr5);
-          } else if (ptr->mux == LIC_MUX_DATE0) {
-            if (date_.size() == 0) {
-              date_.push_back(ptr->date0.date0);
-              date_.push_back(ptr->date0.date1);
-              date_.push_back(ptr->date0.date2);
-              date_.push_back(ptr->date0.date3);
-              date_.push_back(ptr->date0.date4);
-              date_.push_back(ptr->date0.date5);
-            }
-          } else if (ptr->mux == LIC_MUX_DATE1) {
-            if (date_.size() == 6) {
-              date_.push_back(ptr->date1.date6);
-              date_.push_back(ptr->date1.date7);
-              date_.push_back(ptr->date1.date8);
-              date_.push_back(ptr->date1.date9);
-              ROS_INFO("Detected firmware build date: %s", date_.c_str());
-            }
-          } else if (ptr->mux == LIC_MUX_VIN0) {
-            if (vin_.size() == 0) {
-              vin_.push_back(ptr->vin0.vin00);
-              vin_.push_back(ptr->vin0.vin01);
-              vin_.push_back(ptr->vin0.vin02);
-              vin_.push_back(ptr->vin0.vin03);
-              vin_.push_back(ptr->vin0.vin04);
-              vin_.push_back(ptr->vin0.vin05);
-            }
-          } else if (ptr->mux == LIC_MUX_VIN1) {
-            if (vin_.size() == 6) {
-              vin_.push_back(ptr->vin1.vin06);
-              vin_.push_back(ptr->vin1.vin07);
-              vin_.push_back(ptr->vin1.vin08);
-              vin_.push_back(ptr->vin1.vin09);
-              vin_.push_back(ptr->vin1.vin10);
-              vin_.push_back(ptr->vin1.vin11);
-            }
-          } else if (ptr->mux == LIC_MUX_VIN2) {
-            if (vin_.size() == 12) {
-              vin_.push_back(ptr->vin2.vin12);
-              vin_.push_back(ptr->vin2.vin13);
-              vin_.push_back(ptr->vin2.vin14);
-              vin_.push_back(ptr->vin2.vin15);
-              vin_.push_back(ptr->vin2.vin16);
-              std_msgs::String msg; msg.data = vin_;
-              pub_vin_.publish(msg);
-              ROS_INFO("Detected VIN: %s", vin_.c_str());
-            }
-          } else if (ptr->mux == LIC_MUX_F0) {
-            const char * const NAME = "BASE"; // Base functionality
-            if (ptr->license.enabled) {
-              ROS_INFO_ONCE("DBW Licensing: Feature '%s' enabled%s", NAME, ptr->license.trial ? " as a counted trial" : "");
-            } else if (ptr->ready) {
-              ROS_WARN_ONCE("DBW Licensing: Feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", NAME);
-            }
-            if (ptr->ready && (ptr->license.trial || !ptr->license.enabled)) {
-              ROS_INFO_ONCE("DBW Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,
-                            ptr->license.trials_used, ptr->license.trials_left);
-            }
+          if (ptr->expired) {
+            ROS_WARN("Detected(%d) Licensing: One or more feature licenses expired due to the firmware build date",ptr->module);
+          }
+        } else {
+          ROS_INFO_THROTTLE(10.0, "Detected(%d) Licensing: Waiting to resolve VIN...",ptr->module);
+        }
+        if (ptr->mux == LIC_MUX_LDATE0) {
+          if (ldate_.size() == 0) {
+            ldate_.push_back(ptr->ldate0.ldate0);
+            ldate_.push_back(ptr->ldate0.ldate1);
+            ldate_.push_back(ptr->ldate0.ldate2);
+            ldate_.push_back(ptr->ldate0.ldate3);
+            ldate_.push_back(ptr->ldate0.ldate4);
+            ldate_.push_back(ptr->ldate0.ldate5);
+          }
+        } else if (ptr->mux == LIC_MUX_LDATE1) {
+          if (ldate_.size() == 6) {
+            ldate_.push_back(ptr->ldate1.ldate6);
+            ldate_.push_back(ptr->ldate1.ldate7);
+            ldate_.push_back(ptr->ldate1.ldate8);
+            ldate_.push_back(ptr->ldate1.ldate9);
+            ROS_INFO("Licensing: %s license date: %s", str_m, ldate_.c_str());
+            ldate_.clear();
+          }
+        } else if (ptr->mux == LIC_MUX_MAC) {
+          ROS_INFO_ONCE("Detected firmware MAC: %02X:%02X:%02X:%02X:%02X:%02X",
+                        ptr->mac.addr0, ptr->mac.addr1,
+                        ptr->mac.addr2, ptr->mac.addr3,
+                        ptr->mac.addr4, ptr->mac.addr5);
+        } else if (ptr->mux == LIC_MUX_BDATE0) {
+            bdate_.push_back(ptr->bdate0.date0);
+            bdate_.push_back(ptr->bdate0.date1);
+            bdate_.push_back(ptr->bdate0.date2);
+            bdate_.push_back(ptr->bdate0.date3);
+            bdate_.push_back(ptr->bdate0.date4);
+            bdate_.push_back(ptr->bdate0.date5);
+            mapbdate_[ptr->module] = bdate_;
+#if 0
+            ROS_FATAL("LICENSE Firmware build date(%d, %s, %s)",ptr->module, str_m, mapbdate_[ptr->module].c_str());
+#endif
+            bdate_.clear();
+        } else if (ptr->mux == LIC_MUX_BDATE1) {
+            bdate_.push_back(ptr->bdate1.date6);
+            bdate_.push_back(ptr->bdate1.date7);
+            bdate_.push_back(ptr->bdate1.date8);
+            bdate_.push_back(ptr->bdate1.date9);
+            std::map<uint8_t, std::string>::iterator it = mapbdate_.find(ptr->module);
+            if(it->first == ptr->module)
+              mapbdate_[ptr->module] = it->second + bdate_;
+#if 0
+            ROS_FATAL("LICENSE Firmware build date(%d, %s, %s)",ptr->module, str_m, mapbdate_[ptr->module].c_str());
+#endif
+            std_msgs::String msg; msg.data = mapbdate_[ptr->module];
+            ROS_INFO("Licensing: %s firmware build date: %s", str_m, mapbdate_[ptr->module].c_str());
+            bdate_.clear();
+            mapbdate_.clear();
+        } else if (ptr->mux == LIC_MUX_VIN0) {
+          if (vin_.size() == 0) {
+            vin_.push_back(ptr->vin0.vin00);
+            vin_.push_back(ptr->vin0.vin01);
+            vin_.push_back(ptr->vin0.vin02);
+            vin_.push_back(ptr->vin0.vin03);
+            vin_.push_back(ptr->vin0.vin04);
+            vin_.push_back(ptr->vin0.vin05);
+          }
+        } else if (ptr->mux == LIC_MUX_VIN1) {
+          if (vin_.size() == 6) {
+            vin_.push_back(ptr->vin1.vin06);
+            vin_.push_back(ptr->vin1.vin07);
+            vin_.push_back(ptr->vin1.vin08);
+            vin_.push_back(ptr->vin1.vin09);
+            vin_.push_back(ptr->vin1.vin10);
+            vin_.push_back(ptr->vin1.vin11);
+          }
+        } else if (ptr->mux == LIC_MUX_VIN2) {
+          if (vin_.size() == 12) {
+            vin_.push_back(ptr->vin2.vin12);
+            vin_.push_back(ptr->vin2.vin13);
+            vin_.push_back(ptr->vin2.vin14);
+            vin_.push_back(ptr->vin2.vin15);
+            vin_.push_back(ptr->vin2.vin16);
+            std_msgs::String msg; msg.data = vin_;
+            pub_vin_.publish(msg);
+            ROS_INFO("Detected(%d) VIN: %s",ptr->module, vin_.c_str());
+            vin_.clear();
+          }
+        } else if (ptr->mux == LIC_MUX_F0) {
+          const char * const NAME = "BASE"; // Base functionality
+          if (ptr->license.enabled) {
+            ROS_WARN("Detected(%d) Licensing: Feature '%s' enabled%s", ptr->module,NAME, ptr->license.trial ? " as a counted trial" : "");
+          } else if (ptr->ready) {
+            ROS_WARN("Detected(%d) Licensing: Feature '%s' not licensed. Visit http://dataspeedinc.com/maintenance/ to request a license.", ptr->module,NAME);
+          }
+          if (ptr->ready && (ptr->license.trial || !ptr->license.enabled)) {
+            ROS_INFO_ONCE("DBW Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,
+                          ptr->license.trials_used, ptr->license.trials_left);
           }
         }
-        break;
+      }
+      break;
 
       case ID_VERSION:
         if (msg->dlc >= sizeof(MsgVersion)) {

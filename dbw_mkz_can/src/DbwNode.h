@@ -161,7 +161,8 @@ private:
 
   // Licensing
   std::string vin_;
-  std::string date_;
+  std::string ldate_; // license date
+  std::map<uint8_t, std::string> bdate_;
 
   // Firmware Versions
   PlatformMap firmware_;

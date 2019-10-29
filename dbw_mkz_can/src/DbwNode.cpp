@@ -412,6 +412,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               enableSystem();
             }
           }
+
           dbw_mkz_msgs::Misc1Report out;
           out.header.stamp = msg->header.stamp;
           out.turn_signal.value = ptr->turn_signal;
@@ -431,6 +432,18 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.btn_cc_gap_inc = ptr->btn_cc_gap_inc ? true : false;
           out.btn_cc_gap_dec = ptr->btn_cc_gap_dec ? true : false;
           out.btn_la_on_off = ptr->btn_la_on_off ? true : false;
+          out.btn_r_ok         = ptr->btn_r_ok;
+          out.btn_r_up         = ptr->btn_r_up;
+          out.btn_r_down       = ptr->btn_r_down;
+          out.btn_r_left       = ptr->btn_r_left;
+          out.btn_r_right      = ptr->btn_r_right;
+          out.btn_r_call_start = ptr->btn_r_call_start;
+          out.btn_r_call_end   = ptr->btn_r_call_end;
+          out.btn_r_speak      = ptr->btn_r_speak;
+          out.btn_r_mute       = ptr->btn_r_mute;
+          out.btn_r_vol_up     = ptr->btn_r_vol_up;
+          out.btn_r_vol_down   = ptr->btn_r_vol_down;
+
           out.fault_bus = ptr->FLTBUS ? true : false;
           if (msg->dlc >= 5) {
             out.door_driver = ptr->door_driver ? true : false;

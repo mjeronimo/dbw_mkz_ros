@@ -449,6 +449,22 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.btn_ld_left = ptr->btn_ld_left ? true : false;
             out.btn_ld_right = ptr->btn_ld_right ? true : false;
           }
+          if (msg->dlc >= 8) {
+            out.btn_rd_ok = ptr->btn_rd_ok ? true : false;
+            out.btn_rd_up = ptr->btn_rd_up ? true : false;
+            out.btn_rd_down = ptr->btn_rd_down ? true : false;
+            out.btn_rd_left = ptr->btn_rd_left ? true : false;
+            out.btn_rd_right = ptr->btn_rd_right ? true : false;
+            out.btn_vol_inc = ptr->btn_vol_inc ? true : false;
+            out.btn_vol_dec = ptr->btn_vol_dec ? true : false;
+            out.btn_mute = ptr->btn_mute ? true : false;
+            out.btn_media = ptr->btn_media ? true : false;
+            out.btn_prev = ptr->btn_prev ? true : false;
+            out.btn_next = ptr->btn_next ? true : false;
+            out.btn_speak = ptr->btn_speak ? true : false;
+            out.btn_call_start = ptr->btn_call_start ? true : false;
+            out.btn_call_end = ptr->btn_call_end ? true : false;
+          }
           if ((msg->dlc >= 8) && (ptr->outside_air_temp < 0xFE)) {
             out.outside_temperature = ((float)ptr->outside_air_temp * 0.5f) - 40.0f;
           } else {

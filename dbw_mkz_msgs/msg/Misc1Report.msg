@@ -1,4 +1,3 @@
-
 Header header
 
 # Turn Signal enumeration
@@ -35,17 +34,20 @@ bool btn_ld_up        # Left D-Pad Up
 bool btn_ld_down      # Left D-Pad Down
 bool btn_ld_left      # Left D-Pad Left
 bool btn_ld_right     # Left D-Pad Right
-bool btn_r_ok         # Steering wheel button on the right side, Ok(Center)
-bool btn_r_up         # Steering wheel button on the right side, Up
-bool btn_r_down       # Steering wheel button on the right side, Down
-bool btn_r_left       # Steering wheel button on the right side, Left
-bool btn_r_right      # Steering wheel button on the right side, Right
-bool btn_r_call_start # Steering wheel button on the right side, Call start
-bool btn_r_call_end   # Steering wheel button on the right side, Call end
-bool btn_r_speak      # Steering wheel button on the right side, Speak
-bool btn_r_mute       # Steering wheel button on the right side, Mute
-bool btn_r_vol_up     # Steering wheel button on the right side, Volume up
-bool btn_r_vol_down   # Steering wheel button on the right side, Volume down
+bool btn_rd_ok        # Right D-Pad OK
+bool btn_rd_up        # Right D-Pad Up
+bool btn_rd_down      # Right D-Pad Down
+bool btn_rd_left      # Right D-Pad Left
+bool btn_rd_right     # Right D-Pad Right
+bool btn_vol_inc      # Volume increment
+bool btn_vol_dec      # Volume decrement
+bool btn_mute         # Volume mute
+bool btn_media        # Media (source)
+bool btn_prev         # Media previous
+bool btn_next         # Media next
+bool btn_speak        # Speak
+bool btn_call_start   # Call start/answer
+bool btn_call_end     # Call end/disconnect
 
 # Faults
 bool fault_bus

@@ -2,10 +2,6 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.2.5 (2019-10-29)
-------------------
-* Added Steering wheel buttons on the right side to Misc1Report
-
 1.2.4 (2019-09-13)
 ------------------
 

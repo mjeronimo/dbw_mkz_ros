@@ -412,7 +412,6 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               enableSystem();
             }
           }
-
           dbw_mkz_msgs::Misc1Report out;
           out.header.stamp = msg->header.stamp;
           out.turn_signal.value = ptr->turn_signal;
@@ -432,18 +431,6 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           out.btn_cc_gap_inc = ptr->btn_cc_gap_inc ? true : false;
           out.btn_cc_gap_dec = ptr->btn_cc_gap_dec ? true : false;
           out.btn_la_on_off = ptr->btn_la_on_off ? true : false;
-          out.btn_r_ok         = ptr->btn_r_ok;
-          out.btn_r_up         = ptr->btn_r_up;
-          out.btn_r_down       = ptr->btn_r_down;
-          out.btn_r_left       = ptr->btn_r_left;
-          out.btn_r_right      = ptr->btn_r_right;
-          out.btn_r_call_start = ptr->btn_r_call_start;
-          out.btn_r_call_end   = ptr->btn_r_call_end;
-          out.btn_r_speak      = ptr->btn_r_speak;
-          out.btn_r_mute       = ptr->btn_r_mute;
-          out.btn_r_vol_up     = ptr->btn_r_vol_up;
-          out.btn_r_vol_down   = ptr->btn_r_vol_down;
-
           out.fault_bus = ptr->FLTBUS ? true : false;
           if (msg->dlc >= 5) {
             out.door_driver = ptr->door_driver ? true : false;
@@ -461,6 +448,22 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.btn_ld_down = ptr->btn_ld_down ? true : false;
             out.btn_ld_left = ptr->btn_ld_left ? true : false;
             out.btn_ld_right = ptr->btn_ld_right ? true : false;
+          }
+          if (msg->dlc >= 8) {
+            out.btn_rd_ok = ptr->btn_rd_ok ? true : false;
+            out.btn_rd_up = ptr->btn_rd_up ? true : false;
+            out.btn_rd_down = ptr->btn_rd_down ? true : false;
+            out.btn_rd_left = ptr->btn_rd_left ? true : false;
+            out.btn_rd_right = ptr->btn_rd_right ? true : false;
+            out.btn_vol_inc = ptr->btn_vol_inc ? true : false;
+            out.btn_vol_dec = ptr->btn_vol_dec ? true : false;
+            out.btn_mute = ptr->btn_mute ? true : false;
+            out.btn_media = ptr->btn_media ? true : false;
+            out.btn_prev = ptr->btn_prev ? true : false;
+            out.btn_next = ptr->btn_next ? true : false;
+            out.btn_speak = ptr->btn_speak ? true : false;
+            out.btn_call_start = ptr->btn_call_start ? true : false;
+            out.btn_call_end = ptr->btn_call_end ? true : false;
           }
           if ((msg->dlc >= 8) && (ptr->outside_air_temp < 0xFE)) {
             out.outside_temperature = ((float)ptr->outside_air_temp * 0.5f) - 40.0f;

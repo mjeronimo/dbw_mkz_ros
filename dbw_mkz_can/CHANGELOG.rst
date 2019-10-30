@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add steering wheel buttons in Misc1Report
+* Contributors: Kevin Hallenbeck, Sun Hwang
+
 1.2.4 (2019-09-13)
 ------------------
 * Added argument to enable/disable CAN message filtering on DBW message range

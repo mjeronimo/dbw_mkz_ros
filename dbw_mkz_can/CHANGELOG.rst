@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.5 (2019-10-30)
+------------------
 * Add steering wheel buttons in Misc1Report
 * Contributors: Kevin Hallenbeck, Sun Hwang
 

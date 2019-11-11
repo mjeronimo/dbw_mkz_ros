@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.5 (2019-10-30)
 ------------------
 * Add steering wheel buttons in Misc1Report

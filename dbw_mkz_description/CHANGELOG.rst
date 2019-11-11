@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added URDF model for F150
+* Contributors: Micho Radovnikovich
+
 1.2.5 (2019-10-30)
 ------------------
 

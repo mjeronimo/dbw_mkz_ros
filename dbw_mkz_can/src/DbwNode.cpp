@@ -107,11 +107,8 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
 , sync_gps_(10, boost::bind(&DbwNode::recvCanGps, this, _1), ID_REPORT_GPS1, ID_REPORT_GPS2, ID_REPORT_GPS3)
 {
   // Reduce synchronization delay
-  sync_imu_.setInterMessageLowerBound(0, ros::Duration(0.003)); // 10ms period
-  sync_imu_.setInterMessageLowerBound(1, ros::Duration(0.003)); // 10ms period
-  sync_gps_.setInterMessageLowerBound(0, ros::Duration(0.3)); // 1s period
-  sync_gps_.setInterMessageLowerBound(1, ros::Duration(0.3)); // 1s period
-  sync_gps_.setInterMessageLowerBound(2, ros::Duration(0.3)); // 1s period
+  sync_imu_.setInterMessageLowerBound(ros::Duration(0.003)); // 10ms period
+  sync_gps_.setInterMessageLowerBound(ros::Duration(0.3)); // 1s period
 
   // Initialize enable state machine
   prev_enable_ = true;

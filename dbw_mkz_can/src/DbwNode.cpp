@@ -325,15 +325,29 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           faultWatchdog(ptr->FLTWDC);
           dbw_mkz_msgs::SteeringReport out;
           out.header.stamp = msg->header.stamp;
-          out.steering_wheel_angle     = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
+          if ((uint16_t)ptr->ANGLE == 0x8000) {
+            out.steering_wheel_angle = NAN;
+          } else {
+            out.steering_wheel_angle = (float)ptr->ANGLE * (float)(0.1 * M_PI / 180);
+          }
           out.steering_wheel_cmd_type = ptr->TMODE ? dbw_mkz_msgs::SteeringReport::CMD_TORQUE : dbw_mkz_msgs::SteeringReport::CMD_ANGLE;
-          if (out.steering_wheel_cmd_type == dbw_mkz_msgs::SteeringReport::CMD_ANGLE) {
+          if ((uint16_t)ptr->CMD == 0xC000) {
+            out.steering_wheel_cmd = NAN;
+          } else if (out.steering_wheel_cmd_type == dbw_mkz_msgs::SteeringReport::CMD_ANGLE) {
             out.steering_wheel_cmd = (float)ptr->CMD * (float)(0.1 * M_PI / 180);
           } else {
             out.steering_wheel_cmd = (float)ptr->CMD / 128.0f;
           }
-          out.steering_wheel_torque = (float)ptr->TORQUE * (float)0.0625;
-          out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6) * (float)speedSign();
+          if ((uint8_t)ptr->TORQUE == 0x80) {
+            out.steering_wheel_torque = NAN;
+          } else {
+            out.steering_wheel_torque = (float)ptr->TORQUE * (float)0.0625;
+          }
+          if (ptr->SPEED == 0xFFFF) {
+            out.speed = NAN;
+          } else {
+            out.speed = (float)ptr->SPEED * (float)(0.01 / 3.6) * (float)speedSign();
+          }
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.fault_wdc = ptr->FLTWDC ? true : false;
@@ -481,10 +495,26 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportWheelSpeed *ptr = (const MsgReportWheelSpeed*)msg->data.elems;
           dbw_mkz_msgs::WheelSpeedReport out;
           out.header.stamp = msg->header.stamp;
-          out.front_left  = (float)ptr->front_left  * 0.01f;
-          out.front_right = (float)ptr->front_right * 0.01f;
-          out.rear_left   = (float)ptr->rear_left   * 0.01f;
-          out.rear_right  = (float)ptr->rear_right  * 0.01f;
+          if ((uint16_t)ptr->front_left == 0x8000) {
+            out.front_left = NAN;
+          } else {
+            out.front_left = (float)ptr->front_left * 0.01f;
+          }
+          if ((uint16_t)ptr->front_right == 0x8000) {
+            out.front_right = NAN;
+          } else {
+            out.front_right = (float)ptr->front_right * 0.01f;
+          }
+          if ((uint16_t)ptr->rear_left == 0x8000) {
+            out.rear_left = NAN;
+          } else {
+            out.rear_left = (float)ptr->rear_left * 0.01f;
+          }
+          if ((uint16_t)ptr->rear_right == 0x8000) {
+            out.rear_right = NAN;
+          } else {
+            out.rear_right = (float)ptr->rear_right * 0.01f;
+          }
           pub_wheel_speeds_.publish(out);
           publishJointStates(msg->header.stamp, &out, NULL);
         }
@@ -508,10 +538,26 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportTirePressure *ptr = (const MsgReportTirePressure*)msg->data.elems;
           dbw_mkz_msgs::TirePressureReport out;
           out.header.stamp = msg->header.stamp;
-          out.front_left  = (float)ptr->front_left;
-          out.front_right = (float)ptr->front_right;
-          out.rear_left   = (float)ptr->rear_left;
-          out.rear_right  = (float)ptr->rear_right;
+          if (ptr->front_left == 0xFFFF) {
+            out.front_left = NAN;
+          } else {
+            out.front_left = (float)ptr->front_left;
+          }
+          if (ptr->front_right == 0xFFFF) {
+            out.front_right = NAN;
+          } else {
+            out.front_right = (float)ptr->front_right;
+          }
+          if (ptr->rear_left == 0xFFFF) {
+            out.rear_left = NAN;
+          } else {
+            out.rear_left = (float)ptr->rear_left;
+          }
+          if (ptr->rear_right == 0xFFFF) {
+            out.rear_right = NAN;
+          } else {
+            out.rear_right = (float)ptr->rear_right;
+          }
           pub_tire_pressure_.publish(out);
         }
         break;
@@ -572,10 +618,26 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportBrakeInfo *ptr = (const MsgReportBrakeInfo*)msg->data.elems;
           dbw_mkz_msgs::BrakeInfoReport out;
           out.header.stamp = msg->header.stamp;
-          out.brake_torque_request = (float)ptr->brake_torque_request * 4.0f;
-          out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0f;
-          out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0f;
-          out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035f;
+          if (ptr->brake_torque_request == 0xFFF) {
+            out.brake_torque_request = NAN;
+          } else {
+            out.brake_torque_request = (float)ptr->brake_torque_request * 4.0f;
+          }
+          if (ptr->brake_torque_actual == 0xFFF) {
+            out.brake_torque_actual = NAN;
+          } else {
+            out.brake_torque_actual = (float)ptr->brake_torque_actual * 4.0f;
+          }
+          if ((uint16_t)ptr->wheel_torque == 0xE000) {
+            out.wheel_torque_actual = NAN;
+          } else {
+            out.wheel_torque_actual = (float)ptr->wheel_torque * 4.0f;
+          }
+          if ((uint16_t)ptr->accel_over_ground_est == 0xE00) {
+            out.accel_over_ground = NAN;
+          } else {
+            out.accel_over_ground = (float)ptr->accel_over_ground_est * 0.035f;
+          }
           out.brake_pedal_qf.value = ptr->bped_qf;
           out.hsa.status = ptr->hsa_stat;
           out.hsa.mode = ptr->hsa_mode;
@@ -599,10 +661,22 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           const MsgReportThrottleInfo *ptr = (const MsgReportThrottleInfo*)msg->data.elems;
           dbw_mkz_msgs::ThrottleInfoReport out;
           out.header.stamp = msg->header.stamp;
-          out.throttle_pc = (float)ptr->throttle_pc * 1e-3f;
-          out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
+          if (ptr->throttle_pc == 0x3FF) {
+            out.throttle_pc = NAN;
+          } else {
+            out.throttle_pc = (float)ptr->throttle_pc * 1e-3f;
+          }
+          if ((uint8_t)ptr->throttle_rate == 0x80) {
+            out.throttle_rate = NAN;
+          } else {
+            out.throttle_rate = (float)ptr->throttle_rate * 4e-4f;
+          }
           out.throttle_pedal_qf.value = ptr->aped_qf;
-          out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
+          if (ptr->engine_rpm == 0xFFFF) {
+            out.engine_rpm = NAN;
+          } else {
+            out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
+          }
           out.gear_num.num = ptr->gear_num;      
           pub_throttle_info_.publish(out);
           if (ptr->aped_qf != dbw_mkz_msgs::QualityFactor::OK) {
@@ -805,11 +879,31 @@ void DbwNode::recvCanImu(const std::vector<can_msgs::Frame::ConstPtr> &msgs) {
     out.header.stamp = msgs[0]->header.stamp;
     out.header.frame_id = frame_id_;
     out.orientation_covariance[0] = -1; // Orientation not present
-    out.linear_acceleration.x = (double)ptr_accel->accel_long * 0.01;
-    out.linear_acceleration.y = (double)ptr_accel->accel_lat * -0.01;
-    out.linear_acceleration.z = (double)ptr_accel->accel_vert * -0.01;
-    out.angular_velocity.x = (double)ptr_gyro->gyro_roll * 0.0002;
-    out.angular_velocity.z = (double)ptr_gyro->gyro_yaw * 0.0002;
+    if ((uint16_t)ptr_accel->accel_long == 0x8000) {
+      out.linear_acceleration.x = NAN;
+    } else {
+      out.linear_acceleration.x = (double)ptr_accel->accel_long * 0.01;
+    }
+    if ((uint16_t)ptr_accel->accel_lat == 0x8000) {
+      out.linear_acceleration.y = NAN;
+    } else {
+      out.linear_acceleration.y = (double)ptr_accel->accel_lat * -0.01;
+    }
+    if ((uint16_t)ptr_accel->accel_vert == 0x8000) {
+      out.linear_acceleration.z = NAN;
+    } else {
+      out.linear_acceleration.z = (double)ptr_accel->accel_vert * -0.01;
+    }
+    if ((uint16_t)ptr_gyro->gyro_roll == 0x8000) {
+      out.angular_velocity.x = NAN;
+    } else {
+      out.angular_velocity.x = (double)ptr_gyro->gyro_roll * 0.0002;
+    }
+    if ((uint16_t)ptr_gyro->gyro_yaw == 0x8000) {
+      out.angular_velocity.z = NAN;
+    } else {
+      out.angular_velocity.z = (double)ptr_gyro->gyro_yaw * 0.0002;
+    }
     pub_imu_.publish(out);
   }
 #if 0

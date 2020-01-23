@@ -1569,20 +1569,30 @@ void DbwNode::publishJointStates(const ros::Time &stamp, const dbw_mkz_msgs::Whe
 {
   double dt = (stamp - joint_state_.header.stamp).toSec();
   if (wheels) {
-    joint_state_.velocity[JOINT_FL] = wheels->front_left;
-    joint_state_.velocity[JOINT_FR] = wheels->front_right;
-    joint_state_.velocity[JOINT_RL] = wheels->rear_left;
-    joint_state_.velocity[JOINT_RR] = wheels->rear_right;
+    if (std::isfinite(wheels->front_left)) {
+      joint_state_.velocity[JOINT_FL] = wheels->front_left;
+    }
+    if (std::isfinite(wheels->front_right)) {
+      joint_state_.velocity[JOINT_FR] = wheels->front_right;
+    }
+    if (std::isfinite(wheels->rear_left)) {
+      joint_state_.velocity[JOINT_RL] = wheels->rear_left;
+    }
+    if (std::isfinite(wheels->rear_right)) {
+      joint_state_.velocity[JOINT_RR] = wheels->rear_right;
+    }
   }
   if (steering) {
-    const double L = acker_wheelbase_;
-    const double W = acker_track_;
-    const double r = L / tan(steering->steering_wheel_angle / steering_ratio_);
-    joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
-    joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
+    if (std::isfinite(steering->steering_wheel_angle)) {
+      const double L = acker_wheelbase_;
+      const double W = acker_track_;
+      const double r = L / tan(steering->steering_wheel_angle / steering_ratio_);
+      joint_state_.position[JOINT_SL] = atan(L / (r - W/2));
+      joint_state_.position[JOINT_SR] = atan(L / (r + W/2));
+    }
   }
   if (dt < 0.5) {
-    for (unsigned int i = JOINT_FL; i <= JOINT_RR; i++) {
+    for (size_t i = JOINT_FL; i <= JOINT_RR; i++) {
       joint_state_.position[i] = fmod(joint_state_.position[i] + dt * joint_state_.velocity[i], 2*M_PI);
     }
   }

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.7 (2020-02-14)
+------------------
 * Update firmware versions
 * Report NAN for signals that are unavailable/faulted
 * Use fewer function calls to setup message sync

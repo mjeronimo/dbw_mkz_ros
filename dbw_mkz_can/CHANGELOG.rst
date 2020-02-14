@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update firmware versions
+* Report NAN for signals that are unavailable/faulted
+* Use fewer function calls to setup message sync
+* Add Lincoln Aviator to list of platforms
+* Contributors: Kevin Hallenbeck
+
 1.2.6 (2019-11-11)
 ------------------
 

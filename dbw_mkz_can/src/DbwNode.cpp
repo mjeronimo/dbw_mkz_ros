@@ -411,6 +411,12 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
                 case dbw_mkz_msgs::GearReject::VEHICLE:
                   ROS_WARN("Gear shift rejected: Rejected by vehicle, try pressing the brakes");
                   break;
+                case dbw_mkz_msgs::GearReject::UNSUPPORTED:
+                  ROS_WARN("Gear shift rejected: Unsupported gear command");
+                  break;
+                case dbw_mkz_msgs::GearReject::FAULT:
+                  ROS_WARN("Gear shift rejected: System in fault state");
+                  break;
               }
             }
           }

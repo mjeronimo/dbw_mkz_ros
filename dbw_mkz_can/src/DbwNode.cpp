@@ -188,11 +188,16 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   pub_gps_fix_ = node.advertise<sensor_msgs::NavSatFix>("gps/fix", 10);
   pub_gps_vel_ = node.advertise<geometry_msgs::TwistStamped>("gps/vel", 10);
   pub_gps_time_ = node.advertise<sensor_msgs::TimeReference>("gps/time", 10);
-  pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10);
   pub_twist_ = node.advertise<geometry_msgs::TwistStamped>("twist", 10);
   pub_vin_ = node.advertise<std_msgs::String>("vin", 1, true);
   pub_sys_enable_ = node.advertise<std_msgs::Bool>("dbw_enabled", 1, true);
   publishDbwEnabled();
+
+  // Publish joint states if enabled
+  priv_nh.param("joint_states", enable_joint_states_, true);
+  if (enable_joint_states_) {
+    pub_joint_states_ = node.advertise<sensor_msgs::JointState>("joint_states", 10);
+  }
 
   // Setup Subscribers
   const ros::TransportHints NODELAY = ros::TransportHints().tcpNoDelay();
@@ -367,7 +372,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           twist.twist.linear.x = out.speed;
           twist.twist.angular.z = out.speed * tan(out.steering_wheel_angle / steering_ratio_) / acker_wheelbase_;
           pub_twist_.publish(twist);
-          publishJointStates(msg->header.stamp, NULL, &out);
+          if (enable_joint_states_) {
+            publishJointStates(msg->header.stamp, NULL, &out);
+          }
           if (ptr->FLTBUS1 || ptr->FLTBUS2 || ptr->FLTPWR) {
             ROS_WARN_THROTTLE(5.0, "Steering fault. FLT1: %s FLT2: %s FLTPWR: %s",
                 ptr->FLTBUS1 ? "true, " : "false,",
@@ -522,7 +529,9 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.rear_right = (float)ptr->rear_right * 0.01f;
           }
           pub_wheel_speeds_.publish(out);
-          publishJointStates(msg->header.stamp, &out, NULL);
+          if (enable_joint_states_) {
+            publishJointStates(msg->header.stamp, &out, NULL);
+          }
         }
         break;
 

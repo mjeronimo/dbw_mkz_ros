@@ -161,12 +161,12 @@ DbwNode::DbwNode(ros::NodeHandle &node, ros::NodeHandle &priv_nh)
   joint_state_.velocity.resize(JOINT_COUNT);
   joint_state_.effort.resize(JOINT_COUNT);
   joint_state_.name.resize(JOINT_COUNT);
-  joint_state_.name[JOINT_FL] = "wheel_fl"; // Front Left
-  joint_state_.name[JOINT_FR] = "wheel_fr"; // Front Right
-  joint_state_.name[JOINT_RL] = "wheel_rl"; // Rear Left
-  joint_state_.name[JOINT_RR] = "wheel_rr"; // Rear Right
-  joint_state_.name[JOINT_SL] = "steer_fl";
-  joint_state_.name[JOINT_SR] = "steer_fr";
+  joint_state_.name[JOINT_FL] = "wheel_fl_joint"; // Front Left
+  joint_state_.name[JOINT_FR] = "wheel_fr_joint"; // Front Right
+  joint_state_.name[JOINT_RL] = "wheel_rl_joint"; // Rear Left
+  joint_state_.name[JOINT_RR] = "wheel_rr_joint"; // Rear Right
+  joint_state_.name[JOINT_SL] = "steer_fl_joint";
+  joint_state_.name[JOINT_SR] = "steer_fr_joint";
 
   // Setup Publishers
   pub_can_ = node.advertise<can_msgs::Frame>("can_tx", 10);

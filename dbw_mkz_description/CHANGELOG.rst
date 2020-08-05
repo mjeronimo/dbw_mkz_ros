@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.10 (2020-08-05)
+-------------------
 * Change names of joints to be different from links
   Gazebo 11 doesn't let joint names and link names be the same, which was allowed in earlier versions
 * Contributors: Micho Radovnikovich

@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.10 (2020-08-05)
+-------------------
 * Only publish joint states from DbwNode if set to load URDF model
   The joint states messages from DbwNode collide with the joint states published by the Gazebo simulator otherwise.
 * Change names of joints to be different from links

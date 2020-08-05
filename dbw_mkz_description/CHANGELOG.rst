@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Change names of joints to be different from links
+  Gazebo 11 doesn't let joint names and link names be the same, which was allowed in earlier versions
+* Contributors: Micho Radovnikovich
+
 1.2.9 (2020-07-09)
 ------------------
 * Increase CMake minimum version to 3.0.2 to avoid warning about CMP0048

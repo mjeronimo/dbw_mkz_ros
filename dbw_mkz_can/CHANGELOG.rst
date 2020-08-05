@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Only publish joint states from DbwNode if set to load URDF model
+  The joint states messages from DbwNode collide with the joint states published by the Gazebo simulator otherwise.
+* Change names of joints to be different from links
+  Gazebo 11 doesn't let joint names and link names be the same, which was allowed in earlier versions
+* Contributors: Kevin Hallenbeck, Micho Radovnikovich
+
 1.2.9 (2020-07-09)
 ------------------
 * Add gear reject enumerations

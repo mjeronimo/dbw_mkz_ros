@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.9 (2020-07-09)
 ------------------
 * Increase CMake minimum version to 3.0.2 to avoid warning about CMP0048

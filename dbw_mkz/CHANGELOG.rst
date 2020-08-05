@@ -2,6 +2,9 @@
 Changelog for package dbw_mkz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.2.9 (2020-07-09)
 ------------------
 * Add Ubuntu Focal and ROS Noetic to ROS install script

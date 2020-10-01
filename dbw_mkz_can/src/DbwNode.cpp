@@ -692,7 +692,12 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           } else {
             out.engine_rpm = (float)ptr->engine_rpm * 0.25f;
           }
-          out.gear_num.num = ptr->gear_num;      
+          out.gear_num.num = ptr->gear_num;
+          if ((uint16_t)ptr->batt_curr == 0xE000) {
+            out.batt_curr = NAN;
+          } else {
+            out.batt_curr = (float)ptr->batt_curr * 0.0625f;
+          }
           pub_throttle_info_.publish(out);
           if (ptr->aped_qf != dbw_mkz_msgs::QualityFactor::OK) {
             ROS_WARN_THROTTLE(5.0, "Throttle pedal limp-home: %u", ptr->aped_qf);

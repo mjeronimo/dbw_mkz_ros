@@ -115,7 +115,8 @@ typedef struct {
   uint8_t IGNORE :1;
   uint8_t :1;
   uint8_t QUIET :1;
-  uint8_t :2;
+  uint8_t RES1 :1;
+  uint8_t :1;
   uint8_t CMD_TYPE :1;
   uint8_t SVEL;
   uint8_t :8;
@@ -142,7 +143,8 @@ typedef struct {
 
 typedef struct {
   uint8_t GCMD :3;
-  uint8_t :4;
+  uint8_t :3;
+  uint8_t RES1 :1;
   uint8_t CLEAR :1;
 } MsgGearCmd;
 

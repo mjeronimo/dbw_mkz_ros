@@ -243,7 +243,7 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
           faultWatchdog(ptr->FLTWDC, ptr->WDCSRC, ptr->WDCBRK);
           dbw_mkz_msgs::BrakeReport out;
           out.header.stamp = msg->header.stamp;
-          if (ptr->BTYPE == 0) {
+          if (ptr->BTYPE == 0 || firmware_.findModule(M_BPEC).valid()) {
             // Brake pedal emulator for hybrid electric vehicles
             out.pedal_input  = (float)ptr->PI / UINT16_MAX;
             out.pedal_cmd    = (float)ptr->PC / UINT16_MAX;
@@ -251,22 +251,20 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
             out.torque_input  = brakeTorqueFromPedal(out.pedal_input);
             out.torque_cmd    = brakeTorqueFromPedal(out.pedal_cmd);
             out.torque_output = brakeTorqueFromPedal(out.pedal_output);
-            out.decel_cmd = 0;
-            out.decel_output = 0;
-          } else {
+          } else if (ptr->BTYPE == 1 || firmware_.findModule(M_ABS).valid()) {
             // ACC/AEB braking for non-hybrid vehicles
-            out.pedal_input = 0;
-            out.pedal_cmd = 0;
-            out.pedal_output = 0;
             out.torque_input = ptr->PI;
-            out.torque_cmd = 0;
-            out.torque_output = 0;
             out.decel_cmd    = ptr->PC * 1e-3f;
             out.decel_output = ptr->PO * 1e-3f;
+          } else if (ptr->BTYPE == 2) {
+            // Brake pedal actuator for vehicles without brake-by-wire
+            out.torque_input = ptr->PI;
+            out.torque_cmd = ptr->PC;
+            out.torque_output = ptr->PO;
+          } else {
+            ROS_WARN_THROTTLE(5.0, "Unsupported brake report type: %u", ptr->BTYPE);
           }
-          out.boo_input  = ptr->BI ? true : false;
           out.boo_cmd    = ptr->BC ? true : false;
-          out.boo_output = ptr->BI || ptr->BC;
           out.enabled = ptr->ENABLED ? true : false;
           out.override = ptr->OVERRIDE ? true : false;
           out.driver = ptr->DRIVER ? true : false;

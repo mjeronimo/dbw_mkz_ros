@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.0 (2020-11-18)
+------------------
 * Add brake pedal actuator brake type
 * Add Ford Ranger platform
 * Add reserved bit to prevent warnings

@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add brake pedal actuator brake type
+* Add Ford Ranger platform
+* Add reserved bit to prevent warnings
+* Add battery current measurement
+* Contributors: Kevin Hallenbeck, Sun Hwang
+
 1.2.11 (2020-08-17)
 -------------------
 * Bump firmware versions

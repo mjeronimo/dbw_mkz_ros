@@ -2,6 +2,12 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add brake pedal actuator brake type
+* Add battery current measurement
+* Contributors: Kevin Hallenbeck, Sun Hwang
+
 1.2.11 (2020-08-17)
 -------------------
 

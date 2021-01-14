@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add hazard light enumeration to turn signal status
+* Contributors: Kevin Hallenbeck
+
 1.3.0 (2020-11-18)
 ------------------
 * Add brake pedal actuator brake type

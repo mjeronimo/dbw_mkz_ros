@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.1 (2021-01-14)
+------------------
 * Bump firmware versions
 * Contributors: Kevin Hallenbeck
 

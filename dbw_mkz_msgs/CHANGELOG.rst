@@ -2,8 +2,8 @@
 Changelog for package dbw_mkz_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.1 (2021-01-14)
+------------------
 * Add hazard light enumeration to turn signal status
 * Contributors: Kevin Hallenbeck
 

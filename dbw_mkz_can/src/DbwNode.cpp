@@ -821,15 +821,17 @@ void DbwNode::recvCAN(const can_msgs::Frame::ConstPtr& msg)
               pub_vin_.publish(msg);
               ROS_INFO("Licensing: VIN: %s", vin_.c_str());
             }
-          } else if (ptr->mux == LIC_MUX_F0) {
-            const char * const NAME = "BASE"; // Base functionality
+          } else if ((LIC_MUX_F0 <= ptr->mux) && (ptr->mux <= LIC_MUX_F7)) {
+            constexpr std::array<const char*, 8> NAME = {"BASE","CONTROL","SENSORS","","","","",""};
+            const size_t i = ptr->mux - LIC_MUX_F0;
+            const int id = module * NAME.size() + i;
             if (ptr->license.enabled) {
-              ROS_INFO_ONCE_ID(module, "Licensing: %s feature '%s' enabled%s", str_m, NAME, ptr->license.trial ? " as a counted trial" : "");
+              ROS_INFO_ONCE_ID(id, "Licensing: %s feature '%s' enabled%s", str_m, NAME[i], ptr->license.trial ? " as a counted trial" : "");
             } else if (ptr->ready) {
-              ROS_WARN_ONCE_ID(module, "Licensing: %s feature '%s' not licensed. Visit https://www.dataspeedinc.com/products/maintenance-subscription/ to request a license.", str_m, NAME);
+              ROS_WARN_ONCE_ID(id, "Licensing: %s feature '%s' not licensed. Visit https://www.dataspeedinc.com/products/maintenance-subscription/ to request a license.", str_m, NAME[i]);
             }
             if (ptr->ready && (module == M_STEER) && (ptr->license.trial || !ptr->license.enabled)) {
-              ROS_INFO_ONCE("Licensing: Feature '%s' trials used: %u, remaining: %u", NAME,
+              ROS_INFO_ONCE("Licensing: Feature '%s' trials used: %u, remaining: %u", NAME[i],
                             ptr->license.trials_used, ptr->license.trials_left);
             }
           }

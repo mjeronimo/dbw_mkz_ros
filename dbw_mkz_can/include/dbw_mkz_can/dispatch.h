@@ -365,7 +365,14 @@ typedef struct {
 } MsgReportDriverAssist;
 
 typedef enum {
-  LIC_MUX_F0     = 0x00, // Feature 0 (Main)
+  LIC_MUX_F0     = 0x00, // Feature 0 (BASE)
+  LIC_MUX_F1     = 0x01, // Feature 1 (CONTROL)
+  LIC_MUX_F2     = 0x02, // Feature 2 (SENSORS)
+  LIC_MUX_F3     = 0x03, // Feature 3 (unused)
+  LIC_MUX_F4     = 0x04, // Feature 4 (unused)
+  LIC_MUX_F5     = 0x05, // Feature 5 (unused)
+  LIC_MUX_F6     = 0x06, // Feature 6 (unused)
+  LIC_MUX_F7     = 0x07, // Feature 7 (unused)
   LIC_MUX_LDATE0 = 0x41,
   LIC_MUX_LDATE1 = 0x42,
   LIC_MUX_MAC    = 0x80,

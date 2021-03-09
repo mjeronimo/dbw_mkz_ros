@@ -2,6 +2,14 @@
 Changelog for package dbw_mkz_can
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump firmware versions
+* License multiple features individually
+* Add option to use socketcan hardware
+* Add Ford Edge platform
+* Contributors: Kevin Hallenbeck
+
 1.3.1 (2021-01-14)
 ------------------
 * Bump firmware versions

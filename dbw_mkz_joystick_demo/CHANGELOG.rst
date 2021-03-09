@@ -2,6 +2,11 @@
 Changelog for package dbw_mkz_joystick_demo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add option to use socketcan hardware
+* Contributors: Kevin Hallenbeck
+
 1.3.1 (2021-01-14)
 ------------------
 
